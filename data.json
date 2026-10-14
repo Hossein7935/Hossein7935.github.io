@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-14T12:29:00.700Z",
+  "updatedAt": "2026-10-14T12:31:42.596Z",
   "data": {
     "CHN": {
       "rate": {
@@ -246,24 +246,13 @@
     "y10": 1
   },
   "errors": [
-    "Inflation CHN CPALTT01CNM659N: letzter Wert 2025-04-01 ist älter als 120 Tage",
-    "Inflation CHN CPALTT01CNQ659N: letzter Wert 2025-01-01 ist älter als 200 Tage",
-    "Inflation CHN: keine CPI-Reihe bei FRED verfügbar",
-    "Inflation USA CPALTT01USM659N: letzter Wert 2025-04-01 ist älter als 120 Tage",
-    "Inflation USA CPALTT01USQ659N: letzter Wert 2025-01-01 ist älter als 200 Tage",
-    "Inflation USA: keine CPI-Reihe bei FRED verfügbar",
-    "Inflation JPN CPALTT01JPM659N: letzter Wert 2021-06-01 ist älter als 120 Tage",
-    "Inflation JPN CPALTT01JPQ659N: letzter Wert 2021-04-01 ist älter als 200 Tage",
-    "Inflation JPN: keine CPI-Reihe bei FRED verfügbar",
-    "Inflation FRA CPALTT01FRM659N: letzter Wert 2025-03-01 ist älter als 120 Tage",
-    "Inflation FRA CPALTT01FRQ659N: letzter Wert 2025-01-01 ist älter als 200 Tage",
-    "Inflation FRA: keine CPI-Reihe bei FRED verfügbar",
-    "Inflation DEU CPALTT01DEM659N: letzter Wert 2025-03-01 ist älter als 120 Tage",
-    "Inflation DEU CPALTT01DEQ659N: letzter Wert 2025-01-01 ist älter als 200 Tage",
-    "Inflation DEU: keine CPI-Reihe bei FRED verfügbar",
-    "Inflation AUS CPALTT01AUM659N: HTTP 404",
-    "Inflation AUS CPALTT01AUQ659N: letzter Wert 2025-01-01 ist älter als 200 Tage",
-    "Inflation AUS: keine CPI-Reihe bei FRED verfügbar",
+    "OECD-G20-Inflation: HTTP 500",
+    "Inflation CHN: keine aktuelle CPI-Reihe verfügbar",
+    "Inflation USA: keine aktuelle CPI-Reihe verfügbar",
+    "Inflation JPN: keine aktuelle CPI-Reihe verfügbar",
+    "Inflation FRA: keine aktuelle CPI-Reihe verfügbar",
+    "Inflation DEU: keine aktuelle CPI-Reihe verfügbar",
+    "Inflation AUS: keine aktuelle CPI-Reihe verfügbar",
     "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer",
     "OECD-Langfristzinsen: HTTP 500",
     "10-Jahres-Rendite CHN: FRED-Fallback HTTP 404",
