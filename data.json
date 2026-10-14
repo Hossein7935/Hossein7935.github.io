@@ -1,11 +1,16 @@
 {
-  "updatedAt": "2026-10-14T12:02:28.227Z",
+  "updatedAt": "2026-10-14T12:18:26.735Z",
   "data": {
     "CHN": {
       "rate": {
         "value": 3,
         "date": "2026-10-06",
         "source": "BIS · Central bank policy rates"
+      },
+      "gdp": {
+        "value": 4.5,
+        "date": "IMF WEO · 2026",
+        "source": "IMF DataMapper · NGDP_RPCH"
       }
     },
     "USA": {
@@ -13,6 +18,11 @@
         "value": 3.875,
         "date": "2026-10-06",
         "source": "BIS · Central bank policy rates"
+      },
+      "gdp": {
+        "value": 2.3,
+        "date": "IMF WEO · 2026",
+        "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
         "value": 4.79,
@@ -31,6 +41,11 @@
         "date": "2026-10-06",
         "source": "BIS · Central bank policy rates"
       },
+      "gdp": {
+        "value": 0.7,
+        "date": "IMF WEO · 2026",
+        "source": "IMF DataMapper · NGDP_RPCH"
+      },
       "y10": {
         "value": 2.94,
         "date": "2026-08-01",
@@ -39,9 +54,14 @@
     },
     "FRA": {
       "rate": {
-        "value": 3,
-        "date": "1998-12-31",
-        "source": "BIS · Central bank policy rates"
+        "value": 2.5,
+        "date": "2026-10-14",
+        "source": "ECB · Einlagefazilität"
+      },
+      "gdp": {
+        "value": 0.4,
+        "date": "IMF WEO · 2026",
+        "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
         "value": 4,
@@ -51,9 +71,14 @@
     },
     "DEU": {
       "rate": {
-        "value": 3,
-        "date": "1998-12-31",
-        "source": "BIS · Central bank policy rates"
+        "value": 2.5,
+        "date": "2026-10-14",
+        "source": "ECB · Einlagefazilität"
+      },
+      "gdp": {
+        "value": 1.3,
+        "date": "IMF WEO · 2026",
+        "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
         "value": 3.18,
@@ -67,6 +92,11 @@
         "date": "2026-09-24",
         "source": "BIS · Central bank policy rates"
       },
+      "gdp": {
+        "value": 1.9,
+        "date": "IMF WEO · 2026",
+        "source": "IMF DataMapper · NGDP_RPCH"
+      },
       "y10": {
         "value": 5.015,
         "date": "2026-08-01",
@@ -76,12 +106,36 @@
   },
   "histories": {},
   "forecasts": {
-    "CHN": {},
-    "USA": {},
-    "JPN": {},
-    "FRA": {},
-    "DEU": {},
-    "AUS": {}
+    "CHN": {
+      "2026": 4.5,
+      "2027": 4,
+      "2028": 4
+    },
+    "USA": {
+      "2026": 2.3,
+      "2027": 2.3,
+      "2028": 2.1
+    },
+    "JPN": {
+      "2026": 0.7,
+      "2027": 0.7,
+      "2028": 0.6
+    },
+    "FRA": {
+      "2026": 0.4,
+      "2027": 0.7,
+      "2028": 1.2
+    },
+    "DEU": {
+      "2026": 1.3,
+      "2027": 1.1,
+      "2028": 1.1
+    },
+    "AUS": {
+      "2026": 1.9,
+      "2027": 1.6,
+      "2028": 1.8
+    }
   },
   "forecastYears": [
     2026,
@@ -92,18 +146,24 @@
     "inflation": 0,
     "gdp": 0,
     "imf": {
-      "2026": 0,
-      "2027": 0,
-      "2028": 0
+      "2026": 6,
+      "2027": 6,
+      "2028": 6
     },
     "rate": 6,
     "y2": 1,
     "y10": 5
   },
   "errors": [
-    "Inflation: HTTP 500",
+    "OECD Inflation M: HTTP 500",
+    "OECD Inflation Q: HTTP 500",
+    "Inflation CHN: OECD liefert keine gültigen Monats- oder Quartalswerte",
+    "Inflation USA: OECD liefert keine gültigen Monats- oder Quartalswerte",
+    "Inflation JPN: OECD liefert keine gültigen Monats- oder Quartalswerte",
+    "Inflation FRA: OECD liefert keine gültigen Monats- oder Quartalswerte",
+    "Inflation DEU: OECD liefert keine gültigen Monats- oder Quartalswerte",
+    "Inflation AUS: OECD liefert keine gültigen Monats- oder Quartalswerte",
     "BIP-Quartale: HTTP 500",
-    "IMF-Prognose: HTTP 403",
     "OECD-Langfristzinsen: HTTP 500",
     "10-Jahres-Rendite CHN: FRED-Fallback HTTP 404",
     "2-Jahres-Renditen außerhalb der USA: TRADING_ECONOMICS_API_KEY als GitHub Actions Secret fehlt"
