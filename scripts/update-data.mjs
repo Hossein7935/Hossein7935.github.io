@@ -61,92 +61,96 @@ function saveHistory(key, points) { histories[key]=points.slice(-5); }
 function latest(rows) { return rows.filter(x=>x && Number.isFinite(Number(x.value)) && x.period).sort((a,b)=>String(a.period).localeCompare(String(b.period))).at(-1) || null; }
 function err(label,e) { errors.push(`${label}: ${e?.message || String(e)}`); }
 
+async function fetchFredSeries(seriesId, startDate = '2024-01-01') {
+  const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${seriesId}&cosd=${startDate}`;
+  const rows = csvParse(await getText(url, 'text/csv, text/plain;q=0.9, */*;q=0.8'));
+  const col = Object.keys(rows[0] || {}).find(k => k === seriesId);
+  if (!col) throw new Error(`FRED-Reihe ${seriesId} fehlt in der CSV`);
+  return rows.map(r => ({
+    date: r.observation_date || r.DATE || r.date,
+    value: r[col] === '' || r[col] === '.' || r[col] === undefined ? NaN : Number(r[col])
+  })).filter(p => p.date && Number.isFinite(p.value)).sort((a, b) => a.date.localeCompare(b.date));
+}
+const cpiSeries = {
+  CHN: ['CPALTT01CNM657N', 'CPALTT01CNQ657N'],
+  USA: ['CPALTT01USM657N', 'CPALTT01USQ657N'],
+  JPN: ['CPALTT01JPM657N', 'CPALTT01JPQ657N'],
+  FRA: ['CPALTT01FRM657N', 'CPALTT01FRQ657N'],
+  DEU: ['CPALTT01DEM657N', 'CPALTT01DEQ657N'],
+  AUS: ['CPALTT01AUM657N', 'CPALTT01AUQ657N']
+};
 async function loadInflation() {
-  const areaCodes = countries.map(c => c.oecd).join('+');
-  const urls = [
-    `https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/${areaCodes}.M.N.CPI.PA._T.N.GY?startPeriod=2024-10&dimensionAtObservation=AllDimensions&format=csvfile`,
-    `https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/${areaCodes}.Q.N.CPI.PA._T.N.GY?startPeriod=2024-Q1&dimensionAtObservation=AllDimensions&format=csvfile`
-  ];
-  const rowsByFrequency = { M: [], Q: [] };
-  for (const [i, url] of urls.entries()) {
-    const freq = i === 0 ? 'M' : 'Q';
-    try {
-      rowsByFrequency[freq] = csvParse(await getText(url, 'text/csv, text/plain;q=0.9, */*;q=0.8'));
-    } catch (e) {
-      errors.push(`OECD Inflation ${freq}: ${e.message}`);
-    }
-  }
   let count = 0;
   for (const c of countries) {
-    const monthly = rowsByFrequency.M
-      .filter(r => area(r) === c.oecd && /^\d{4}-\d{2}$/.test(period(r)) && Number.isFinite(observation(r)))
-      .map(r => ({ period: period(r), value: observation(r) }))
-      .sort((a, b) => a.period.localeCompare(b.period));
-    const quarterly = rowsByFrequency.Q
-      .filter(r => area(r) === c.oecd && /^\d{4}-Q[1-4]$/i.test(period(r)) && Number.isFinite(observation(r)))
-      .map(r => ({ period: period(r).toUpperCase(), value: observation(r) }))
-      .sort((a, b) => a.period.localeCompare(b.period));
-    const quarters = new Map();
-    for (const p of monthly) {
-      const [y, m] = p.period.split('-').map(Number);
-      const q = `${y}-Q${Math.floor((m - 1) / 3) + 1}`;
-      if (!quarters.has(q)) quarters.set(q, []);
-      quarters.get(q).push(p.value);
+    let points = [];
+    let usedSeries = '';
+    const candidates = cpiSeries[c.id] || [];
+    for (const seriesId of candidates) {
+      try {
+        const rows = await fetchFredSeries(seriesId, '2024-01-01');
+        if (rows.length) {
+          points = rows;
+          usedSeries = seriesId;
+          break;
+        }
+      } catch (e) {
+        errors.push(`Inflation ${c.id} ${seriesId}: ${e.message}`);
+      }
     }
-    let arr = [...quarters.entries()].map(([q, values]) => ({
-      period: q, value: values.reduce((sum, v) => sum + v, 0) / values.length
-    })).sort((a, b) => a.period.localeCompare(b.period));
-    // Some OECD countries, including Australia, publish this CPI series quarterly rather than monthly.
-    if (!arr.length) arr = quarterly;
-    arr = arr.slice(-5);
-    if (arr.length) {
-      saveHistory(`${c.id}-inflation`, arr);
-      set(c.id, 'inflation', arr.at(-1).value, arr.at(-1).period, 'OECD · CPI year-over-year');
+    if (!points.length) {
+      errors.push(`Inflation ${c.id}: keine CPI-Reihe bei FRED verfügbar`);
+      continue;
+    }
+    const quarterly = new Map();
+    for (const p of points) {
+      const d = new Date(`${p.date}T00:00:00Z`);
+      const q = `${d.getUTCFullYear()}-Q${Math.floor(d.getUTCMonth() / 3) + 1}`;
+      if (!quarterly.has(q)) quarterly.set(q, []);
+      quarterly.get(q).push(p.value);
+    }
+    const history = [...quarterly.entries()].map(([period, values]) => ({
+      period, value: values.reduce((sum, v) => sum + v, 0) / values.length
+    })).sort((a, b) => a.period.localeCompare(b.period)).slice(-5);
+    if (history.length) {
+      saveHistory(`${c.id}-inflation`, history);
+      set(c.id, 'inflation', history.at(-1).value, history.at(-1).period, `FRED · CPI inflation (${usedSeries})`);
       count++;
-    } else {
-      errors.push(`Inflation ${c.id}: OECD liefert keine gültigen Monats- oder Quartalswerte`);
     }
   }
   return count;
 }
+const gdpLevelSeries = {
+  USA: 'A191RL1Q225SBEA', // real GDP, quarter-on-quarter annualized growth rate
+  JPN: 'JPNRGDPEXP',
+  FRA: 'CLVMNACSCAB1GQFR',
+  DEU: 'CLVMNACSCAB1GQDE',
+  AUS: 'AUSGDPRQDSMEI'
+};
 async function loadGDPQuarterly() {
-  const cs = countries.map(c => c.oecd).join('+');
-  const base = 'https://sdmx.oecd.org/public/rest/data/OECD.SDD.NAD,DSD_NAMAIN1@DF_QNA_EXPENDITURE_GROWTH_G20,1.1/';
-  const urls = [
-    `${base}Q..${cs}.S1..B1GQ.......?startPeriod=2024-Q1&dimensionAtObservation=AllDimensions&format=csvfile`,
-    // Fallback follows the official OECD Data Explorer query pattern, then selects the GDP-total series (B1GQ).
-    `${base}Q..${cs}..........?startPeriod=2024-Q1&dimensionAtObservation=AllDimensions&format=csvfile`
-  ];
-  let rows = null;
-  let lastError = null;
-  for (let i = 0; i < urls.length; i++) {
-    try {
-      rows = csvParse(await getText(urls[i], 'text/csv, text/plain;q=0.9, */*;q=0.8'));
-      if (rows.length) break;
-      lastError = new Error('OECD-CSV enthält keine Zeilen');
-    } catch (e) {
-      lastError = e;
-    }
-  }
-  if (!rows?.length) throw lastError || new Error('OECD-Quartalsreihe ist leer');
-  const hasB1GQ = rows.some(r => Object.values(r).some(v => String(v).trim().toUpperCase() === 'B1GQ'));
   let count = 0;
   for (const c of countries) {
-    let selected = rows.filter(r => area(r) === c.oecd && /^\d{4}-Q[1-4]$/i.test(period(r)) && Number.isFinite(observation(r)));
-    if (hasB1GQ) {
-      const gdpRows = selected.filter(r => Object.values(r).some(v => String(v).trim().toUpperCase() === 'B1GQ'));
-      if (gdpRows.length) selected = gdpRows;
+    const seriesId = gdpLevelSeries[c.id];
+    if (!seriesId) {
+      errors.push(`BIP-Quartale ${c.id}: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer`);
+      continue;
     }
-    const hasS1 = selected.some(r => Object.values(r).some(v => String(v).trim().toUpperCase() === 'S1'));
-    if (hasS1) selected = selected.filter(r => Object.values(r).some(v => String(v).trim().toUpperCase() === 'S1'));
-    const byPeriod = new Map();
-    for (const r of selected) byPeriod.set(period(r).toUpperCase(), { period: period(r).toUpperCase(), value: observation(r) });
-    const points = [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period)).slice(-5);
-    if (points.length) {
-      saveHistory(`${c.id}-gdp`, points);
+    try {
+      const raw = await fetchFredSeries(seriesId, '2024-01-01');
+      if (raw.length < 2) throw new Error('zu wenige Quartalsbeobachtungen');
+      const isGrowthSeries = c.id === 'USA';
+      const points = (isGrowthSeries
+        ? raw.map(p => ({ date: p.date, value: p.value }))
+        : raw.slice(1).map((p, i) => ({ date: p.date, value: (p.value / raw[i].value - 1) * 100 })))
+        .filter(p => Number.isFinite(p.value));
+      const latest = points.slice(-5).map(p => {
+        const d = new Date(`${p.date}T00:00:00Z`);
+        return { period: `${d.getUTCFullYear()}-Q${Math.floor(d.getUTCMonth() / 3) + 1}`, value: p.value };
+      });
+      if (!latest.length) throw new Error('keine gültigen Quartalswerte');
+      saveHistory(`${c.id}-gdp`, latest);
       count++;
-    } else {
-      errors.push(`BIP-Quartale ${c.id}: keine passenden OECD-Werte für B1GQ`);
+    } catch (e) {
+      errors.push(`BIP-Quartale ${c.id} (${seriesId}): ${e.message}`);
     }
   }
   return count;
