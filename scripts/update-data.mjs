@@ -81,45 +81,67 @@ const cpiSeries = {
   AUS: ['CPALTT01AUM659N', 'CPALTT01AUQ659N']
 };
 async function loadInflation() {
+  // Current OECD G20 series provides year-on-year CPI inflation for all six countries.
+  // Use it first; older CPALTT01 FRED mirrors are no longer updated reliably.
+  let rows = [];
+  let oecdError = null;
+  const url = 'https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_G20_PRICES@DF_G20_PRICES,1.0/all.M...PA...?startPeriod=2024-01&dimensionAtObservation=AllDimensions&format=csvfile';
+  try {
+    rows = csvParse(await getText(url, 'text/csv, text/plain;q=0.9, */*;q=0.8'));
+    if (!rows.length) throw new Error('OECD-G20-Inflationsreihe enthält keine Zeilen');
+  } catch (e) {
+    oecdError = e;
+  }
+
   let count = 0;
+  if (rows.length) {
+    for (const c of countries) {
+      const points = rows
+        .filter(r => area(r) === c.id && /^\\d{4}-\\d{2}$/.test(period(r)) && Number.isFinite(observation(r)))
+        .map(r => ({ date: period(r), value: observation(r) }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+      const p = points.at(-1);
+      if (!p) {
+        errors.push(`Inflation ${c.id}: OECD-G20 liefert keine passende aktuelle Reihe`);
+        continue;
+      }
+      const ageDays = (Date.now() - new Date(`${p.date}-01T00:00:00Z`).getTime()) / 86400000;
+      if (ageDays > 120) {
+        errors.push(`Inflation ${c.id}: letzter OECD-Wert ${p.date} ist ${Math.floor(ageDays)} Tage alt`);
+        continue;
+      }
+      const history = points.slice(-5).map(x => ({ period: x.date, value: x.value }));
+      saveHistory(`${c.id}-inflation`, history);
+      set(c.id, 'inflation', p.value, p.date, 'OECD · G20 CPI inflation, annual rate');
+      count++;
+    }
+    return count;
+  }
+
+  // Fallback for any temporary OECD outage; accept only genuinely recent observations.
+  if (oecdError) errors.push(`OECD-G20-Inflation: ${oecdError.message}`);
   for (const c of countries) {
     let points = [];
     let usedSeries = '';
-    const candidates = cpiSeries[c.id] || [];
-    for (const seriesId of candidates) {
+    for (const seriesId of (cpiSeries[c.id] || [])) {
       try {
         const rows = await fetchFredSeries(seriesId, '2024-01-01');
         const maxAgeDays = seriesId.includes('M659N') ? 120 : 200;
         const freshRows = rows.filter(p => (Date.now() - new Date(`${p.date}T00:00:00Z`).getTime()) / 86400000 <= maxAgeDays);
-        if (freshRows.length) {
-          points = freshRows;
-          usedSeries = seriesId;
-          break;
-        }
-        if (rows.length) errors.push(`Inflation ${c.id} ${seriesId}: letzter Wert ${rows.at(-1).date} ist älter als ${maxAgeDays} Tage`);
-      } catch (e) {
-        errors.push(`Inflation ${c.id} ${seriesId}: ${e.message}`);
-      }
+        if (freshRows.length) { points = freshRows; usedSeries = seriesId; break; }
+      } catch (e) { /* Keep fallback quiet; the OECD error above is the actionable cause. */ }
     }
     if (!points.length) {
-      errors.push(`Inflation ${c.id}: keine CPI-Reihe bei FRED verfügbar`);
+      errors.push(`Inflation ${c.id}: keine aktuelle CPI-Reihe verfügbar`);
       continue;
     }
-    const quarterly = new Map();
-    for (const p of points) {
+    const history = points.slice(-5).map(p => {
       const d = new Date(`${p.date}T00:00:00Z`);
-      const q = `${d.getUTCFullYear()}-Q${Math.floor(d.getUTCMonth() / 3) + 1}`;
-      if (!quarterly.has(q)) quarterly.set(q, []);
-      quarterly.get(q).push(p.value);
-    }
-    const history = [...quarterly.entries()].map(([period, values]) => ({
-      period, value: values.reduce((sum, v) => sum + v, 0) / values.length
-    })).sort((a, b) => a.period.localeCompare(b.period)).slice(-5);
-    if (history.length) {
-      saveHistory(`${c.id}-inflation`, history);
-      set(c.id, 'inflation', history.at(-1).value, history.at(-1).period, `FRED · CPI inflation (${usedSeries})`);
-      count++;
-    }
+      return { period: `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}`, value: p.value };
+    });
+    saveHistory(`${c.id}-inflation`, history);
+    set(c.id, 'inflation', history.at(-1).value, history.at(-1).period, `FRED · CPI inflation (${usedSeries})`);
+    count++;
   }
   return count;
 }
