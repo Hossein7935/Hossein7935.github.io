@@ -1,9 +1,111 @@
 {
-  "updatedAt": null,
-  "data": {},
+  "updatedAt": "2026-10-14T11:30:31.556Z",
+  "data": {
+    "CHN": {
+      "rate": {
+        "value": 3,
+        "date": "2026-10-06",
+        "source": "BIS · Central bank policy rates"
+      }
+    },
+    "USA": {
+      "rate": {
+        "value": 3.875,
+        "date": "2026-10-06",
+        "source": "BIS · Central bank policy rates"
+      },
+      "y2": {
+        "value": 4.79,
+        "date": "2026-10-13T00:00:00",
+        "source": "U.S. Treasury · Daily Par Yield Curve"
+      },
+      "y10": {
+        "value": 5.21,
+        "date": "2026-10-13T00:00:00",
+        "source": "U.S. Treasury · Daily Par Yield Curve"
+      }
+    },
+    "JPN": {
+      "rate": {
+        "value": 1.25,
+        "date": "2026-10-06",
+        "source": "BIS · Central bank policy rates"
+      },
+      "y10": {
+        "value": 2.94,
+        "date": "2026-08-01",
+        "source": "FRED/OECD · long-term government bond rate"
+      }
+    },
+    "FRA": {
+      "rate": {
+        "value": 3,
+        "date": "1998-12-31",
+        "source": "BIS · Central bank policy rates"
+      },
+      "y10": {
+        "value": 4,
+        "date": "2026-08-01",
+        "source": "FRED/OECD · long-term government bond rate"
+      }
+    },
+    "DEU": {
+      "rate": {
+        "value": 3,
+        "date": "1998-12-31",
+        "source": "BIS · Central bank policy rates"
+      },
+      "y10": {
+        "value": 3.18,
+        "date": "2026-08-01",
+        "source": "FRED/OECD · long-term government bond rate"
+      }
+    },
+    "AUS": {
+      "rate": {
+        "value": 4.35,
+        "date": "2026-09-24",
+        "source": "BIS · Central bank policy rates"
+      },
+      "y10": {
+        "value": 5.015,
+        "date": "2026-08-01",
+        "source": "FRED/OECD · long-term government bond rate"
+      }
+    }
+  },
   "histories": {},
-  "forecasts": {},
-  "forecastYears": [],
-  "counts": {},
-  "errors": ["Die erste Datenaktualisierung durch GitHub Actions steht noch aus."]
+  "forecasts": {
+    "CHN": {},
+    "USA": {},
+    "JPN": {},
+    "FRA": {},
+    "DEU": {},
+    "AUS": {}
+  },
+  "forecastYears": [
+    2026,
+    2027,
+    2028
+  ],
+  "counts": {
+    "inflation": 0,
+    "gdp": 0,
+    "imf": {
+      "2026": 0,
+      "2027": 0,
+      "2028": 0
+    },
+    "rate": 6,
+    "y2": 1,
+    "y10": 5
+  },
+  "errors": [
+    "Inflation: HTTP 500",
+    "BIP-Quartale: HTTP 500",
+    "IMF-Prognose: HTTP 403",
+    "OECD-Langfristzinsen: HTTP 500",
+    "10-Jahres-Rendite CHN: FRED-Fallback HTTP 404",
+    "2-Jahres-Renditen außerhalb der USA: TRADING_ECONOMICS_API_KEY als GitHub Actions Secret fehlt"
+  ]
 }
