@@ -16,11 +16,30 @@ const forecastYears = [nowYear, nowYear + 1, nowYear + 2];
 const forecasts = Object.fromEntries(countries.map(c => [c.id, {}]));
 
 async function getText(url, accept = '*/*') {
-  const response = await fetch(url, { headers: { Accept: accept }, signal: AbortSignal.timeout(25000), cache: 'no-store' });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const body = await response.text();
-  if (!body || body.trim().length < 2) throw new Error('leere Antwort');
-  return body;
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const response = await fetch(url, {
+        headers: { Accept: accept, 'User-Agent': 'MacroWatch/1.1 (+https://hossein7935.github.io/)' },
+        signal: AbortSignal.timeout(30000),
+        cache: 'no-store'
+      });
+      if (!response.ok) {
+        const error = new Error(`HTTP ${response.status}`);
+        if (![408, 425, 429, 500, 502, 503, 504].includes(response.status) || attempt === 2) throw error;
+        lastError = error;
+      } else {
+        const body = await response.text();
+        if (!body || body.trim().length < 2) throw new Error('leere Antwort');
+        return body;
+      }
+    } catch (e) {
+      lastError = e;
+      if (attempt === 2 || !/HTTP (408|425|429|500|502|503|504)|fetch failed|timed out|timeout|ECONNRESET|ECONNREFUSED|EAI_AGAIN/i.test(e?.message || String(e))) throw e;
+    }
+    await new Promise(resolve => setTimeout(resolve, 800 * (attempt + 1)));
+  }
+  throw lastError || new Error('Datenquelle nach mehreren Versuchen nicht erreichbar');
 }
 async function getJSON(url, accept = 'application/json') {
   const text = await getText(url, accept);
@@ -43,28 +62,92 @@ function latest(rows) { return rows.filter(x=>x && Number.isFinite(Number(x.valu
 function err(label,e) { errors.push(`${label}: ${e?.message || String(e)}`); }
 
 async function loadInflation() {
-  const url='https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/.M.N.CPI.PA._T.N.GY?startPeriod=2024-10&dimensionAtObservation=AllDimensions&format=csvfile';
-  const rows=csvParse(await getText(url,'text/csv, text/plain;q=0.9, */*;q=0.8'));
-  let count=0;
-  for(const c of countries){
-    const pts=rows.filter(r=>area(r)===c.oecd && /^\d{4}-\d{2}$/.test(period(r)) && Number.isFinite(observation(r))).map(r=>({month:period(r),value:observation(r)})).sort((a,b)=>a.month.localeCompare(b.month));
-    const quarters={};
-    for(const p of pts){const [y,m]=p.month.split('-').map(Number);const q=`${y}-Q${Math.floor((m-1)/3)+1}`;(quarters[q] ||= []).push(p.value);}
-    const arr=Object.entries(quarters).map(([q,vs])=>({period:q,value:vs.reduce((a,b)=>a+b,0)/vs.length})).sort((a,b)=>a.period.localeCompare(b.period)).slice(-5);
-    if(arr.length){saveHistory(`${c.id}-inflation`,arr);set(c.id,'inflation',arr.at(-1).value,arr.at(-1).period,'OECD · CPI year-over-year');count++;}
-    else errors.push(`Inflation ${c.id}: OECD liefert keine Monatsreihe; kein anderer Zeitraum wird als Quartal ausgegeben`);
+  const areaCodes = countries.map(c => c.oecd).join('+');
+  const urls = [
+    `https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/${areaCodes}.M.N.CPI.PA._T.N.GY?startPeriod=2024-10&dimensionAtObservation=AllDimensions&format=csvfile`,
+    `https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/${areaCodes}.Q.N.CPI.PA._T.N.GY?startPeriod=2024-Q1&dimensionAtObservation=AllDimensions&format=csvfile`
+  ];
+  const rowsByFrequency = { M: [], Q: [] };
+  for (const [i, url] of urls.entries()) {
+    const freq = i === 0 ? 'M' : 'Q';
+    try {
+      rowsByFrequency[freq] = csvParse(await getText(url, 'text/csv, text/plain;q=0.9, */*;q=0.8'));
+    } catch (e) {
+      errors.push(`OECD Inflation ${freq}: ${e.message}`);
+    }
+  }
+  let count = 0;
+  for (const c of countries) {
+    const monthly = rowsByFrequency.M
+      .filter(r => area(r) === c.oecd && /^\d{4}-\d{2}$/.test(period(r)) && Number.isFinite(observation(r)))
+      .map(r => ({ period: period(r), value: observation(r) }))
+      .sort((a, b) => a.period.localeCompare(b.period));
+    const quarterly = rowsByFrequency.Q
+      .filter(r => area(r) === c.oecd && /^\d{4}-Q[1-4]$/i.test(period(r)) && Number.isFinite(observation(r)))
+      .map(r => ({ period: period(r).toUpperCase(), value: observation(r) }))
+      .sort((a, b) => a.period.localeCompare(b.period));
+    const quarters = new Map();
+    for (const p of monthly) {
+      const [y, m] = p.period.split('-').map(Number);
+      const q = `${y}-Q${Math.floor((m - 1) / 3) + 1}`;
+      if (!quarters.has(q)) quarters.set(q, []);
+      quarters.get(q).push(p.value);
+    }
+    let arr = [...quarters.entries()].map(([q, values]) => ({
+      period: q, value: values.reduce((sum, v) => sum + v, 0) / values.length
+    })).sort((a, b) => a.period.localeCompare(b.period));
+    // Some OECD countries, including Australia, publish this CPI series quarterly rather than monthly.
+    if (!arr.length) arr = quarterly;
+    arr = arr.slice(-5);
+    if (arr.length) {
+      saveHistory(`${c.id}-inflation`, arr);
+      set(c.id, 'inflation', arr.at(-1).value, arr.at(-1).period, 'OECD · CPI year-over-year');
+      count++;
+    } else {
+      errors.push(`Inflation ${c.id}: OECD liefert keine gültigen Monats- oder Quartalswerte`);
+    }
   }
   return count;
 }
 async function loadGDPQuarterly() {
-  const cs='AUS+CHN+DEU+FRA+JPN+USA';
-  const url=`https://sdmx.oecd.org/public/rest/data/OECD.SDD.NAD,DSD_NAMAIN1@DF_QNA_EXPENDITURE_GROWTH_G20,1.1/Q..${cs}.S1..B1GQ.......?startPeriod=2024-Q1&dimensionAtObservation=AllDimensions&format=csvfile`;
-  const rows=csvParse(await getText(url,'text/csv, text/plain;q=0.9, */*;q=0.8'));
-  let count=0;
-  for(const c of countries){
-    const pts=rows.filter(r=>area(r)===c.oecd && /^\d{4}-Q[1-4]$/.test(period(r)) && Number.isFinite(observation(r))).map(r=>({period:period(r),value:observation(r)})).sort((a,b)=>a.period.localeCompare(b.period));
-    const unique=[...new Map(pts.map(p=>[p.period,p])).values()];
-    if(unique.length){saveHistory(`${c.id}-gdp`,unique.slice(-5));count++;}else errors.push(`BIP-Quartale ${c.id}: keine OECD-Quartalswerte`);
+  const cs = countries.map(c => c.oecd).join('+');
+  const base = 'https://sdmx.oecd.org/public/rest/data/OECD.SDD.NAD,DSD_NAMAIN1@DF_QNA_EXPENDITURE_GROWTH_G20,1.1/';
+  const urls = [
+    `${base}Q..${cs}.S1..B1GQ.......?startPeriod=2024-Q1&dimensionAtObservation=AllDimensions&format=csvfile`,
+    // Fallback follows the official OECD Data Explorer query pattern, then selects the GDP-total series (B1GQ).
+    `${base}Q..${cs}..........?startPeriod=2024-Q1&dimensionAtObservation=AllDimensions&format=csvfile`
+  ];
+  let rows = null;
+  let lastError = null;
+  for (let i = 0; i < urls.length; i++) {
+    try {
+      rows = csvParse(await getText(urls[i], 'text/csv, text/plain;q=0.9, */*;q=0.8'));
+      if (rows.length) break;
+      lastError = new Error('OECD-CSV enthält keine Zeilen');
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  if (!rows?.length) throw lastError || new Error('OECD-Quartalsreihe ist leer');
+  const hasB1GQ = rows.some(r => Object.values(r).some(v => String(v).trim().toUpperCase() === 'B1GQ'));
+  let count = 0;
+  for (const c of countries) {
+    let selected = rows.filter(r => area(r) === c.oecd && /^\d{4}-Q[1-4]$/i.test(period(r)) && Number.isFinite(observation(r)));
+    if (hasB1GQ) {
+      const gdpRows = selected.filter(r => Object.values(r).some(v => String(v).trim().toUpperCase() === 'B1GQ'));
+      if (gdpRows.length) selected = gdpRows;
+    }
+    const hasS1 = selected.some(r => Object.values(r).some(v => String(v).trim().toUpperCase() === 'S1'));
+    if (hasS1) selected = selected.filter(r => Object.values(r).some(v => String(v).trim().toUpperCase() === 'S1'));
+    const byPeriod = new Map();
+    for (const r of selected) byPeriod.set(period(r).toUpperCase(), { period: period(r).toUpperCase(), value: observation(r) });
+    const points = [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period)).slice(-5);
+    if (points.length) {
+      saveHistory(`${c.id}-gdp`, points);
+      count++;
+    } else {
+      errors.push(`BIP-Quartale ${c.id}: keine passenden OECD-Werte für B1GQ`);
+    }
   }
   return count;
 }
@@ -74,30 +157,90 @@ function parseBISLatest(j) {
   for(const s of Object.values(series)) for(const [idx,a] of Object.entries(s.observations||{})) { const v=Number(Array.isArray(a)?a[0]:a), t=times[Number(idx)]?.id||times[Number(idx)]?.name||''; if(t&&Number.isFinite(v))points.push({period:t,value:v}); }
   return latest(points);
 }
+function requireFreshPoint(point, maxAgeDays = 180) {
+  if (!point?.period || !Number.isFinite(Number(point.value))) throw new Error('keine gültige Beobachtung');
+  const date = new Date(point.period);
+  if (!Number.isFinite(date.getTime())) throw new Error(`ungültiges Datum ${point.period}`);
+  const ageDays = (Date.now() - date.getTime()) / 86400000;
+  if (ageDays > maxAgeDays) throw new Error(`letzter Wert ist veraltet (${point.period})`);
+  if (ageDays < -2) throw new Error(`Beobachtung liegt in der Zukunft (${point.period})`);
+  return point;
+}
 async function bisRate(areaCode) {
-  const candidates=[];
-  for(const freq of ['D','M']) {
-    try { const j=await getJSON(`https://stats.bis.org/api/v2/data/dataflow/BIS/WS_CBPOL/1.0/${freq}.${areaCode}?lastNObservations=5`,'application/vnd.sdmx.data+json;version=1.0.0'); const p=parseBISLatest(j); if(p)return p; }
-    catch(e){candidates.push(`${freq}: ${e.message}`);}
+  const candidates = [];
+  for (const freq of ['D', 'M']) {
+    try {
+      const j = await getJSON(`https://stats.bis.org/api/v2/data/dataflow/BIS/WS_CBPOL/1.0/${freq}.${areaCode}?lastNObservations=5`, 'application/vnd.sdmx.data+json;version=1.0.0');
+      const p = parseBISLatest(j);
+      if (p) return requireFreshPoint(p, 180);
+    } catch (e) {
+      candidates.push(`${freq}: ${e.message}`);
+    }
   }
-  throw new Error(candidates.join('; ')||'keine lesbaren Beobachtungen');
+  throw new Error(candidates.join('; ') || 'keine lesbaren aktuellen Beobachtungen');
+}
+async function ecbPolicyRate() {
+  const url = 'https://data-api.ecb.europa.eu/service/data/FM/D.U2.EUR.4F.KR.DFR.LEV?lastNObservations=20&format=csvdata';
+  const rows = csvParse(await getText(url, 'text/csv, text/plain;q=0.9, */*;q=0.8'));
+  const points = rows.map(r => ({ period: period(r), value: observation(r) }))
+    .filter(p => p.period && Number.isFinite(p.value))
+    .sort((a, b) => a.period.localeCompare(b.period));
+  return requireFreshPoint(points.at(-1), 180);
 }
 async function loadPolicyRates() {
-  const results=await Promise.all(countries.map(async c=>{
-    const areas=[c.bis,...(['FR','DE'].includes(c.bis)?['XM']:[])];
-    for(const a of [...new Set(areas)]){try{const p=await bisRate(a);set(c.id,'rate',p.value,p.period,'BIS · Central bank policy rates');return true;}catch{}}
-    errors.push(`Leitzins ${c.id}: BIS lieferte keine aktuelle lesbare Beobachtung`);return false;
+  let count = 0;
+  try {
+    const p = await ecbPolicyRate();
+    for (const id of ['FRA', 'DEU']) set(id, 'rate', p.value, p.period, 'ECB · Einlagefazilität');
+    count += 2;
+  } catch (e) {
+    errors.push(`Leitzins FRA/DEU: ECB-Einlagefazilität ${e.message}`);
+  }
+  const results = await Promise.all(countries.filter(c => !['FRA', 'DEU'].includes(c.id)).map(async c => {
+    try {
+      const p = await bisRate(c.bis);
+      set(c.id, 'rate', p.value, p.period, 'BIS · Central bank policy rates');
+      return true;
+    } catch (e) {
+      errors.push(`Leitzins ${c.id}: ${e.message}`);
+      return false;
+    }
   }));
-  return results.filter(Boolean).length;
+  return count + results.filter(Boolean).length;
 }
 async function loadIMFForecasts() {
-  const ids=countries.map(c=>c.id).join('/');
-  const j=await getJSON(`https://www.imf.org/external/datamapper/api/v1/NGDP_RPCH/${ids}?periods=${forecastYears.join(',')}`);
-  const series=j?.values?.NGDP_RPCH;
-  if(!series)throw new Error('IMF DataMapper enthält values.NGDP_RPCH nicht');
-  let n=0;
-  for(const c of countries){for(const year of forecastYears){const v=series[c.id]?.[year];if(v!==undefined&&v!==null&&v!==''&&Number.isFinite(Number(v))){forecasts[c.id][year]=Number(v);if(year===forecastYears[0])set(c.id,'gdp',Number(v),`IMF WEO · ${year}`,'IMF DataMapper · NGDP_RPCH');}}if(forecasts[c.id][forecastYears[0]]!==undefined)n++;else errors.push(`IMF-Prognose ${c.id}: kein Wert für ${forecastYears[0]}`);}
-  return n;
+  const ids = countries.map(c => c.id).join('/');
+  const urls = [
+    `https://www.imf.org/external/datamapper/api/v2/NGDP_RPCH/${ids}?periods=${forecastYears.join(',')}`,
+    `https://www.imf.org/external/datamapper/api/v1/NGDP_RPCH/${ids}?periods=${forecastYears.join(',')}`
+  ];
+  let j = null;
+  let lastError = null;
+  for (const url of urls) {
+    try {
+      j = await getJSON(url, 'application/json, text/plain;q=0.9, */*;q=0.8');
+      if (j?.values?.NGDP_RPCH || j?.values?.ngdp_rpch) break;
+      lastError = new Error('Antwort enthält keine NGDP_RPCH-Zeitreihe');
+      j = null;
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  const series = j?.values?.NGDP_RPCH || j?.values?.ngdp_rpch;
+  if (!series) throw lastError || new Error('IMF DataMapper liefert keine NGDP_RPCH-Zeitreihe (v1/v2)');
+  let count = 0;
+  for (const c of countries) {
+    for (const year of forecastYears) {
+      const v = series[c.id]?.[year] ?? series[c.id]?.[String(year)];
+      if (v !== undefined && v !== null && v !== '' && Number.isFinite(Number(v))) {
+        forecasts[c.id][year] = Number(v);
+        if (year === forecastYears[0]) set(c.id, 'gdp', Number(v), `IMF WEO · ${year}`, 'IMF DataMapper · NGDP_RPCH');
+      }
+    }
+    if (forecasts[c.id][forecastYears[0]] !== undefined) count++;
+    else errors.push(`IMF-Prognose ${c.id}: kein Wert für ${forecastYears[0]}`);
+  }
+  return count;
 }
 function xmlField(entry,name){const re=new RegExp(`<(?:(?:[\\w.-]+):)?${name}\\b[^>]*>([\\s\\S]*?)<\\/(?:(?:[\\w.-]+):)?${name}>`,'i');return (entry.match(re)?.[1]||'').replace(/<[^>]+>/g,'').trim();}
 async function loadUSTreasury() {
@@ -114,14 +257,58 @@ async function loadUSTreasuryFRED() {
   const pts=rows.map(r=>({date:r.observation_date,y2:Number(r.DGS2),y10:Number(r.DGS10)})).filter(r=>r.date).sort((a,b)=>a.date.localeCompare(b.date));const p=pts.reverse().find(r=>Number.isFinite(r.y2)||Number.isFinite(r.y10));if(!p)throw new Error('FRED-Treasury-Reihen ohne Zahlenwerte');if(Number.isFinite(p.y2))set('USA','y2',p.y2,p.date,'FRED · DGS2');if(Number.isFinite(p.y10))set('USA','y10',p.y10,p.date,'FRED · DGS10');return p;
 }
 async function loadOECDLongRates() {
-  const cs='AUS+CHN+DEU+FRA+JPN+USA';const url=`https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_STES@DF_FINMARK,4.0/${cs}.M.IRLT.PA.....?startPeriod=2024-01&dimensionAtObservation=AllDimensions&format=csvfile`;
-  const rows=csvParse(await getText(url,'text/csv, text/plain;q=0.9, */*;q=0.8'));let count=0;
-  for(const c of countries){if(data[c.id].y10?.source.startsWith('U.S. Treasury')||data[c.id].y10?.source.startsWith('Trading Economics')){count++;continue;}const pts=rows.filter(r=>area(r)===c.oecd&&/^\d{4}-\d{2}$/.test(period(r))&&Number.isFinite(observation(r))).map(r=>({period:period(r),value:observation(r)})).sort((a,b)=>a.period.localeCompare(b.period));const p=pts.at(-1);if(p){set(c.id,'y10',p.value,p.period,'OECD · Financial market long-term rate');count++;}else errors.push(`10-Jahres-Rendite ${c.id}: OECD-Monatsreihe fehlt`);}
+  const cs = countries.map(c => c.oecd).join('+');
+  const urls = [
+    `https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_STES@DF_FINMARK,4.0/${cs}.M.IRLT.PA.....?startPeriod=2024-01&dimensionAtObservation=AllDimensions&format=csvfile`,
+    `https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_KEI@DF_KEI,4.0/${cs}.M.IRLT....?startPeriod=2024-01&dimensionAtObservation=AllDimensions&format=csvfile`
+  ];
+  let rows = null;
+  let lastError = null;
+  for (const url of urls) {
+    try {
+      rows = csvParse(await getText(url, 'text/csv, text/plain;q=0.9, */*;q=0.8'));
+      if (rows.length) break;
+      lastError = new Error('OECD-Langfristzins-CSV enthält keine Zeilen');
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  if (!rows?.length) throw lastError || new Error('OECD-Langfristzinsreihe ist leer');
+  let count = 0;
+  for (const c of countries) {
+    if (data[c.id].y10?.source.startsWith('U.S. Treasury') || data[c.id].y10?.source.startsWith('Trading Economics')) {
+      count++;
+      continue;
+    }
+    const points = rows.filter(r => area(r) === c.oecd && /^\d{4}-\d{2}$/.test(period(r)) && Number.isFinite(observation(r)))
+      .map(r => ({ period: period(r), value: observation(r) }))
+      .sort((a, b) => a.period.localeCompare(b.period));
+    const p = points.at(-1);
+    if (p) {
+      set(c.id, 'y10', p.value, p.period, 'OECD · Financial market long-term rate');
+      count++;
+    } else errors.push(`10-Jahres-Rendite ${c.id}: OECD-Monatsreihe fehlt`);
+  }
   return count;
 }
 async function loadFREDLongRatesFallback() {
-  let count=0;
-  for(const c of countries){if(data[c.id].y10) {count++;continue;}try{const rows=csvParse(await getText(`https://fred.stlouisfed.org/graph/fredgraph.csv?id=${c.fred10}&cosd=2024-01-01`,'text/csv, text/plain;q=0.9, */*;q=0.8'));const col=Object.keys(rows[0]||{}).find(k=>k===c.fred10);const p=rows.map(r=>({period:r.observation_date,value:Number(r[col])})).filter(x=>x.period&&Number.isFinite(x.value)).at(-1);if(!p)throw new Error('keine numerische Beobachtung');set(c.id,'y10',p.value,p.period,'FRED/OECD · long-term government bond rate');count++;}catch(e){errors.push(`10-Jahres-Rendite ${c.id}: FRED-Fallback ${e.message}`);}}
+  let count = 0;
+  for (const c of countries) {
+    if (data[c.id].y10) { count++; continue; }
+    try {
+      const rows = csvParse(await getText(`https://fred.stlouisfed.org/graph/fredgraph.csv?id=${c.fred10}&cosd=2024-01-01`, 'text/csv, text/plain;q=0.9, */*;q=0.8'));
+      const col = Object.keys(rows[0] || {}).find(k => k === c.fred10);
+      const points = rows.map(r => ({ period: r.observation_date, raw: r[col], value: r[col] === '' || r[col] === '.' || r[col] === undefined ? NaN : Number(r[col]) }))
+        .filter(x => x.period && Number.isFinite(x.value))
+        .sort((a, b) => a.period.localeCompare(b.period));
+      const p = points.at(-1);
+      if (!p) throw new Error('keine numerische Beobachtung');
+      set(c.id, 'y10', p.value, p.period, 'FRED/OECD · long-term government bond rate');
+      count++;
+    } catch (e) {
+      errors.push(`10-Jahres-Rendite ${c.id}: FRED-Fallback ${e.message}`);
+    }
+  }
   return count;
 }
 function teCountry(row){const s=String(row.Country||row.country||'').toLowerCase();if(s.includes('china'))return'CHN';if(s.includes('united states'))return'USA';if(s.includes('japan'))return'JPN';if(s.includes('france'))return'FRA';if(s.includes('germany'))return'DEU';if(s.includes('australia'))return'AUS';return null;}
