@@ -72,12 +72,13 @@ async function fetchFredSeries(seriesId, startDate = '2024-01-01') {
   })).filter(p => p.date && Number.isFinite(p.value)).sort((a, b) => a.date.localeCompare(b.date));
 }
 const cpiSeries = {
-  CHN: ['CPALTT01CNM657N', 'CPALTT01CNQ657N'],
-  USA: ['CPALTT01USM657N', 'CPALTT01USQ657N'],
-  JPN: ['CPALTT01JPM657N', 'CPALTT01JPQ657N'],
-  FRA: ['CPALTT01FRM657N', 'CPALTT01FRQ657N'],
-  DEU: ['CPALTT01DEM657N', 'CPALTT01DEQ657N'],
-  AUS: ['CPALTT01AUM657N', 'CPALTT01AUQ657N']
+  // M659N/Q659N = CPI change versus the same period last year; M657N/Q657N are period-on-period.
+  CHN: ['CPALTT01CNM659N', 'CPALTT01CNQ659N'],
+  USA: ['CPALTT01USM659N', 'CPALTT01USQ659N'],
+  JPN: ['CPALTT01JPM659N', 'CPALTT01JPQ659N'],
+  FRA: ['CPALTT01FRM659N', 'CPALTT01FRQ659N'],
+  DEU: ['CPALTT01DEM659N', 'CPALTT01DEQ659N'],
+  AUS: ['CPALTT01AUM659N', 'CPALTT01AUQ659N']
 };
 async function loadInflation() {
   let count = 0;
@@ -88,11 +89,14 @@ async function loadInflation() {
     for (const seriesId of candidates) {
       try {
         const rows = await fetchFredSeries(seriesId, '2024-01-01');
-        if (rows.length) {
-          points = rows;
+        const maxAgeDays = seriesId.includes('M659N') ? 120 : 200;
+        const freshRows = rows.filter(p => (Date.now() - new Date(`${p.date}T00:00:00Z`).getTime()) / 86400000 <= maxAgeDays);
+        if (freshRows.length) {
+          points = freshRows;
           usedSeries = seriesId;
           break;
         }
+        if (rows.length) errors.push(`Inflation ${c.id} ${seriesId}: letzter Wert ${rows.at(-1).date} ist älter als ${maxAgeDays} Tage`);
       } catch (e) {
         errors.push(`Inflation ${c.id} ${seriesId}: ${e.message}`);
       }
@@ -124,7 +128,7 @@ const gdpLevelSeries = {
   JPN: 'JPNRGDPEXP',
   FRA: 'CLVMNACSCAB1GQFR',
   DEU: 'CLVMNACSCAB1GQDE',
-  AUS: 'AUSGDPRQDSMEI'
+  AUS: 'NGDPRSAXDCAUQ'
 };
 async function loadGDPQuarterly() {
   let count = 0;
@@ -137,6 +141,9 @@ async function loadGDPQuarterly() {
     try {
       const raw = await fetchFredSeries(seriesId, '2024-01-01');
       if (raw.length < 2) throw new Error('zu wenige Quartalsbeobachtungen');
+      const newestDate = raw.at(-1).date;
+      const ageDays = (Date.now() - new Date(`${newestDate}T00:00:00Z`).getTime()) / 86400000;
+      if (ageDays > 200) throw new Error(`letzter Wert ${newestDate} ist ${Math.floor(ageDays)} Tage alt`);
       const isGrowthSeries = c.id === 'USA';
       const points = (isGrowthSeries
         ? raw.map(p => ({ date: p.date, value: p.value }))
@@ -289,8 +296,12 @@ async function loadOECDLongRates() {
       .sort((a, b) => a.period.localeCompare(b.period));
     const p = points.at(-1);
     if (p) {
-      set(c.id, 'y10', p.value, p.period, 'OECD · Financial market long-term rate');
-      count++;
+      const ageDays = (Date.now() - new Date(`${p.period}-01T00:00:00Z`).getTime()) / 86400000;
+      if (ageDays > 45) errors.push(`10-Jahres-Rendite ${c.id}: OECD-Wert ${p.period} ist ${Math.floor(ageDays)} Tage alt`);
+      else {
+        set(c.id, 'y10', p.value, p.period, 'OECD · Financial market long-term rate');
+        count++;
+      }
     } else errors.push(`10-Jahres-Rendite ${c.id}: OECD-Monatsreihe fehlt`);
   }
   return count;
@@ -307,6 +318,8 @@ async function loadFREDLongRatesFallback() {
         .sort((a, b) => a.period.localeCompare(b.period));
       const p = points.at(-1);
       if (!p) throw new Error('keine numerische Beobachtung');
+      const ageDays = (Date.now() - new Date(`${p.period}T00:00:00Z`).getTime()) / 86400000;
+      if (ageDays > 45) throw new Error(`letzter Wert ${p.period} ist ${Math.floor(ageDays)} Tage alt`);
       set(c.id, 'y10', p.value, p.period, 'FRED/OECD · long-term government bond rate');
       count++;
     } catch (e) {
