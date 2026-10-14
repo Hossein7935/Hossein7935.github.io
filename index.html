@@ -41,10 +41,13 @@ async function refresh(){
    const r=await fetch(`./data.json?refresh=${Date.now()}`,{cache:'no-store'});if(!r.ok)throw Error(`data.json fehlt oder ist nicht erreichbar (HTTP ${r.status}). Warte, bis GitHub Actions einmal gelaufen ist.`);
    const payload=await r.json();if(!payload||!payload.data)throw Error('data.json hat ein ungültiges Format');
    for(const c of countries){const incoming=payload.data[c.id]||{};data[c.id]||(data[c.id]={});for(const key of ['inflation','rate','y2','y10']){if(incoming[key])data[c.id][key]=incoming[key];else if(data[c.id][key]&&data[c.id][key].source!=='Manuell')delete data[c.id][key];}}
-   if(payload.histories)histories={...histories,...payload.histories};
+   // Replace remote histories instead of merging them, so obsolete cached quarters cannot survive a failed refresh.
+   if(payload.histories){for(const key of Object.keys(histories)){if(key.endsWith('-gdp')||key.endsWith('-inflation'))delete histories[key];}histories={...histories,...payload.histories};}
    const year=String(document.querySelector('#year').value);for(const c of countries){const v=payload.forecasts?.[c.id]?.[year];if(v!==undefined&&v!==null&&Number.isFinite(Number(v)))setValue(c.id,'gdp',Number(v),`IMF WEO · ${year}`,'IMF DataMapper · NGDP_RPCH');else if(data[c.id]?.gdp?.source?.includes('IMF'))delete data[c.id].gdp;}
    persist();render();const e=Array.isArray(payload.errors)?payload.errors:[];const counts={inflation:countries.filter(c=>!!data[c.id]?.inflation).length,gdp:countries.filter(c=>(histories[c.id+'-gdp']||[]).length>0).length,imf:countries.filter(c=>!!data[c.id]?.gdp&&String(data[c.id].gdp.source||'').includes('IMF')).length,rate:countries.filter(c=>!!data[c.id]?.rate&&String(data[c.id].rate.source||'').includes('BIS')).length,y2:countries.filter(c=>!!data[c.id]?.y2).length,y10:countries.filter(c=>!!data[c.id]?.y10).length};
-   const stamp=payload.updatedAt?new Date(payload.updatedAt).toLocaleString('de-DE'):'Zeitpunkt unbekannt';status.innerHTML=`Datenstand: ${esc(stamp)}. Inflation ${counts.inflation}/6 · BIP-Quartale ${counts.gdp}/6 · IMF-Prognose ${counts.imf}/6 (${year}) · Leitzins ${counts.rate}/6 · 2 Jahre ${counts.y2}/6 · 10 Jahre ${counts.y10}/6.`+(e.length?`<br><span class="err">Nicht geladene Quellen: ${e.map(esc).join(' · ')}</span>`:'');
+   const stamp=payload.updatedAt?new Date(payload.updatedAt).toLocaleString('de-DE'):'Zeitpunkt unbekannt';
+   const summary=`Datenstand: ${esc(stamp)}. Inflation ${counts.inflation}/6 · BIP-Quartale ${counts.gdp}/6 · IMF-Prognose ${counts.imf}/6 (${year}) · Leitzins ${counts.rate}/6 · 2 Jahre ${counts.y2}/6 · 10 Jahre ${counts.y10}/6.`;
+   status.innerHTML=summary+(e.length?`<br><span class="err">${e.length} Datenprobleme. Nicht alle Werte konnten aktuell geladen werden.</span><details style="margin-top:8px"><summary>Fehlerdetails anzeigen</summary><ul>${e.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details>`:'');
  }catch(e){status.innerHTML=`<span class="err">${esc(e.message||e)}</span>`;}
  finally{btn.disabled=false;}
 }
