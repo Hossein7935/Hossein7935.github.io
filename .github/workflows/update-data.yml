@@ -22,6 +22,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Debug repository files
+        run: |
+          pwd
+          git log -1 --oneline
+          ls -la
+          ls -la scripts || true
+          git ls-tree -r HEAD --name-only | grep -i update-data || true
+
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
