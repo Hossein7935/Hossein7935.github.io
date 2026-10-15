@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-15T16:59:04.360Z",
+  "updatedAt": "2026-10-15T21:21:28.566Z",
   "data": {
     "CHN": {
       "rate": {
@@ -25,13 +25,13 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.82,
-        "date": "2026-10-14T00:00:00",
+        "value": 4.77,
+        "date": "2026-10-15T00:00:00",
         "source": "U.S. Treasury · Daily Par Yield Curve"
       },
       "y10": {
-        "value": 5.19,
-        "date": "2026-10-14T00:00:00",
+        "value": 5.1,
+        "date": "2026-10-15T00:00:00",
         "source": "U.S. Treasury · Daily Par Yield Curve"
       }
     },
@@ -45,6 +45,11 @@
         "value": 0.7,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · NGDP_RPCH"
+      },
+      "y10": {
+        "value": 3.05,
+        "date": "2026-09-01",
+        "source": "FRED/OECD · long-term government bond rate"
       }
     },
     "FRA": {
@@ -57,6 +62,11 @@
         "value": 0.4,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · NGDP_RPCH"
+      },
+      "y10": {
+        "value": 4.4771,
+        "date": "2026-09-01",
+        "source": "FRED/OECD · long-term government bond rate"
       }
     },
     "DEU": {
@@ -69,6 +79,11 @@
         "value": 1.3,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · NGDP_RPCH"
+      },
+      "y10": {
+        "value": 3.46952380952381,
+        "date": "2026-09-01",
+        "source": "FRED/OECD · long-term government bond rate"
       }
     },
     "AUS": {
@@ -81,6 +96,11 @@
         "value": 1.9,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · NGDP_RPCH"
+      },
+      "y10": {
+        "value": 5.283,
+        "date": "2026-09-01",
+        "source": "FRED/OECD · long-term government bond rate"
       }
     }
   },
@@ -243,7 +263,7 @@
     },
     "rate": 6,
     "y2": 1,
-    "y10": 1
+    "y10": 5
   },
   "errors": [
     "OECD-G20-Inflation: HTTP 500",
@@ -256,10 +276,6 @@
     "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer",
     "OECD-Langfristzinsen: HTTP 500",
     "10-Jahres-Rendite CHN: FRED-Fallback HTTP 404",
-    "10-Jahres-Rendite JPN: FRED-Fallback letzter Wert 2026-08-01 ist 75 Tage alt",
-    "10-Jahres-Rendite FRA: FRED-Fallback letzter Wert 2026-08-01 ist 75 Tage alt",
-    "10-Jahres-Rendite DEU: FRED-Fallback letzter Wert 2026-08-01 ist 75 Tage alt",
-    "10-Jahres-Rendite AUS: FRED-Fallback letzter Wert 2026-08-01 ist 75 Tage alt",
     "2-Jahres-Renditen außerhalb der USA: TRADING_ECONOMICS_API_KEY als GitHub Actions Secret fehlt"
   ]
 }
