@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-10-15T04:35:32.556Z",
+  "updatedAt": "2026-10-15T11:26:12.142Z",
   "data": {
     "CHN": {
       "rate": {
         "value": 3,
-        "date": "2026-10-06",
+        "date": "2026-10-13",
         "source": "BIS · Central bank policy rates"
       },
       "gdp": {
@@ -16,7 +16,7 @@
     "USA": {
       "rate": {
         "value": 3.875,
-        "date": "2026-10-06",
+        "date": "2026-10-13",
         "source": "BIS · Central bank policy rates"
       },
       "gdp": {
@@ -38,7 +38,7 @@
     "JPN": {
       "rate": {
         "value": 1.25,
-        "date": "2026-10-06",
+        "date": "2026-10-13",
         "source": "BIS · Central bank policy rates"
       },
       "gdp": {
@@ -73,8 +73,8 @@
     },
     "AUS": {
       "rate": {
-        "value": 4.35,
-        "date": "2026-09-24",
+        "value": 4.6,
+        "date": "2026-10-08",
         "source": "BIS · Central bank policy rates"
       },
       "gdp": {
