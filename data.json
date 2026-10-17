@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-16T21:05:42.098Z",
+  "updatedAt": "2026-10-17T04:22:54.151Z",
   "data": {
     "CHN": {
       "rate": {
@@ -50,7 +50,7 @@
     "FRA": {
       "rate": {
         "value": 2.5,
-        "date": "2026-10-16",
+        "date": "2026-10-17",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
@@ -62,7 +62,7 @@
     "DEU": {
       "rate": {
         "value": 2.5,
-        "date": "2026-10-16",
+        "date": "2026-10-17",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
@@ -256,10 +256,10 @@
     "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer",
     "OECD-Langfristzinsen: HTTP 500",
     "10-Jahres-Rendite CHN: FRED-Fallback HTTP 404",
-    "10-Jahres-Rendite JPN: FRED-Fallback letzter Wert 2026-09-01 ist 45 Tage alt",
-    "10-Jahres-Rendite FRA: FRED-Fallback letzter Wert 2026-09-01 ist 45 Tage alt",
-    "10-Jahres-Rendite DEU: FRED-Fallback letzter Wert 2026-09-01 ist 45 Tage alt",
-    "10-Jahres-Rendite AUS: FRED-Fallback letzter Wert 2026-09-01 ist 45 Tage alt",
+    "10-Jahres-Rendite JPN: FRED-Fallback letzter Wert 2026-09-01 ist 46 Tage alt",
+    "10-Jahres-Rendite FRA: FRED-Fallback letzter Wert 2026-09-01 ist 46 Tage alt",
+    "10-Jahres-Rendite DEU: FRED-Fallback letzter Wert 2026-09-01 ist 46 Tage alt",
+    "10-Jahres-Rendite AUS: FRED-Fallback letzter Wert 2026-09-01 ist 46 Tage alt",
     "2-Jahres-Renditen außerhalb der USA: TRADING_ECONOMICS_API_KEY als GitHub Actions Secret fehlt"
   ]
 }
