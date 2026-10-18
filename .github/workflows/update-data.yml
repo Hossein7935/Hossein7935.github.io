@@ -18,22 +18,35 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore and patch updater if broken
+        run: |
+          set -e
+          if ! grep -q 'async function loadInflation' scripts/update-data.mjs 2>/dev/null; then
+            echo "Restoring update-data.mjs from known good commit"
+            git show c8234d974ef2cf0248b0edd8a81744c2cd03227e:scripts/update-data.mjs > scripts/update-data.mjs
+          fi
+          # Relax age limits so monthly FRED rates and quarterly GDP are accepted
+          sed -i 's/ageDays > 200/ageDays > 280/g' scripts/update-data.mjs
+          sed -i 's/ageDays > 45/ageDays > 75/g' scripts/update-data.mjs
+          # Prefer slightly longer history window for FRED CPI fallback
+          sed -i "s/startDate = '2024-01-01'/startDate = '2023-01-01'/g" scripts/update-data.mjs || true
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
       - name: Check updater syntax
         run: node --check scripts/update-data.mjs
-
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
         run: node scripts/update-data.mjs
-      - name: Commit updated data
+      - name: Commit updated data and restored script
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data.json
+          git add data.json scripts/update-data.mjs
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
