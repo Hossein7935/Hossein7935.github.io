@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-18T15:50:50.919Z",
+  "updatedAt": "2026-10-18T20:39:58.329Z",
   "data": {
     "CHN": {
       "rate": {
@@ -266,7 +266,7 @@
     "y10": 5
   },
   "errors": [
-    "OECD-G20-Inflation: HTTP 500",
+    "OECD-G20-Inflation: HTTP 404",
     "Inflation CHN: keine aktuelle CPI-Reihe verfügbar",
     "Inflation USA: keine aktuelle CPI-Reihe verfügbar",
     "Inflation JPN: keine aktuelle CPI-Reihe verfügbar",
