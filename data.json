@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-19T23:17:39.431Z",
+  "updatedAt": "2026-10-19T23:26:42.682Z",
   "data": {
     "CHN": {
       "rate": {
@@ -16,6 +16,11 @@
         "value": 1,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
+      },
+      "y2": {
+        "value": 1.254,
+        "date": "2026-10-19",
+        "source": "TradingView · TVC:CN02Y (China 2 Year Government Bonds Yield)"
       }
     },
     "USA": {
@@ -30,9 +35,9 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.77,
-        "date": "2026-10-19T00:00:00",
-        "source": "U.S. Treasury · Daily Par Yield Curve"
+        "value": 4.778,
+        "date": "2026-10-19",
+        "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
         "value": 5.15,
@@ -65,6 +70,11 @@
         "value": 2,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
+      },
+      "y2": {
+        "value": 1.888,
+        "date": "2026-10-19",
+        "source": "TradingView · TVC:JP02Y (Japan 2 Year LSEG Government Bonds Yield)"
       }
     },
     "FRA": {
@@ -87,6 +97,11 @@
         "value": 2.4,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
+      },
+      "y2": {
+        "value": 3.6479,
+        "date": "2026-10-19",
+        "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
       }
     },
     "DEU": {
@@ -109,6 +124,11 @@
         "value": 2.7,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
+      },
+      "y2": {
+        "value": 3.0958,
+        "date": "2026-10-19",
+        "source": "TradingView · TVC:DE02Y (Germany 2 Year Government Bonds Yield)"
       }
     },
     "AUS": {
@@ -131,6 +151,11 @@
         "value": 3.9,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
+      },
+      "y2": {
+        "value": 4.925,
+        "date": "2026-10-19",
+        "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       }
     }
   },
@@ -424,13 +449,12 @@
       "2028": 6
     },
     "rate": 6,
-    "y2": 1,
+    "y2": 6,
     "y10": 5
   },
   "errors": [
     "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer",
     "OECD-Langfristzinsen: HTTP 500",
-    "10-Jahres-Rendite CHN: FRED-Fallback HTTP 404",
-    "2-Jahres-Renditen außerhalb der USA: TRADING_ECONOMICS_API_KEY als GitHub Actions Secret fehlt"
+    "10-Jahres-Rendite CHN: FRED-Fallback HTTP 404"
   ]
 }
