@@ -39,6 +39,7 @@ jobs:
           node --check scripts/fetch-inflation.mjs
           node --check scripts/fetch-y2.mjs
           node --check scripts/fetch-y10.mjs
+          node --check scripts/fetch-tips.mjs
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
@@ -49,6 +50,8 @@ jobs:
         run: node scripts/fetch-y2.mjs
       - name: Fill 10Y yields (TradingView TVC:*10Y)
         run: node scripts/fetch-y10.mjs
+      - name: Fill US TIPS real yields (FRED DFII5/DFII10)
+        run: node scripts/fetch-tips.mjs
       - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
