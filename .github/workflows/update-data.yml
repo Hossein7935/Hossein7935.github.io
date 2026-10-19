@@ -29,22 +29,25 @@ jobs:
           fi
           sed -i 's/ageDays > 200/ageDays > 280/g' scripts/update-data.mjs
           sed -i 's/ageDays > 45/ageDays > 75/g' scripts/update-data.mjs
-          sed -i "s/startDate = '2024-01-01'/startDate = '2023-01-01'/g" scripts/update-data.mjs || true
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
       - name: Check updater syntax
-        run: node --check scripts/update-data.mjs
+        run: |
+          node --check scripts/update-data.mjs
+          node --check scripts/fetch-inflation.mjs
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
         run: node scripts/update-data.mjs
-      - name: Commit updated data and restored script
+      - name: Fill inflation (FRED YoY + IMF annual)
+        run: node scripts/fetch-inflation.mjs
+      - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data.json scripts/update-data.mjs
+          git add data.json scripts/
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
