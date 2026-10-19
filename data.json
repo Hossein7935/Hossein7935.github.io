@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-19T23:46:55.408Z",
+  "updatedAt": "2026-10-19T23:49:30.813Z",
   "data": {
     "CHN": {
       "rate": {
@@ -158,7 +158,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.929,
+        "value": 4.928,
         "date": "2026-10-19",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       }
