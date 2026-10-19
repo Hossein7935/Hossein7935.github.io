@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-19T22:47:40.565Z",
+  "updatedAt": "2026-10-19T22:49:36.524Z",
   "data": {
     "CHN": {
       "rate": {
@@ -11,6 +11,11 @@
         "value": 4.5,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · NGDP_RPCH"
+      },
+      "inflation": {
+        "value": 1,
+        "date": "IMF WEO · 2026",
+        "source": "IMF DataMapper · PCPIPCH (annual)"
       }
     },
     "USA": {
@@ -33,6 +38,11 @@
         "value": 5.15,
         "date": "2026-10-19T00:00:00",
         "source": "U.S. Treasury · Daily Par Yield Curve"
+      },
+      "inflation": {
+        "value": 3.72,
+        "date": "2026-09",
+        "source": "FRED · CPI YoY (CPIAUCSL)"
       }
     },
     "JPN": {
@@ -50,6 +60,11 @@
         "value": 3.05,
         "date": "2026-09-01",
         "source": "FRED/OECD · long-term government bond rate"
+      },
+      "inflation": {
+        "value": 2,
+        "date": "IMF WEO · 2026",
+        "source": "IMF DataMapper · PCPIPCH (annual)"
       }
     },
     "FRA": {
@@ -67,6 +82,11 @@
         "value": 4.4771,
         "date": "2026-09-01",
         "source": "FRED/OECD · long-term government bond rate"
+      },
+      "inflation": {
+        "value": 3.42,
+        "date": "2026-09",
+        "source": "FRED · CPI YoY (CP0000FRM086NEST)"
       }
     },
     "DEU": {
@@ -84,6 +104,11 @@
         "value": 3.46952380952381,
         "date": "2026-09-01",
         "source": "FRED/OECD · long-term government bond rate"
+      },
+      "inflation": {
+        "value": 3.26,
+        "date": "2026-09",
+        "source": "FRED · CPI YoY (CP0000DEM086NEST)"
       }
     },
     "AUS": {
@@ -101,6 +126,11 @@
         "value": 5.283,
         "date": "2026-09-01",
         "source": "FRED/OECD · long-term government bond rate"
+      },
+      "inflation": {
+        "value": 3.9,
+        "date": "IMF WEO · 2026",
+        "source": "IMF DataMapper · PCPIPCH (annual)"
       }
     }
   },
@@ -214,6 +244,78 @@
         "period": "2026-Q2",
         "value": 0.41950271269806105
       }
+    ],
+    "USA-inflation": [
+      {
+        "period": "2026-07",
+        "value": 3.3
+      },
+      {
+        "period": "2026-08",
+        "value": 3.35
+      },
+      {
+        "period": "2026-09",
+        "value": 3.72
+      }
+    ],
+    "DEU-inflation": [
+      {
+        "period": "2026-07",
+        "value": 2.84
+      },
+      {
+        "period": "2026-08",
+        "value": 2.93
+      },
+      {
+        "period": "2026-09",
+        "value": 3.26
+      }
+    ],
+    "FRA-inflation": [
+      {
+        "period": "2026-07",
+        "value": 2.37
+      },
+      {
+        "period": "2026-08",
+        "value": 2.63
+      },
+      {
+        "period": "2026-09",
+        "value": 3.42
+      }
+    ],
+    "CHN-inflation": [
+      {
+        "period": "2025",
+        "value": 0
+      },
+      {
+        "period": "2026",
+        "value": 1
+      }
+    ],
+    "JPN-inflation": [
+      {
+        "period": "2025",
+        "value": 3.2
+      },
+      {
+        "period": "2026",
+        "value": 2
+      }
+    ],
+    "AUS-inflation": [
+      {
+        "period": "2025",
+        "value": 2.8
+      },
+      {
+        "period": "2026",
+        "value": 3.9
+      }
     ]
   },
   "forecasts": {
@@ -254,7 +356,7 @@
     2028
   ],
   "counts": {
-    "inflation": 0,
+    "inflation": 6,
     "gdp": 5,
     "imf": {
       "2026": 6,
@@ -266,13 +368,6 @@
     "y10": 5
   },
   "errors": [
-    "OECD-G20-Inflation: HTTP 404",
-    "Inflation CHN: keine aktuelle CPI-Reihe verfügbar",
-    "Inflation USA: keine aktuelle CPI-Reihe verfügbar",
-    "Inflation JPN: keine aktuelle CPI-Reihe verfügbar",
-    "Inflation FRA: keine aktuelle CPI-Reihe verfügbar",
-    "Inflation DEU: keine aktuelle CPI-Reihe verfügbar",
-    "Inflation AUS: keine aktuelle CPI-Reihe verfügbar",
     "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer",
     "OECD-Langfristzinsen: HTTP 500",
     "10-Jahres-Rendite CHN: FRED-Fallback HTTP 404",
