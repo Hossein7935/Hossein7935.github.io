@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-19T23:49:30.813Z",
+  "updatedAt": "2026-10-19T23:56:27.829Z",
   "data": {
     "CHN": {
       "rate": {
@@ -148,7 +148,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 5.299,
+        "value": 5.298,
         "date": "2026-10-19",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
@@ -158,7 +158,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.928,
+        "value": 4.925,
         "date": "2026-10-19",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       }
