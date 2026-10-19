@@ -1,0 +1,5 @@
+# Static site — disable Jekyll processing
+plugin: []
+exclude:
+  - scripts
+  - .github
