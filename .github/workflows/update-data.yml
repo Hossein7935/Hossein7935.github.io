@@ -9,8 +9,6 @@ on:
       - 'data.json'
 permissions:
   contents: write
-  pages: write
-  id-token: write
 concurrency:
   group: macrowatch-data-update
   cancel-in-progress: false
@@ -63,12 +61,3 @@ jobs:
             git pull --rebase origin main || true
             git push
           fi
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
