@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-18T20:39:58.329Z",
+  "updatedAt": "2026-10-19T04:37:26.867Z",
   "data": {
     "CHN": {
       "rate": {
@@ -55,7 +55,7 @@
     "FRA": {
       "rate": {
         "value": 2.5,
-        "date": "2026-10-18",
+        "date": "2026-10-19",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
@@ -72,7 +72,7 @@
     "DEU": {
       "rate": {
         "value": 2.5,
-        "date": "2026-10-18",
+        "date": "2026-10-19",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
