@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20T00:28:01.693Z",
+  "updatedAt": "2026-10-20T00:31:06.363Z",
   "data": {
     "CHN": {
       "rate": {
@@ -40,7 +40,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.768,
+        "value": 4.77,
         "date": "2026-10-20",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
@@ -524,7 +524,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 4.768
+        "value": 4.77
       }
     ],
     "USA-y10": [
@@ -635,6 +635,226 @@
       {
         "period": "2026-10-20",
         "value": 5.14
+      }
+    ],
+    "DEU-y2": [
+      {
+        "period": "2026-04-24",
+        "value": 2.542
+      },
+      {
+        "period": "2026-05-04",
+        "value": 2.64
+      },
+      {
+        "period": "2026-05-11",
+        "value": 2.592
+      },
+      {
+        "period": "2026-05-18",
+        "value": 2.64
+      },
+      {
+        "period": "2026-05-25",
+        "value": 2.478
+      },
+      {
+        "period": "2026-06-01",
+        "value": 2.578
+      },
+      {
+        "period": "2026-06-08",
+        "value": 2.624
+      },
+      {
+        "period": "2026-06-15",
+        "value": 2.518
+      },
+      {
+        "period": "2026-06-22",
+        "value": 2.545
+      },
+      {
+        "period": "2026-06-29",
+        "value": 2.477
+      },
+      {
+        "period": "2026-07-06",
+        "value": 2.485
+      },
+      {
+        "period": "2026-07-13",
+        "value": 2.645
+      },
+      {
+        "period": "2026-07-20",
+        "value": 2.71
+      },
+      {
+        "period": "2026-07-27",
+        "value": 2.73
+      },
+      {
+        "period": "2026-08-03",
+        "value": 2.702
+      },
+      {
+        "period": "2026-08-10",
+        "value": 2.721
+      },
+      {
+        "period": "2026-08-17",
+        "value": 2.736
+      },
+      {
+        "period": "2026-08-24",
+        "value": 2.796
+      },
+      {
+        "period": "2026-08-31",
+        "value": 2.856
+      },
+      {
+        "period": "2026-09-07",
+        "value": 2.913
+      },
+      {
+        "period": "2026-09-14",
+        "value": 3.228
+      },
+      {
+        "period": "2026-09-21",
+        "value": 3.148
+      },
+      {
+        "period": "2026-09-28",
+        "value": 3.233
+      },
+      {
+        "period": "2026-10-05",
+        "value": 2.997
+      },
+      {
+        "period": "2026-10-12",
+        "value": 3.066
+      },
+      {
+        "period": "2026-10-16",
+        "value": 3.03
+      },
+      {
+        "period": "2026-10-20",
+        "value": 3.096
+      }
+    ],
+    "FRA-y2": [
+      {
+        "period": "2026-04-24",
+        "value": 2.542
+      },
+      {
+        "period": "2026-05-04",
+        "value": 2.64
+      },
+      {
+        "period": "2026-05-11",
+        "value": 2.592
+      },
+      {
+        "period": "2026-05-18",
+        "value": 2.64
+      },
+      {
+        "period": "2026-05-25",
+        "value": 2.478
+      },
+      {
+        "period": "2026-06-01",
+        "value": 2.578
+      },
+      {
+        "period": "2026-06-08",
+        "value": 2.624
+      },
+      {
+        "period": "2026-06-15",
+        "value": 2.518
+      },
+      {
+        "period": "2026-06-22",
+        "value": 2.545
+      },
+      {
+        "period": "2026-06-29",
+        "value": 2.477
+      },
+      {
+        "period": "2026-07-06",
+        "value": 2.485
+      },
+      {
+        "period": "2026-07-13",
+        "value": 2.645
+      },
+      {
+        "period": "2026-07-20",
+        "value": 2.71
+      },
+      {
+        "period": "2026-07-27",
+        "value": 2.73
+      },
+      {
+        "period": "2026-08-03",
+        "value": 2.702
+      },
+      {
+        "period": "2026-08-10",
+        "value": 2.721
+      },
+      {
+        "period": "2026-08-17",
+        "value": 2.736
+      },
+      {
+        "period": "2026-08-24",
+        "value": 2.796
+      },
+      {
+        "period": "2026-08-31",
+        "value": 2.856
+      },
+      {
+        "period": "2026-09-07",
+        "value": 2.913
+      },
+      {
+        "period": "2026-09-14",
+        "value": 3.228
+      },
+      {
+        "period": "2026-09-21",
+        "value": 3.148
+      },
+      {
+        "period": "2026-09-28",
+        "value": 3.233
+      },
+      {
+        "period": "2026-10-05",
+        "value": 2.997
+      },
+      {
+        "period": "2026-10-12",
+        "value": 3.066
+      },
+      {
+        "period": "2026-10-16",
+        "value": 3.03
+      },
+      {
+        "period": "2026-10-20",
+        "value": 3.648
       }
     ],
     "JPN-y2": [
@@ -931,18 +1151,6 @@
       {
         "period": "2026-10-20",
         "value": 1.637
-      }
-    ],
-    "FRA-y2": [
-      {
-        "period": "2026-10-20",
-        "value": 3.648
-      }
-    ],
-    "DEU-y2": [
-      {
-        "period": "2026-10-20",
-        "value": 3.096
       }
     ],
     "USA-rate": [
@@ -1898,7 +2106,6 @@
     "tips10": 1
   },
   "errors": [
-    "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer",
-    "Yield-Charts ECB 2Y: ECB 2Y HTTP 504"
+    "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer"
   ]
 }
