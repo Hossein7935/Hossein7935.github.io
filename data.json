@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-19T23:59:24.118Z",
+  "updatedAt": "2026-10-20T00:08:45.533Z",
   "data": {
     "CHN": {
       "rate": {
@@ -19,12 +19,12 @@
       },
       "y2": {
         "value": 1.254,
-        "date": "2026-10-19",
+        "date": "2026-10-20",
         "source": "TradingView · TVC:CN02Y (China 2 Year Government Bonds Yield)"
       },
       "y10": {
         "value": 1.637,
-        "date": "2026-10-19",
+        "date": "2026-10-20",
         "source": "TradingView · TVC:CN10Y (China 10 Year Government Bonds Yield)"
       }
     },
@@ -40,13 +40,13 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.778,
-        "date": "2026-10-19",
+        "value": 4.772,
+        "date": "2026-10-20",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
         "value": 5.142,
-        "date": "2026-10-19",
+        "date": "2026-10-20",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -77,8 +77,8 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 2.913,
-        "date": "2026-10-19",
+        "value": 2.934,
+        "date": "2026-10-20",
         "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
       "inflation": {
@@ -87,8 +87,8 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.888,
-        "date": "2026-10-19",
+        "value": 1.897,
+        "date": "2026-10-20",
         "source": "TradingView · TVC:JP02Y (Japan 2 Year LSEG Government Bonds Yield)"
       }
     },
@@ -105,7 +105,7 @@
       },
       "y10": {
         "value": 4.9394,
-        "date": "2026-10-19",
+        "date": "2026-10-20",
         "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -115,7 +115,7 @@
       },
       "y2": {
         "value": 3.6479,
-        "date": "2026-10-19",
+        "date": "2026-10-20",
         "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
       }
     },
@@ -132,7 +132,7 @@
       },
       "y10": {
         "value": 3.4646,
-        "date": "2026-10-19",
+        "date": "2026-10-20",
         "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -142,7 +142,7 @@
       },
       "y2": {
         "value": 3.0958,
-        "date": "2026-10-19",
+        "date": "2026-10-20",
         "source": "TradingView · TVC:DE02Y (Germany 2 Year Government Bonds Yield)"
       }
     },
@@ -159,7 +159,7 @@
       },
       "y10": {
         "value": 5.299,
-        "date": "2026-10-19",
+        "date": "2026-10-20",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -168,8 +168,8 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.923,
-        "date": "2026-10-19",
+        "value": 4.926,
+        "date": "2026-10-20",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       }
     }
@@ -415,6 +415,382 @@
       {
         "period": "2026",
         "value": 3.9
+      }
+    ],
+    "USA-y2": [
+      {
+        "period": "2026-04-22",
+        "value": 3.79
+      },
+      {
+        "period": "2026-04-29",
+        "value": 3.92
+      },
+      {
+        "period": "2026-05-06",
+        "value": 3.87
+      },
+      {
+        "period": "2026-05-13",
+        "value": 3.98
+      },
+      {
+        "period": "2026-05-20",
+        "value": 4.04
+      },
+      {
+        "period": "2026-05-28",
+        "value": 3.99
+      },
+      {
+        "period": "2026-06-04",
+        "value": 4.05
+      },
+      {
+        "period": "2026-06-11",
+        "value": 4.05
+      },
+      {
+        "period": "2026-06-18",
+        "value": 4.19
+      },
+      {
+        "period": "2026-06-26",
+        "value": 4.07
+      },
+      {
+        "period": "2026-07-06",
+        "value": 4.13
+      },
+      {
+        "period": "2026-07-13",
+        "value": 4.26
+      },
+      {
+        "period": "2026-07-20",
+        "value": 4.21
+      },
+      {
+        "period": "2026-07-27",
+        "value": 4.31
+      },
+      {
+        "period": "2026-08-03",
+        "value": 4.25
+      },
+      {
+        "period": "2026-08-10",
+        "value": 4.25
+      },
+      {
+        "period": "2026-08-17",
+        "value": 4.19
+      },
+      {
+        "period": "2026-08-24",
+        "value": 4.24
+      },
+      {
+        "period": "2026-08-31",
+        "value": 4.34
+      },
+      {
+        "period": "2026-09-08",
+        "value": 4.39
+      },
+      {
+        "period": "2026-09-15",
+        "value": 4.67
+      },
+      {
+        "period": "2026-09-22",
+        "value": 4.71
+      },
+      {
+        "period": "2026-09-29",
+        "value": 4.89
+      },
+      {
+        "period": "2026-10-06",
+        "value": 4.79
+      },
+      {
+        "period": "2026-10-14",
+        "value": 4.82
+      },
+      {
+        "period": "2026-10-16",
+        "value": 4.74
+      },
+      {
+        "period": "2026-10-20",
+        "value": 4.772
+      }
+    ],
+    "USA-y10": [
+      {
+        "period": "2026-04-22",
+        "value": 4.3
+      },
+      {
+        "period": "2026-04-29",
+        "value": 4.42
+      },
+      {
+        "period": "2026-05-06",
+        "value": 4.36
+      },
+      {
+        "period": "2026-05-13",
+        "value": 4.46
+      },
+      {
+        "period": "2026-05-20",
+        "value": 4.57
+      },
+      {
+        "period": "2026-05-28",
+        "value": 4.45
+      },
+      {
+        "period": "2026-06-04",
+        "value": 4.47
+      },
+      {
+        "period": "2026-06-11",
+        "value": 4.45
+      },
+      {
+        "period": "2026-06-18",
+        "value": 4.46
+      },
+      {
+        "period": "2026-06-26",
+        "value": 4.38
+      },
+      {
+        "period": "2026-07-06",
+        "value": 4.48
+      },
+      {
+        "period": "2026-07-13",
+        "value": 4.62
+      },
+      {
+        "period": "2026-07-20",
+        "value": 4.6
+      },
+      {
+        "period": "2026-07-27",
+        "value": 4.65
+      },
+      {
+        "period": "2026-08-03",
+        "value": 4.7
+      },
+      {
+        "period": "2026-08-10",
+        "value": 4.72
+      },
+      {
+        "period": "2026-08-17",
+        "value": 4.72
+      },
+      {
+        "period": "2026-08-24",
+        "value": 4.7
+      },
+      {
+        "period": "2026-08-31",
+        "value": 4.75
+      },
+      {
+        "period": "2026-09-08",
+        "value": 4.8
+      },
+      {
+        "period": "2026-09-15",
+        "value": 5
+      },
+      {
+        "period": "2026-09-22",
+        "value": 4.96
+      },
+      {
+        "period": "2026-09-29",
+        "value": 5.26
+      },
+      {
+        "period": "2026-10-06",
+        "value": 5.27
+      },
+      {
+        "period": "2026-10-14",
+        "value": 5.19
+      },
+      {
+        "period": "2026-10-16",
+        "value": 5.09
+      },
+      {
+        "period": "2026-10-20",
+        "value": 5.142
+      }
+    ],
+    "DEU-y10": [
+      {
+        "period": "2026-04-01",
+        "value": 3.001
+      },
+      {
+        "period": "2026-05-01",
+        "value": 3.047
+      },
+      {
+        "period": "2026-06-01",
+        "value": 2.964
+      },
+      {
+        "period": "2026-07-01",
+        "value": 3.07
+      },
+      {
+        "period": "2026-08-01",
+        "value": 3.186
+      },
+      {
+        "period": "2026-09-01",
+        "value": 3.47
+      },
+      {
+        "period": "2026-10-20",
+        "value": 3.465
+      }
+    ],
+    "FRA-y10": [
+      {
+        "period": "2026-04-01",
+        "value": 3.675
+      },
+      {
+        "period": "2026-05-01",
+        "value": 3.742
+      },
+      {
+        "period": "2026-06-01",
+        "value": 3.671
+      },
+      {
+        "period": "2026-07-01",
+        "value": 3.885
+      },
+      {
+        "period": "2026-08-01",
+        "value": 4.031
+      },
+      {
+        "period": "2026-09-01",
+        "value": 4.477
+      },
+      {
+        "period": "2026-10-20",
+        "value": 4.939
+      }
+    ],
+    "JPN-y10": [
+      {
+        "period": "2026-04-01",
+        "value": 2.515
+      },
+      {
+        "period": "2026-05-01",
+        "value": 2.65
+      },
+      {
+        "period": "2026-06-01",
+        "value": 2.67
+      },
+      {
+        "period": "2026-07-01",
+        "value": 2.79
+      },
+      {
+        "period": "2026-08-01",
+        "value": 2.94
+      },
+      {
+        "period": "2026-09-01",
+        "value": 3.05
+      },
+      {
+        "period": "2026-10-20",
+        "value": 2.934
+      }
+    ],
+    "AUS-y10": [
+      {
+        "period": "2026-04-01",
+        "value": 4.969
+      },
+      {
+        "period": "2026-05-01",
+        "value": 4.982
+      },
+      {
+        "period": "2026-06-01",
+        "value": 4.831
+      },
+      {
+        "period": "2026-07-01",
+        "value": 4.919
+      },
+      {
+        "period": "2026-08-01",
+        "value": 5.015
+      },
+      {
+        "period": "2026-09-01",
+        "value": 5.283
+      },
+      {
+        "period": "2026-10-20",
+        "value": 5.299
+      }
+    ],
+    "CHN-y2": [
+      {
+        "period": "2026-10-20",
+        "value": 1.254
+      }
+    ],
+    "CHN-y10": [
+      {
+        "period": "2026-10-20",
+        "value": 1.637
+      }
+    ],
+    "JPN-y2": [
+      {
+        "period": "2026-10-20",
+        "value": 1.897
+      }
+    ],
+    "FRA-y2": [
+      {
+        "period": "2026-10-20",
+        "value": 3.648
+      }
+    ],
+    "DEU-y2": [
+      {
+        "period": "2026-10-20",
+        "value": 3.096
+      }
+    ],
+    "AUS-y2": [
+      {
+        "period": "2026-10-20",
+        "value": 4.926
       }
     ]
   },
