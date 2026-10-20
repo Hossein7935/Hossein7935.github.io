@@ -1,14 +1,5 @@
 import fs from 'node:fs';
 
-/**
- * 6-month histories for 2Y and 10Y yield charts.
- * USA: FRED DGS2/DGS10
- * DEU/FRA 2Y: ECB euro-area government 2Y spot (daily → weekly)
- * JPN 2Y: MOF JGB 2Y (daily → weekly)
- * AUS 2Y: RBA F2.1 monthly seed + TV current
- * 10Y DE/FR/JP/AU: FRED monthly long-term
- */
-
 const AUS_Y2_SEED = [
   { period: '2025-10', value: 3.437 },
   { period: '2025-11', value: 3.669 },
@@ -74,10 +65,11 @@ function mergeHistory(existing, incoming, maxPts = 30) {
 }
 
 async function ecb2Y(start = '2026-04-01') {
-  const url = `https://data-api.ecb.europa.eu/service/data/YC/B.U2.EUR.4F.G_N_C.SV_C_YM.SR_2Y?startPeriod=${start}&format=csvdata`;
+  // AAA euro-area 2Y spot (reliable); shape for DE/FR charts
+  const url = `https://data-api.ecb.europa.eu/service/data/YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_2Y?startPeriod=${start}&format=csvdata`;
   const r = await fetch(url, {
     headers: { Accept: 'text/csv', 'User-Agent': 'MacroWatch/1.5' },
-    signal: AbortSignal.timeout(45000),
+    signal: AbortSignal.timeout(60000),
     cache: 'no-store'
   });
   if (!r.ok) throw new Error(`ECB 2Y HTTP ${r.status}`);
@@ -87,6 +79,7 @@ async function ecb2Y(start = '2026-04-01') {
     const m = line.match(/(20\d{2}-\d{2}-\d{2}),([0-9.]+)/);
     if (m) rows.push({ period: m[1], value: Math.round(Number(m[2]) * 1000) / 1000 });
   }
+  if (!rows.length) throw new Error('ECB 2Y keine Punkte');
   return rows;
 }
 
@@ -94,7 +87,7 @@ async function japan2Y() {
   const url = 'https://www.mof.go.jp/jgbs/reference/interest_rate/data/jgbcm_all.csv';
   const r = await fetch(url, {
     headers: { 'User-Agent': 'MacroWatch/1.5' },
-    signal: AbortSignal.timeout(45000),
+    signal: AbortSignal.timeout(60000),
     cache: 'no-store'
   });
   if (!r.ok) throw new Error(`MOF JGB HTTP ${r.status}`);
@@ -133,10 +126,8 @@ try {
 
 try {
   const ecb = sampleWeekly(await ecb2Y('2026-04-01'));
-  if (ecb.length) {
-    histories['DEU-y2'] = mergeHistory([], ecb, 28);
-    histories['FRA-y2'] = mergeHistory([], ecb, 28);
-  }
+  histories['DEU-y2'] = mergeHistory([], ecb, 28);
+  histories['FRA-y2'] = mergeHistory([], ecb, 28);
 } catch (e) {
   errors.push(`Yield-Charts ECB 2Y: ${e.message}`);
 }
@@ -148,14 +139,14 @@ try {
   errors.push(`Yield-Charts JPN 2Y: ${e.message}`);
 }
 
-histories['AUS-y2'] = mergeHistory(histories['AUS-y2'], AUS_Y2_SEED, 18);
+histories['AUS-y2'] = mergeHistory([], AUS_Y2_SEED, 18);
 
 for (const [id, seriesId] of Object.entries(FRED_10Y)) {
   try {
     const rows = await fredSeries(seriesId, '2025-10-01');
     const recent = rows.filter(p => p.period >= '2026-04-01');
     const use = recent.length >= 3 ? recent : rows.slice(-6);
-    histories[`${id}-y10`] = mergeHistory(histories[`${id}-y10`], use, 12);
+    histories[`${id}-y10`] = mergeHistory([], use, 12);
   } catch (e) {
     errors.push(`Yield-Charts ${id} 10Y: ${e.message}`);
   }
@@ -180,6 +171,4 @@ payload.errors = [
   ...errors
 ];
 fs.writeFileSync('data.json', JSON.stringify(payload, null, 2) + '\n');
-
-const n = (k) => (histories[k] || []).length;
-console.log('y2-charts', 'USA', n('USA-y2'), 'DEU', n('DEU-y2'), 'FRA', n('FRA-y2'), 'JPN', n('JPN-y2'), 'AUS', n('AUS-y2'), 'CHN', n('CHN-y2'));
+console.log('y2-charts', 'USA', (histories['USA-y2']||[]).length, 'DEU', (histories['DEU-y2']||[]).length, 'FRA', (histories['FRA-y2']||[]).length, 'JPN', (histories['JPN-y2']||[]).length, 'AUS', (histories['AUS-y2']||[]).length, 'CHN', (histories['CHN-y2']||[]).length);
