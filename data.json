@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20T00:47:53.895Z",
+  "updatedAt": "2026-10-20T00:49:40.960Z",
   "data": {
     "CHN": {
       "rate": {
@@ -45,7 +45,7 @@
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 5.138,
+        "value": 5.14,
         "date": "2026-10-20",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
@@ -918,7 +918,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 5.138
+        "value": 5.14
       }
     ],
     "DEU-y2": [
