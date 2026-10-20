@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20T01:33:41.388Z",
+  "updatedAt": "2026-10-20T01:37:45.990Z",
   "data": {
     "CHN": {
       "rate": {
@@ -45,12 +45,12 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.763,
+        "value": 4.768,
         "date": "2026-10-20",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 5.129,
+        "value": 5.136,
         "date": "2026-10-20",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
@@ -198,7 +198,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.903,
+        "value": 4.906,
         "date": "2026-10-20",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
@@ -1323,7 +1323,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 4.763
+        "value": 4.768
       }
     ],
     "USA-y10": [
@@ -1433,7 +1433,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 5.129
+        "value": 5.136
       }
     ],
     "DEU-y2": [
@@ -2037,7 +2037,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 4.903
+        "value": 4.906
       }
     ],
     "DEU-y10": [
