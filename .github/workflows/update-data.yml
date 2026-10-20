@@ -40,6 +40,7 @@ jobs:
           node --check scripts/fetch-y10.mjs
           node --check scripts/fetch-tips.mjs
           node --check scripts/fetch-yield-charts.mjs
+          node --check scripts/fetch-rate-charts.mjs
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
@@ -54,6 +55,8 @@ jobs:
         run: node scripts/fetch-tips.mjs
       - name: Build 6-month yield charts
         run: node scripts/fetch-yield-charts.mjs
+      - name: Build 3-year policy rate charts
+        run: node scripts/fetch-rate-charts.mjs
       - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
