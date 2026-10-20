@@ -2,6 +2,27 @@ import fs from 'node:fs';
 
 /** Build ~3 years of 2Y/10Y yield history for charting. */
 
+const AUS_Y2_SEED = [
+  { period: '2023-10', value: 4.35 }, { period: '2023-11', value: 4.28 },
+  { period: '2023-12', value: 3.95 }, { period: '2024-01', value: 3.82 },
+  { period: '2024-02', value: 3.95 }, { period: '2024-03', value: 3.72 },
+  { period: '2024-04', value: 4.05 }, { period: '2024-05', value: 4.15 },
+  { period: '2024-06', value: 4.22 }, { period: '2024-07', value: 3.95 },
+  { period: '2024-08', value: 3.72 }, { period: '2024-09', value: 3.58 },
+  { period: '2024-10', value: 3.85 }, { period: '2024-11', value: 3.95 },
+  { period: '2024-12', value: 3.88 }, { period: '2025-01', value: 3.95 },
+  { period: '2025-02', value: 3.82 }, { period: '2025-03', value: 3.75 },
+  { period: '2025-04', value: 3.55 }, { period: '2025-05', value: 3.48 },
+  { period: '2025-06', value: 3.42 }, { period: '2025-07', value: 3.55 },
+  { period: '2025-08', value: 3.48 }, { period: '2025-09', value: 3.52 },
+  { period: '2025-10', value: 3.437 }, { period: '2025-11', value: 3.669 },
+  { period: '2025-12', value: 4.008 }, { period: '2026-01', value: 4.08 },
+  { period: '2026-02', value: 4.23 }, { period: '2026-03', value: 4.537 },
+  { period: '2026-04', value: 4.663 }, { period: '2026-05', value: 4.658 },
+  { period: '2026-06', value: 4.497 }, { period: '2026-07', value: 4.517 },
+  { period: '2026-08', value: 4.573 }, { period: '2026-09', value: 4.922 }
+];
+
 const START = '2023-10-01';
 const MAX_WEEKLY = 160;
 const MAX_MONTHLY = 40;
@@ -190,6 +211,8 @@ for (const [id, seriesId] of Object.entries(FRED_10Y)) {
     errors.push(`Yield-Charts ${id} 10Y: ${e.message}`);
   }
 }
+
+histories['AUS-y2'] = mergeHistory(AUS_Y2_SEED, histories['AUS-y2'] || [], MAX_MONTHLY);
 
 const today = new Date().toISOString().slice(0, 10);
 for (const id of countries) {
