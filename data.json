@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20T17:01:21.809Z",
+  "updatedAt": "2026-10-20T21:36:21.541Z",
   "data": {
     "CHN": {
       "rate": {
@@ -45,12 +45,12 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.795,
+        "value": 4.78,
         "date": "2026-10-20",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 5.131,
+        "value": 5.111,
         "date": "2026-10-20",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
@@ -60,13 +60,13 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "tips5": {
-        "value": 2.52,
-        "date": "2026-10-16",
+        "value": 2.56,
+        "date": "2026-10-19",
         "source": "FRED · DFII5 (US TIPS real yield, constant maturity)"
       },
       "tips10": {
-        "value": 2.74,
-        "date": "2026-10-16",
+        "value": 2.8,
+        "date": "2026-10-19",
         "source": "FRED · DFII10 (US TIPS real yield, constant maturity)"
       },
       "reservesGdp": {
@@ -92,7 +92,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 2.909,
+        "value": 2.894,
         "date": "2026-10-20",
         "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
@@ -102,7 +102,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.916,
+        "value": 1.897,
         "date": "2026-10-20",
         "source": "TradingView · TVC:JP02Y (Japan 2 Year LSEG Government Bonds Yield)"
       },
@@ -198,7 +198,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.877,
+        "value": 4.884,
         "date": "2026-10-20",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
@@ -1063,7 +1063,7 @@
       },
       {
         "period": "2026-10",
-        "value": 2.52
+        "value": 2.56
       }
     ],
     "USA-tips10": [
@@ -1213,7 +1213,7 @@
       },
       {
         "period": "2026-10",
-        "value": 2.74
+        "value": 2.8
       }
     ],
     "USA-y2": [
@@ -1850,12 +1850,12 @@
         "value": 4.79
       },
       {
-        "period": "2026-10-16",
-        "value": 4.74
+        "period": "2026-10-19",
+        "value": 4.77
       },
       {
         "period": "2026-10-20",
-        "value": 4.795
+        "value": 4.78
       }
     ],
     "USA-y10": [
@@ -2492,12 +2492,12 @@
         "value": 5.21
       },
       {
-        "period": "2026-10-16",
-        "value": 5.09
+        "period": "2026-10-19",
+        "value": 5.15
       },
       {
         "period": "2026-10-20",
-        "value": 5.131
+        "value": 5.111
       }
     ],
     "DEU-y2": [
@@ -4423,7 +4423,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 1.916
+        "value": 1.897
       }
     ],
     "JPN-y10": [
@@ -5065,7 +5065,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 2.909
+        "value": 2.894
       }
     ],
     "CHN-y2": [
@@ -6949,7 +6949,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 4.877
+        "value": 4.884
       }
     ],
     "USA-rate": [
