@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20T04:05:09.726Z",
+  "updatedAt": "2026-10-20T04:47:27.344Z",
   "data": {
     "CHN": {
       "rate": {
@@ -45,12 +45,12 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.761,
+        "value": 4.759,
         "date": "2026-10-20",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 5.127,
+        "value": 5.123,
         "date": "2026-10-20",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
@@ -92,7 +92,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 2.902,
+        "value": 2.903,
         "date": "2026-10-20",
         "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
@@ -188,7 +188,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 5.275,
+        "value": 5.269,
         "date": "2026-10-20",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
@@ -198,7 +198,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.898,
+        "value": 4.895,
         "date": "2026-10-20",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
@@ -1855,7 +1855,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 4.761
+        "value": 4.759
       }
     ],
     "USA-y10": [
@@ -2497,7 +2497,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 5.127
+        "value": 5.123
       }
     ],
     "DEU-y2": [
@@ -5065,7 +5065,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 2.902
+        "value": 2.903
       }
     ],
     "CHN-y2": [
@@ -6799,7 +6799,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 5.275
+        "value": 5.269
       }
     ],
     "AUS-y2": [
@@ -6949,7 +6949,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 4.898
+        "value": 4.895
       }
     ],
     "USA-rate": [
