@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20T01:26:58.352Z",
+  "updatedAt": "2026-10-20T01:30:56.580Z",
   "data": {
     "CHN": {
       "rate": {
@@ -18,7 +18,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.248,
+        "value": 1.249,
         "date": "2026-10-20",
         "source": "TradingView · TVC:CN02Y (China 2 Year Government Bonds Yield)"
       },
@@ -26,6 +26,11 @@
         "value": 1.63,
         "date": "2026-10-20",
         "source": "TradingView · TVC:CN10Y (China 10 Year Government Bonds Yield)"
+      },
+      "deficit": {
+        "value": -8,
+        "date": "IMF · 2026",
+        "source": "IMF DataMapper · GGXCNL_NGDP (Net lending/borrowing % GDP)"
       }
     },
     "USA": {
@@ -68,6 +73,11 @@
         "value": 9.02,
         "date": "2026-08",
         "source": "FRED · TOTRESNS / GDP (Bank reserves vs nominal GDP)"
+      },
+      "deficit": {
+        "value": -8.5,
+        "date": "IMF · 2026",
+        "source": "IMF DataMapper · GGXCNL_NGDP (Net lending/borrowing % GDP)"
       }
     },
     "JPN": {
@@ -95,6 +105,11 @@
         "value": 1.889,
         "date": "2026-10-20",
         "source": "TradingView · TVC:JP02Y (Japan 2 Year LSEG Government Bonds Yield)"
+      },
+      "deficit": {
+        "value": -1.4,
+        "date": "IMF · 2026",
+        "source": "IMF DataMapper · GGXCNL_NGDP (Net lending/borrowing % GDP)"
       }
     },
     "FRA": {
@@ -122,6 +137,11 @@
         "value": 3.6479,
         "date": "2026-10-20",
         "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
+      },
+      "deficit": {
+        "value": -5.4,
+        "date": "IMF · 2026",
+        "source": "IMF DataMapper · GGXCNL_NGDP (Net lending/borrowing % GDP)"
       }
     },
     "DEU": {
@@ -149,6 +169,11 @@
         "value": 3.0958,
         "date": "2026-10-20",
         "source": "TradingView · TVC:DE02Y (Germany 2 Year Government Bonds Yield)"
+      },
+      "deficit": {
+        "value": -4.3,
+        "date": "IMF · 2026",
+        "source": "IMF DataMapper · GGXCNL_NGDP (Net lending/borrowing % GDP)"
       }
     },
     "AUS": {
@@ -163,7 +188,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 5.284,
+        "value": 5.285,
         "date": "2026-10-20",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
@@ -173,9 +198,14 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.904,
+        "value": 4.903,
         "date": "2026-10-20",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
+      },
+      "deficit": {
+        "value": -3.2,
+        "date": "IMF · 2026",
+        "source": "IMF DataMapper · GGXCNL_NGDP (Net lending/borrowing % GDP)"
       }
     }
   },
@@ -1406,226 +1436,6 @@
         "value": 5.131
       }
     ],
-    "DEU-y2": [
-      {
-        "period": "2026-04-24",
-        "value": 2.542
-      },
-      {
-        "period": "2026-05-04",
-        "value": 2.64
-      },
-      {
-        "period": "2026-05-11",
-        "value": 2.592
-      },
-      {
-        "period": "2026-05-18",
-        "value": 2.64
-      },
-      {
-        "period": "2026-05-25",
-        "value": 2.478
-      },
-      {
-        "period": "2026-06-01",
-        "value": 2.578
-      },
-      {
-        "period": "2026-06-08",
-        "value": 2.624
-      },
-      {
-        "period": "2026-06-15",
-        "value": 2.518
-      },
-      {
-        "period": "2026-06-22",
-        "value": 2.545
-      },
-      {
-        "period": "2026-06-29",
-        "value": 2.477
-      },
-      {
-        "period": "2026-07-06",
-        "value": 2.485
-      },
-      {
-        "period": "2026-07-13",
-        "value": 2.645
-      },
-      {
-        "period": "2026-07-20",
-        "value": 2.71
-      },
-      {
-        "period": "2026-07-27",
-        "value": 2.73
-      },
-      {
-        "period": "2026-08-03",
-        "value": 2.702
-      },
-      {
-        "period": "2026-08-10",
-        "value": 2.721
-      },
-      {
-        "period": "2026-08-17",
-        "value": 2.736
-      },
-      {
-        "period": "2026-08-24",
-        "value": 2.796
-      },
-      {
-        "period": "2026-08-31",
-        "value": 2.856
-      },
-      {
-        "period": "2026-09-07",
-        "value": 2.913
-      },
-      {
-        "period": "2026-09-14",
-        "value": 3.228
-      },
-      {
-        "period": "2026-09-21",
-        "value": 3.148
-      },
-      {
-        "period": "2026-09-28",
-        "value": 3.233
-      },
-      {
-        "period": "2026-10-05",
-        "value": 2.997
-      },
-      {
-        "period": "2026-10-12",
-        "value": 3.066
-      },
-      {
-        "period": "2026-10-16",
-        "value": 3.03
-      },
-      {
-        "period": "2026-10-20",
-        "value": 3.096
-      }
-    ],
-    "FRA-y2": [
-      {
-        "period": "2026-04-24",
-        "value": 2.542
-      },
-      {
-        "period": "2026-05-04",
-        "value": 2.64
-      },
-      {
-        "period": "2026-05-11",
-        "value": 2.592
-      },
-      {
-        "period": "2026-05-18",
-        "value": 2.64
-      },
-      {
-        "period": "2026-05-25",
-        "value": 2.478
-      },
-      {
-        "period": "2026-06-01",
-        "value": 2.578
-      },
-      {
-        "period": "2026-06-08",
-        "value": 2.624
-      },
-      {
-        "period": "2026-06-15",
-        "value": 2.518
-      },
-      {
-        "period": "2026-06-22",
-        "value": 2.545
-      },
-      {
-        "period": "2026-06-29",
-        "value": 2.477
-      },
-      {
-        "period": "2026-07-06",
-        "value": 2.485
-      },
-      {
-        "period": "2026-07-13",
-        "value": 2.645
-      },
-      {
-        "period": "2026-07-20",
-        "value": 2.71
-      },
-      {
-        "period": "2026-07-27",
-        "value": 2.73
-      },
-      {
-        "period": "2026-08-03",
-        "value": 2.702
-      },
-      {
-        "period": "2026-08-10",
-        "value": 2.721
-      },
-      {
-        "period": "2026-08-17",
-        "value": 2.736
-      },
-      {
-        "period": "2026-08-24",
-        "value": 2.796
-      },
-      {
-        "period": "2026-08-31",
-        "value": 2.856
-      },
-      {
-        "period": "2026-09-07",
-        "value": 2.913
-      },
-      {
-        "period": "2026-09-14",
-        "value": 3.228
-      },
-      {
-        "period": "2026-09-21",
-        "value": 3.148
-      },
-      {
-        "period": "2026-09-28",
-        "value": 3.233
-      },
-      {
-        "period": "2026-10-05",
-        "value": 2.997
-      },
-      {
-        "period": "2026-10-12",
-        "value": 3.066
-      },
-      {
-        "period": "2026-10-16",
-        "value": 3.03
-      },
-      {
-        "period": "2026-10-20",
-        "value": 3.648
-      }
-    ],
     "JPN-y2": [
       {
         "period": "2026-05-11",
@@ -1843,7 +1653,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 1.248
+        "value": 1.249
       }
     ],
     "CHN-y10": [
@@ -2007,7 +1817,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 4.904
+        "value": 4.903
       }
     ],
     "DEU-y10": [
@@ -2127,7 +1937,19 @@
       },
       {
         "period": "2026-10-20",
-        "value": 5.284
+        "value": 5.285
+      }
+    ],
+    "FRA-y2": [
+      {
+        "period": "2026-10-20",
+        "value": 3.648
+      }
+    ],
+    "DEU-y2": [
+      {
+        "period": "2026-10-20",
+        "value": 3.096
       }
     ],
     "USA-rate": [
@@ -3197,6 +3019,210 @@
         "period": "2026-08",
         "value": 9.02
       }
+    ],
+    "USA-deficit": [
+      {
+        "period": "2024",
+        "value": -7.8
+      },
+      {
+        "period": "2025",
+        "value": -7.1
+      },
+      {
+        "period": "2026",
+        "value": -8.5
+      },
+      {
+        "period": "2027",
+        "value": -7.8
+      },
+      {
+        "period": "2028",
+        "value": -8.1
+      },
+      {
+        "period": "2029",
+        "value": -8.3
+      },
+      {
+        "period": "2030",
+        "value": -8.4
+      },
+      {
+        "period": "2031",
+        "value": -8.4
+      }
+    ],
+    "DEU-deficit": [
+      {
+        "period": "2024",
+        "value": -2.7
+      },
+      {
+        "period": "2025",
+        "value": -2.9
+      },
+      {
+        "period": "2026",
+        "value": -4.3
+      },
+      {
+        "period": "2027",
+        "value": -4.6
+      },
+      {
+        "period": "2028",
+        "value": -4.5
+      },
+      {
+        "period": "2029",
+        "value": -4.2
+      },
+      {
+        "period": "2030",
+        "value": -4.1
+      },
+      {
+        "period": "2031",
+        "value": -4
+      }
+    ],
+    "FRA-deficit": [
+      {
+        "period": "2024",
+        "value": -5.8
+      },
+      {
+        "period": "2025",
+        "value": -5.1
+      },
+      {
+        "period": "2026",
+        "value": -5.4
+      },
+      {
+        "period": "2027",
+        "value": -5.2
+      },
+      {
+        "period": "2028",
+        "value": -4.9
+      },
+      {
+        "period": "2029",
+        "value": -4.5
+      },
+      {
+        "period": "2030",
+        "value": -4.2
+      },
+      {
+        "period": "2031",
+        "value": -3.9
+      }
+    ],
+    "JPN-deficit": [
+      {
+        "period": "2024",
+        "value": -1.7
+      },
+      {
+        "period": "2025",
+        "value": -0.7
+      },
+      {
+        "period": "2026",
+        "value": -1.4
+      },
+      {
+        "period": "2027",
+        "value": -2.1
+      },
+      {
+        "period": "2028",
+        "value": -2.7
+      },
+      {
+        "period": "2029",
+        "value": -3.2
+      },
+      {
+        "period": "2030",
+        "value": -3.6
+      },
+      {
+        "period": "2031",
+        "value": -4
+      }
+    ],
+    "CHN-deficit": [
+      {
+        "period": "2024",
+        "value": -7.2
+      },
+      {
+        "period": "2025",
+        "value": -7.9
+      },
+      {
+        "period": "2026",
+        "value": -8
+      },
+      {
+        "period": "2027",
+        "value": -8.4
+      },
+      {
+        "period": "2028",
+        "value": -8.2
+      },
+      {
+        "period": "2029",
+        "value": -8
+      },
+      {
+        "period": "2030",
+        "value": -8
+      },
+      {
+        "period": "2031",
+        "value": -8
+      }
+    ],
+    "AUS-deficit": [
+      {
+        "period": "2024",
+        "value": -2.1
+      },
+      {
+        "period": "2025",
+        "value": -2.9
+      },
+      {
+        "period": "2026",
+        "value": -3.2
+      },
+      {
+        "period": "2027",
+        "value": -3
+      },
+      {
+        "period": "2028",
+        "value": -2.8
+      },
+      {
+        "period": "2029",
+        "value": -2.6
+      },
+      {
+        "period": "2030",
+        "value": -2.4
+      },
+      {
+        "period": "2031",
+        "value": -2.4
+      }
     ]
   },
   "forecasts": {
@@ -3252,6 +3278,7 @@
   },
   "errors": [
     "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer",
+    "Yield-Charts ECB 2Y: ECB 2Y HTTP 504",
     "Inflation-Chart JPN: keine YoY-Punkte"
   ]
 }
