@@ -65,7 +65,6 @@ function mergeHistory(existing, incoming, maxPts = 30) {
 }
 
 async function ecb2Y(start = '2026-04-01') {
-  // AAA euro-area 2Y spot (reliable); shape for DE/FR charts
   const url = `https://data-api.ecb.europa.eu/service/data/YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_2Y?startPeriod=${start}&format=csvdata`;
   const r = await fetch(url, {
     headers: { Accept: 'text/csv', 'User-Agent': 'MacroWatch/1.5' },
@@ -111,6 +110,29 @@ async function japan2Y() {
   return rows;
 }
 
+async function chinaYields(symbol) {
+  // Sina Finance: China gov bond daily (CN2YT, CN10YT)
+  const url = `https://bond.finance.sina.com.cn/hq/gb/daily?symbol=${symbol}`;
+  const r = await fetch(url, {
+    headers: { 'User-Agent': 'MacroWatch/1.5', Accept: 'application/json' },
+    signal: AbortSignal.timeout(30000),
+    cache: 'no-store'
+  });
+  if (!r.ok) throw new Error(`Sina ${symbol} HTTP ${r.status}`);
+  const j = await r.json();
+  const data = j?.result?.data || j?.data || [];
+  const rows = [];
+  for (const x of data) {
+    const d = x.d || x.date;
+    const c = Number(x.c ?? x.close);
+    if (!d || !Number.isFinite(c)) continue;
+    if (String(d) < '2026-04-01') continue;
+    rows.push({ period: String(d).slice(0, 10), value: Math.round(c * 1000) / 1000 });
+  }
+  rows.sort((a, b) => a.period.localeCompare(b.period));
+  return rows;
+}
+
 const payload = JSON.parse(fs.readFileSync('data.json', 'utf8'));
 const data = payload.data || {};
 const histories = payload.histories || {};
@@ -137,6 +159,15 @@ try {
   if (jp.length) histories['JPN-y2'] = mergeHistory([], jp, 28);
 } catch (e) {
   errors.push(`Yield-Charts JPN 2Y: ${e.message}`);
+}
+
+try {
+  const cn2 = sampleWeekly(await chinaYields('CN2YT'));
+  const cn10 = sampleWeekly(await chinaYields('CN10YT'));
+  if (cn2.length) histories['CHN-y2'] = mergeHistory([], cn2, 28);
+  if (cn10.length) histories['CHN-y10'] = mergeHistory([], cn10, 28);
+} catch (e) {
+  errors.push(`Yield-Charts CHN Sina: ${e.message}`);
 }
 
 histories['AUS-y2'] = mergeHistory([], AUS_Y2_SEED, 18);
@@ -171,4 +202,13 @@ payload.errors = [
   ...errors
 ];
 fs.writeFileSync('data.json', JSON.stringify(payload, null, 2) + '\n');
-console.log('y2-charts', 'USA', (histories['USA-y2']||[]).length, 'DEU', (histories['DEU-y2']||[]).length, 'FRA', (histories['FRA-y2']||[]).length, 'JPN', (histories['JPN-y2']||[]).length, 'AUS', (histories['AUS-y2']||[]).length, 'CHN', (histories['CHN-y2']||[]).length);
+console.log(
+  'charts',
+  'USA-y2', (histories['USA-y2'] || []).length,
+  'DEU-y2', (histories['DEU-y2'] || []).length,
+  'FRA-y2', (histories['FRA-y2'] || []).length,
+  'JPN-y2', (histories['JPN-y2'] || []).length,
+  'AUS-y2', (histories['AUS-y2'] || []).length,
+  'CHN-y2', (histories['CHN-y2'] || []).length,
+  'CHN-y10', (histories['CHN-y10'] || []).length
+);
