@@ -25,7 +25,7 @@ const FRED_10Y = {
 async function fredSeries(id, start = '2026-04-01') {
   const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=${start}`;
   const r = await fetch(url, {
-    headers: { 'User-Agent': 'MacroWatch/1.5 (+https://hossein7935.github.io/)' },
+    headers: { 'User-Agent': 'MacroWatch/1.6 (+https://hossein7935.github.io/)' },
     signal: AbortSignal.timeout(30000),
     cache: 'no-store'
   });
@@ -67,7 +67,7 @@ function mergeHistory(existing, incoming, maxPts = 30) {
 async function ecb2Y(start = '2026-04-01') {
   const url = `https://data-api.ecb.europa.eu/service/data/YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_2Y?startPeriod=${start}&format=csvdata`;
   const r = await fetch(url, {
-    headers: { Accept: 'text/csv', 'User-Agent': 'MacroWatch/1.5' },
+    headers: { Accept: 'text/csv', 'User-Agent': 'MacroWatch/1.6' },
     signal: AbortSignal.timeout(60000),
     cache: 'no-store'
   });
@@ -75,17 +75,31 @@ async function ecb2Y(start = '2026-04-01') {
   const text = await r.text();
   const rows = [];
   for (const line of text.trim().split(/\r?\n/).slice(1)) {
-    const m = line.match(/(20\d{2}-\d{2}-\d{2}),([0-9.]+)/);
-    if (m) rows.push({ period: m[1], value: Math.round(Number(m[2]) * 1000) / 1000 });
+    if (!line || line.startsWith('{')) continue;
+    const m = line.match(/(20\d{2}-\d{2}-\d{2})[,;]([0-9]+\.[0-9]+)/);
+    if (m) {
+      rows.push({ period: m[1], value: Math.round(Number(m[2]) * 1000) / 1000 });
+      continue;
+    }
+    const parts = line.split(',');
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (/^20\d{2}-\d{2}-\d{2}$/.test(parts[i].trim()) && Number.isFinite(Number(parts[i + 1]))) {
+        rows.push({ period: parts[i].trim(), value: Math.round(Number(parts[i + 1]) * 1000) / 1000 });
+        break;
+      }
+    }
   }
-  if (!rows.length) throw new Error('ECB 2Y keine Punkte');
-  return rows;
+  const map = new Map();
+  for (const p of rows) map.set(p.period, p.value);
+  const out = [...map.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([period, value]) => ({ period, value }));
+  if (!out.length) throw new Error('ECB 2Y keine Punkte');
+  return out;
 }
 
 async function japan2Y() {
   const url = 'https://www.mof.go.jp/jgbs/reference/interest_rate/data/jgbcm_all.csv';
   const r = await fetch(url, {
-    headers: { 'User-Agent': 'MacroWatch/1.5' },
+    headers: { 'User-Agent': 'MacroWatch/1.6' },
     signal: AbortSignal.timeout(60000),
     cache: 'no-store'
   });
@@ -111,10 +125,9 @@ async function japan2Y() {
 }
 
 async function chinaYields(symbol) {
-  // Sina Finance: China gov bond daily (CN2YT, CN10YT)
   const url = `https://bond.finance.sina.com.cn/hq/gb/daily?symbol=${symbol}`;
   const r = await fetch(url, {
-    headers: { 'User-Agent': 'MacroWatch/1.5', Accept: 'application/json' },
+    headers: { 'User-Agent': 'MacroWatch/1.6', Accept: 'application/json' },
     signal: AbortSignal.timeout(30000),
     cache: 'no-store'
   });
@@ -148,8 +161,9 @@ try {
 
 try {
   const ecb = sampleWeekly(await ecb2Y('2026-04-01'));
-  histories['DEU-y2'] = mergeHistory([], ecb, 28);
-  histories['FRA-y2'] = mergeHistory([], ecb, 28);
+  histories['DEU-y2'] = ecb.slice();
+  histories['FRA-y2'] = ecb.slice();
+  if (!histories['DEU-y2'].length) throw new Error('ECB empty after sample');
 } catch (e) {
   errors.push(`Yield-Charts ECB 2Y: ${e.message}`);
 }
