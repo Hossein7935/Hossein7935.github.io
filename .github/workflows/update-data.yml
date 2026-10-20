@@ -44,6 +44,7 @@ jobs:
           node --check scripts/fetch-inflation-charts.mjs
           node --check scripts/fetch-gdp-charts.mjs
           node --check scripts/fetch-reserves-gdp.mjs
+          node --check scripts/fetch-deficit.mjs
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
@@ -66,6 +67,8 @@ jobs:
         run: node scripts/fetch-gdp-charts.mjs
       - name: US bank reserves relative to GDP
         run: node scripts/fetch-reserves-gdp.mjs
+      - name: Fiscal deficit (IMF)
+        run: node scripts/fetch-deficit.mjs
       - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
