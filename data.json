@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20T00:51:43.908Z",
+  "updatedAt": "2026-10-20T00:56:33.250Z",
   "data": {
     "CHN": {
       "rate": {
@@ -77,7 +77,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 2.931,
+        "value": 2.933,
         "date": "2026-10-20",
         "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
@@ -158,7 +158,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 5.298,
+        "value": 5.291,
         "date": "2026-10-20",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
@@ -168,7 +168,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.919,
+        "value": 4.916,
         "date": "2026-10-20",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       }
@@ -177,112 +177,292 @@
   "histories": {
     "USA-gdp": [
       {
-        "period": "2025-Q2",
+        "period": "2023-01",
+        "value": 3.4
+      },
+      {
+        "period": "2023-04",
+        "value": 2.2
+      },
+      {
+        "period": "2023-07",
+        "value": 4.5
+      },
+      {
+        "period": "2023-10",
+        "value": 3.6
+      },
+      {
+        "period": "2024-01",
+        "value": 1.4
+      },
+      {
+        "period": "2024-04",
+        "value": 3.6
+      },
+      {
+        "period": "2024-07",
+        "value": 3.2
+      },
+      {
+        "period": "2024-10",
+        "value": 2.4
+      },
+      {
+        "period": "2025-01",
+        "value": 0.1
+      },
+      {
+        "period": "2025-04",
         "value": 4
       },
       {
-        "period": "2025-Q3",
+        "period": "2025-07",
         "value": 3.9
       },
       {
-        "period": "2025-Q4",
+        "period": "2025-10",
         "value": 0.2
       },
       {
-        "period": "2026-Q1",
+        "period": "2026-01",
         "value": 2.5
       },
       {
-        "period": "2026-Q2",
+        "period": "2026-04",
         "value": 2.2
       }
     ],
     "JPN-gdp": [
       {
-        "period": "2025-Q2",
-        "value": 0.12350645171772534
+        "period": "2023-01",
+        "value": 0.87
       },
       {
-        "period": "2025-Q3",
-        "value": -0.3736948177487265
+        "period": "2023-04",
+        "value": 0.07
       },
       {
-        "period": "2025-Q4",
-        "value": 0.26189742702447116
+        "period": "2023-07",
+        "value": -1.25
       },
       {
-        "period": "2026-Q1",
-        "value": 0.4781979900969624
+        "period": "2023-10",
+        "value": 0.48
       },
       {
-        "period": "2026-Q2",
-        "value": 0.36045618686213476
+        "period": "2024-01",
+        "value": -0.09
+      },
+      {
+        "period": "2024-04",
+        "value": -0.12
+      },
+      {
+        "period": "2024-07",
+        "value": 0.84
+      },
+      {
+        "period": "2024-10",
+        "value": 0.4
+      },
+      {
+        "period": "2025-01",
+        "value": 0.5
+      },
+      {
+        "period": "2025-04",
+        "value": 0.12
+      },
+      {
+        "period": "2025-07",
+        "value": -0.37
+      },
+      {
+        "period": "2025-10",
+        "value": 0.26
+      },
+      {
+        "period": "2026-01",
+        "value": 0.48
+      },
+      {
+        "period": "2026-04",
+        "value": 0.36
       }
     ],
     "FRA-gdp": [
       {
-        "period": "2025-Q2",
-        "value": 0.23591556247890555
+        "period": "2023-01",
+        "value": 0.14
       },
       {
-        "period": "2025-Q3",
-        "value": 0.42374957258870527
+        "period": "2023-04",
+        "value": 0.93
       },
       {
-        "period": "2025-Q4",
-        "value": 0.2629338244650281
+        "period": "2023-07",
+        "value": 0.37
       },
       {
-        "period": "2026-Q1",
-        "value": -0.1798958413278262
+        "period": "2023-10",
+        "value": 0.5
       },
       {
-        "period": "2026-Q2",
-        "value": 0.035427586682845735
+        "period": "2024-01",
+        "value": 0.24
+      },
+      {
+        "period": "2024-04",
+        "value": 0.22
+      },
+      {
+        "period": "2024-07",
+        "value": 0.43
+      },
+      {
+        "period": "2024-10",
+        "value": -0.01
+      },
+      {
+        "period": "2025-01",
+        "value": 0.17
+      },
+      {
+        "period": "2025-04",
+        "value": 0.24
+      },
+      {
+        "period": "2025-07",
+        "value": 0.42
+      },
+      {
+        "period": "2025-10",
+        "value": 0.26
+      },
+      {
+        "period": "2026-01",
+        "value": -0.18
+      },
+      {
+        "period": "2026-04",
+        "value": 0.04
       }
     ],
     "DEU-gdp": [
       {
-        "period": "2025-Q2",
-        "value": -0.019001601913737343
+        "period": "2023-01",
+        "value": -0.68
       },
       {
-        "period": "2025-Q3",
-        "value": -0.028527173390635596
+        "period": "2023-04",
+        "value": -0.1
       },
       {
-        "period": "2025-Q4",
-        "value": 0.2662650642838216
+        "period": "2023-07",
+        "value": 0.15
       },
       {
-        "period": "2026-Q1",
-        "value": 0.44575021640702595
+        "period": "2023-10",
+        "value": -0.3
       },
       {
-        "period": "2026-Q2",
-        "value": 0.3304647689418516
+        "period": "2024-01",
+        "value": 0.21
+      },
+      {
+        "period": "2024-04",
+        "value": -0.13
+      },
+      {
+        "period": "2024-07",
+        "value": 0.11
+      },
+      {
+        "period": "2024-10",
+        "value": 0.22
+      },
+      {
+        "period": "2025-01",
+        "value": 0.12
+      },
+      {
+        "period": "2025-04",
+        "value": -0.02
+      },
+      {
+        "period": "2025-07",
+        "value": -0.03
+      },
+      {
+        "period": "2025-10",
+        "value": 0.27
+      },
+      {
+        "period": "2026-01",
+        "value": 0.45
+      },
+      {
+        "period": "2026-04",
+        "value": 0.33
       }
     ],
     "AUS-gdp": [
       {
-        "period": "2025-Q2",
-        "value": 0.7804049629223098
+        "period": "2023-01",
+        "value": 0.57
       },
       {
-        "period": "2025-Q3",
-        "value": 0.5036345210872373
+        "period": "2023-04",
+        "value": 0.35
       },
       {
-        "period": "2025-Q4",
-        "value": 0.9124312952310865
+        "period": "2023-07",
+        "value": 0.37
       },
       {
-        "period": "2026-Q1",
-        "value": 0.2862280811632312
+        "period": "2023-10",
+        "value": 0.03
       },
       {
-        "period": "2026-Q2",
-        "value": 0.41950271269806105
+        "period": "2024-01",
+        "value": 0.34
+      },
+      {
+        "period": "2024-04",
+        "value": 0.17
+      },
+      {
+        "period": "2024-07",
+        "value": 0.27
+      },
+      {
+        "period": "2024-10",
+        "value": 0.44
+      },
+      {
+        "period": "2025-01",
+        "value": 0.39
+      },
+      {
+        "period": "2025-04",
+        "value": 0.78
+      },
+      {
+        "period": "2025-07",
+        "value": 0.5
+      },
+      {
+        "period": "2025-10",
+        "value": 0.91
+      },
+      {
+        "period": "2026-01",
+        "value": 0.29
+      },
+      {
+        "period": "2026-04",
+        "value": 0.42
       }
     ],
     "CHN-inflation": [
@@ -1522,7 +1702,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 4.919
+        "value": 4.916
       }
     ],
     "DEU-y10": [
@@ -1612,7 +1792,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 2.931
+        "value": 2.933
       }
     ],
     "AUS-y10": [
@@ -1642,7 +1822,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 5.298
+        "value": 5.291
       }
     ],
     "USA-rate": [
@@ -2543,6 +2723,32 @@
       {
         "period": "2026-10",
         "value": 4.6
+      }
+    ],
+    "CHN-gdp": [
+      {
+        "period": "2020",
+        "value": 2.34
+      },
+      {
+        "period": "2021",
+        "value": 8.57
+      },
+      {
+        "period": "2022",
+        "value": 3.13
+      },
+      {
+        "period": "2023",
+        "value": 5.42
+      },
+      {
+        "period": "2024",
+        "value": 4.96
+      },
+      {
+        "period": "2025",
+        "value": 4.96
       }
     ]
   },
