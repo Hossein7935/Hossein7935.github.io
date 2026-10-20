@@ -54,11 +54,11 @@ jobs:
         run: node scripts/fetch-y10.mjs
       - name: Fill US TIPS
         run: node scripts/fetch-tips.mjs
-      - name: Build 6-month yield charts
+      - name: Build 6-month yield charts (2Y/10Y)
         run: node scripts/fetch-yield-charts.mjs
       - name: Build 3-year policy rate charts
         run: node scripts/fetch-rate-charts.mjs
-      - name: Build inflation charts (3y)
+      - name: Build inflation charts (3y selectable)
         run: node scripts/fetch-inflation-charts.mjs
       - name: Commit updated data
         run: |
