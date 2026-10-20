@@ -24,7 +24,6 @@ jobs:
         run: |
           set -e
           if ! grep -q 'async function loadInflation' scripts/update-data.mjs 2>/dev/null; then
-            echo "Restoring update-data.mjs from known good commit"
             git show c8234d974ef2cf0248b0edd8a81744c2cd03227e:scripts/update-data.mjs > scripts/update-data.mjs
           fi
           sed -i 's/ageDays > 200/ageDays > 280/g' scripts/update-data.mjs
@@ -40,18 +39,21 @@ jobs:
           node --check scripts/fetch-y2.mjs
           node --check scripts/fetch-y10.mjs
           node --check scripts/fetch-tips.mjs
+          node --check scripts/fetch-yield-charts.mjs
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
         run: node scripts/update-data.mjs
-      - name: Fill inflation (IMF PCPIPCH / World Bank)
+      - name: Fill inflation
         run: node scripts/fetch-inflation.mjs
-      - name: Fill 2Y yields (TradingView TVC:*02Y)
+      - name: Fill 2Y yields
         run: node scripts/fetch-y2.mjs
-      - name: Fill 10Y yields (TradingView TVC:*10Y)
+      - name: Fill 10Y yields
         run: node scripts/fetch-y10.mjs
-      - name: Fill US TIPS real yields (FRED DFII5/DFII10)
+      - name: Fill US TIPS
         run: node scripts/fetch-tips.mjs
+      - name: Build 6-month yield charts
+        run: node scripts/fetch-yield-charts.mjs
       - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
