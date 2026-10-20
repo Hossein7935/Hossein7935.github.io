@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20T01:06:49.820Z",
+  "updatedAt": "2026-10-20T01:16:15.997Z",
   "data": {
     "CHN": {
       "rate": {
@@ -18,12 +18,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.254,
+        "value": 1.251,
         "date": "2026-10-20",
         "source": "TradingView · TVC:CN02Y (China 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 1.626,
+        "value": 1.628,
         "date": "2026-10-20",
         "source": "TradingView · TVC:CN10Y (China 10 Year Government Bonds Yield)"
       }
@@ -45,7 +45,7 @@
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 5.136,
+        "value": 5.134,
         "date": "2026-10-20",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
@@ -63,6 +63,11 @@
         "value": 2.74,
         "date": "2026-10-16",
         "source": "FRED · DFII10 (US TIPS real yield, constant maturity)"
+      },
+      "reservesGdp": {
+        "value": 9.02,
+        "date": "2026-08",
+        "source": "FRED · TOTRESNS / GDP (Bank reserves vs nominal GDP)"
       }
     },
     "JPN": {
@@ -87,7 +92,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.892,
+        "value": 1.891,
         "date": "2026-10-20",
         "source": "TradingView · TVC:JP02Y (Japan 2 Year LSEG Government Bonds Yield)"
       }
@@ -168,7 +173,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.913,
+        "value": 4.909,
         "date": "2026-10-20",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       }
@@ -1398,7 +1403,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 5.136
+        "value": 5.134
       }
     ],
     "DEU-y2": [
@@ -1728,7 +1733,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 1.892
+        "value": 1.891
       }
     ],
     "CHN-y2": [
@@ -1838,7 +1843,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 1.254
+        "value": 1.251
       }
     ],
     "CHN-y10": [
@@ -1948,7 +1953,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 1.626
+        "value": 1.628
       }
     ],
     "AUS-y2": [
@@ -2002,7 +2007,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 4.913
+        "value": 4.909
       }
     ],
     "DEU-y10": [
@@ -3049,6 +3054,148 @@
       {
         "period": "2025",
         "value": 4.96
+      }
+    ],
+    "USA-reservesGdp": [
+      {
+        "period": "2023-10",
+        "value": 11.51
+      },
+      {
+        "period": "2023-11",
+        "value": 11.96
+      },
+      {
+        "period": "2023-12",
+        "value": 12.27
+      },
+      {
+        "period": "2024-01",
+        "value": 12.18
+      },
+      {
+        "period": "2024-02",
+        "value": 12.39
+      },
+      {
+        "period": "2024-03",
+        "value": 12.31
+      },
+      {
+        "period": "2024-04",
+        "value": 11.73
+      },
+      {
+        "period": "2024-05",
+        "value": 11.55
+      },
+      {
+        "period": "2024-06",
+        "value": 11.56
+      },
+      {
+        "period": "2024-07",
+        "value": 11.17
+      },
+      {
+        "period": "2024-08",
+        "value": 11.23
+      },
+      {
+        "period": "2024-09",
+        "value": 10.95
+      },
+      {
+        "period": "2024-10",
+        "value": 10.73
+      },
+      {
+        "period": "2024-11",
+        "value": 10.88
+      },
+      {
+        "period": "2024-12",
+        "value": 10.83
+      },
+      {
+        "period": "2025-01",
+        "value": 10.79
+      },
+      {
+        "period": "2025-02",
+        "value": 10.81
+      },
+      {
+        "period": "2025-03",
+        "value": 11.3
+      },
+      {
+        "period": "2025-04",
+        "value": 10.95
+      },
+      {
+        "period": "2025-05",
+        "value": 10.65
+      },
+      {
+        "period": "2025-06",
+        "value": 10.96
+      },
+      {
+        "period": "2025-07",
+        "value": 10.71
+      },
+      {
+        "period": "2025-08",
+        "value": 10.53
+      },
+      {
+        "period": "2025-09",
+        "value": 9.84
+      },
+      {
+        "period": "2025-10",
+        "value": 9.36
+      },
+      {
+        "period": "2025-11",
+        "value": 9.15
+      },
+      {
+        "period": "2025-12",
+        "value": 9.35
+      },
+      {
+        "period": "2026-01",
+        "value": 9.3
+      },
+      {
+        "period": "2026-02",
+        "value": 9.27
+      },
+      {
+        "period": "2026-03",
+        "value": 9.45
+      },
+      {
+        "period": "2026-04",
+        "value": 9.27
+      },
+      {
+        "period": "2026-05",
+        "value": 9.45
+      },
+      {
+        "period": "2026-06",
+        "value": 9.27
+      },
+      {
+        "period": "2026-07",
+        "value": 9.37
+      },
+      {
+        "period": "2026-08",
+        "value": 9.02
       }
     ]
   },
