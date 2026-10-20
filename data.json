@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20T00:18:45.190Z",
+  "updatedAt": "2026-10-20T00:28:01.693Z",
   "data": {
     "CHN": {
       "rate": {
@@ -40,7 +40,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.77,
+        "value": 4.768,
         "date": "2026-10-20",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
@@ -77,7 +77,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 2.935,
+        "value": 2.932,
         "date": "2026-10-20",
         "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
@@ -87,7 +87,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.896,
+        "value": 1.895,
         "date": "2026-10-20",
         "source": "TradingView · TVC:JP02Y (Japan 2 Year LSEG Government Bonds Yield)"
       }
@@ -168,7 +168,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.921,
+        "value": 4.919,
         "date": "2026-10-20",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       }
@@ -524,7 +524,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 4.77
+        "value": 4.768
       }
     ],
     "USA-y10": [
@@ -637,6 +637,170 @@
         "value": 5.14
       }
     ],
+    "JPN-y2": [
+      {
+        "period": "2026-05-11",
+        "value": 1.395
+      },
+      {
+        "period": "2026-05-15",
+        "value": 1.413
+      },
+      {
+        "period": "2026-05-21",
+        "value": 1.453
+      },
+      {
+        "period": "2026-05-27",
+        "value": 1.399
+      },
+      {
+        "period": "2026-06-02",
+        "value": 1.38
+      },
+      {
+        "period": "2026-06-08",
+        "value": 1.42
+      },
+      {
+        "period": "2026-06-12",
+        "value": 1.417
+      },
+      {
+        "period": "2026-06-18",
+        "value": 1.4
+      },
+      {
+        "period": "2026-06-24",
+        "value": 1.432
+      },
+      {
+        "period": "2026-06-30",
+        "value": 1.382
+      },
+      {
+        "period": "2026-07-06",
+        "value": 1.396
+      },
+      {
+        "period": "2026-07-10",
+        "value": 1.434
+      },
+      {
+        "period": "2026-07-16",
+        "value": 1.44
+      },
+      {
+        "period": "2026-07-23",
+        "value": 1.499
+      },
+      {
+        "period": "2026-07-29",
+        "value": 1.488
+      },
+      {
+        "period": "2026-08-04",
+        "value": 1.568
+      },
+      {
+        "period": "2026-08-10",
+        "value": 1.618
+      },
+      {
+        "period": "2026-08-17",
+        "value": 1.696
+      },
+      {
+        "period": "2026-08-21",
+        "value": 1.682
+      },
+      {
+        "period": "2026-08-27",
+        "value": 1.696
+      },
+      {
+        "period": "2026-09-02",
+        "value": 1.854
+      },
+      {
+        "period": "2026-09-08",
+        "value": 1.848
+      },
+      {
+        "period": "2026-09-14",
+        "value": 1.841
+      },
+      {
+        "period": "2026-09-18",
+        "value": 1.849
+      },
+      {
+        "period": "2026-09-29",
+        "value": 1.976
+      },
+      {
+        "period": "2026-09-30",
+        "value": 1.952
+      },
+      {
+        "period": "2026-10-20",
+        "value": 1.895
+      }
+    ],
+    "AUS-y2": [
+      {
+        "period": "2025-10",
+        "value": 3.437
+      },
+      {
+        "period": "2025-11",
+        "value": 3.669
+      },
+      {
+        "period": "2025-12",
+        "value": 4.008
+      },
+      {
+        "period": "2026-01",
+        "value": 4.08
+      },
+      {
+        "period": "2026-02",
+        "value": 4.23
+      },
+      {
+        "period": "2026-03",
+        "value": 4.537
+      },
+      {
+        "period": "2026-04",
+        "value": 4.663
+      },
+      {
+        "period": "2026-05",
+        "value": 4.658
+      },
+      {
+        "period": "2026-06",
+        "value": 4.497
+      },
+      {
+        "period": "2026-07",
+        "value": 4.517
+      },
+      {
+        "period": "2026-08",
+        "value": 4.573
+      },
+      {
+        "period": "2026-09",
+        "value": 4.922
+      },
+      {
+        "period": "2026-10-20",
+        "value": 4.919
+      }
+    ],
     "DEU-y10": [
       {
         "period": "2026-04-01",
@@ -724,7 +888,7 @@
       },
       {
         "period": "2026-10-20",
-        "value": 2.935
+        "value": 2.932
       }
     ],
     "AUS-y10": [
@@ -769,12 +933,6 @@
         "value": 1.637
       }
     ],
-    "JPN-y2": [
-      {
-        "period": "2026-10-20",
-        "value": 1.896
-      }
-    ],
     "FRA-y2": [
       {
         "period": "2026-10-20",
@@ -785,12 +943,6 @@
       {
         "period": "2026-10-20",
         "value": 3.096
-      }
-    ],
-    "AUS-y2": [
-      {
-        "period": "2026-10-20",
-        "value": 4.921
       }
     ],
     "USA-rate": [
@@ -1746,6 +1898,7 @@
     "tips10": 1
   },
   "errors": [
-    "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer"
+    "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer",
+    "Yield-Charts ECB 2Y: ECB 2Y HTTP 504"
   ]
 }
