@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-21T17:10:42.492Z",
+  "updatedAt": "2026-10-21T21:41:22.230Z",
   "data": {
     "CHN": {
       "rate": {
@@ -45,12 +45,12 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.785,
+        "value": 4.808,
         "date": "2026-10-21",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 5.102,
+        "value": 5.119,
         "date": "2026-10-21",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
@@ -82,12 +82,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.918,
+        "value": 1.901,
         "date": "2026-10-21",
         "source": "TradingView · TVC:JP02Y (Japan 2 Year LSEG Government Bonds Yield)"
       },
       "y10": {
-        "value": 2.893,
+        "value": 2.882,
         "date": "2026-10-21",
         "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
@@ -114,12 +114,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 3.7122,
+        "value": 3.7217,
         "date": "2026-10-21",
         "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 5.0091,
+        "value": 5.0256,
         "date": "2026-10-21",
         "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
@@ -146,12 +146,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 3.085,
+        "value": 3.0952,
         "date": "2026-10-21",
         "source": "TradingView · TVC:DE02Y (Germany 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 3.4172,
+        "value": 3.427,
         "date": "2026-10-21",
         "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
@@ -178,12 +178,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.942,
+        "value": 4.937,
         "date": "2026-10-21",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 5.275,
+        "value": 5.274,
         "date": "2026-10-21",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
@@ -334,7 +334,7 @@
       },
       {
         "period": "2026-10-21",
-        "value": 4.785
+        "value": 4.808
       }
     ],
     "USA-y10": [
@@ -344,7 +344,7 @@
       },
       {
         "period": "2026-10-21",
-        "value": 5.102
+        "value": 5.119
       }
     ],
     "DEU-y2": [
@@ -986,7 +986,7 @@
       },
       {
         "period": "2026-10-21",
-        "value": 3.085
+        "value": 3.095
       }
     ],
     "FRA-y2": [
@@ -1628,7 +1628,7 @@
       },
       {
         "period": "2026-10-21",
-        "value": 3.712
+        "value": 3.722
       }
     ],
     "JPN-y2": [
@@ -2270,7 +2270,7 @@
       },
       {
         "period": "2026-10-21",
-        "value": 1.918
+        "value": 1.901
       }
     ],
     "JPN-y10": [
@@ -2912,7 +2912,7 @@
       },
       {
         "period": "2026-10-21",
-        "value": 2.893
+        "value": 2.882
       }
     ],
     "CHN-y2": [
@@ -4206,7 +4206,7 @@
       },
       {
         "period": "2026-10-21",
-        "value": 3.417
+        "value": 3.427
       }
     ],
     "FRA-y10": [
@@ -4216,7 +4216,7 @@
       },
       {
         "period": "2026-10-21",
-        "value": 5.009
+        "value": 5.026
       }
     ],
     "AUS-y10": [
@@ -4226,7 +4226,7 @@
       },
       {
         "period": "2026-10-21",
-        "value": 5.275
+        "value": 5.274
       }
     ],
     "AUS-y2": [
@@ -4376,7 +4376,7 @@
       },
       {
         "period": "2026-10-21",
-        "value": 4.942
+        "value": 4.937
       }
     ],
     "USA-rate": [
@@ -5711,6 +5711,6 @@
     "BIP-Chart FRA: FRED NAEXKP01FRQ657S blocked",
     "BIP-Chart JPN: FRED NAEXKP01JPQ657S blocked",
     "BIP-Chart AUS: FRED NAEXKP01AUQ657S blocked",
-    "Reserves/GDP USA: FRED TOTRESNS blocked"
+    "Reserves/GDP USA: FRED GDP blocked"
   ]
 }
