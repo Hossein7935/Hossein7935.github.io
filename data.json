@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-23T21:23:33.311Z",
+  "updatedAt": "2026-10-24T04:33:58.638Z",
   "data": {
     "CHN": {
       "rate": {
@@ -19,12 +19,12 @@
       },
       "y2": {
         "value": 1.256,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:CN02Y (China 2 Year Government Bonds Yield)"
       },
       "y10": {
         "value": 1.638,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:CN10Y (China 10 Year Government Bonds Yield)"
       },
       "deficit": {
@@ -46,12 +46,12 @@
       },
       "y2": {
         "value": 4.686,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
         "value": 4.999,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -93,7 +93,7 @@
       },
       "y10": {
         "value": 2.804,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
       "inflation": {
@@ -103,7 +103,7 @@
       },
       "y2": {
         "value": 1.871,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:JP02Y (Japan 2 Year LSEG Government Bonds Yield)"
       },
       "deficit": {
@@ -115,7 +115,7 @@
     "FRA": {
       "rate": {
         "value": 2.5,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
@@ -125,7 +125,7 @@
       },
       "y10": {
         "value": 5.0188,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -135,7 +135,7 @@
       },
       "y2": {
         "value": 3.7942,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
       },
       "deficit": {
@@ -147,7 +147,7 @@
     "DEU": {
       "rate": {
         "value": 2.5,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
@@ -157,7 +157,7 @@
       },
       "y10": {
         "value": 3.3548,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -167,7 +167,7 @@
       },
       "y2": {
         "value": 3.0312,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:DE02Y (Germany 2 Year Government Bonds Yield)"
       },
       "deficit": {
@@ -189,7 +189,7 @@
       },
       "y10": {
         "value": 5.213,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -199,7 +199,7 @@
       },
       "y2": {
         "value": 4.944,
-        "date": "2026-10-23",
+        "date": "2026-10-24",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
       "deficit": {
@@ -1854,7 +1854,7 @@
         "value": 4.65
       },
       {
-        "period": "2026-10-23",
+        "period": "2026-10-24",
         "value": 4.686
       }
     ],
@@ -2496,7 +2496,7 @@
         "value": 4.96
       },
       {
-        "period": "2026-10-23",
+        "period": "2026-10-24",
         "value": 4.999
       }
     ],
@@ -3138,7 +3138,7 @@
         "value": 3.007
       },
       {
-        "period": "2026-10-23",
+        "period": "2026-10-24",
         "value": 3.031
       }
     ],
@@ -3780,7 +3780,7 @@
         "value": 3.007
       },
       {
-        "period": "2026-10-23",
+        "period": "2026-10-24",
         "value": 3.794
       }
     ],
@@ -4422,7 +4422,7 @@
         "value": 1.952
       },
       {
-        "period": "2026-10-23",
+        "period": "2026-10-24",
         "value": 1.871
       }
     ],
@@ -5064,15 +5064,11 @@
         "value": 3.057
       },
       {
-        "period": "2026-10-23",
+        "period": "2026-10-24",
         "value": 2.804
       }
     ],
     "CHN-y2": [
-      {
-        "period": "2024-04-25",
-        "value": 1.811
-      },
       {
         "period": "2024-05-01",
         "value": 1.89
@@ -5707,14 +5703,14 @@
       },
       {
         "period": "2026-10-23",
+        "value": 1.27
+      },
+      {
+        "period": "2026-10-24",
         "value": 1.256
       }
     ],
     "CHN-y10": [
-      {
-        "period": "2024-04-25",
-        "value": 2.266
-      },
       {
         "period": "2024-05-01",
         "value": 2.307
@@ -6349,6 +6345,10 @@
       },
       {
         "period": "2026-10-23",
+        "value": 1.614
+      },
+      {
+        "period": "2026-10-24",
         "value": 1.638
       }
     ],
@@ -6498,7 +6498,7 @@
         "value": 3.47
       },
       {
-        "period": "2026-10-23",
+        "period": "2026-10-24",
         "value": 3.355
       }
     ],
@@ -6648,7 +6648,7 @@
         "value": 4.477
       },
       {
-        "period": "2026-10-23",
+        "period": "2026-10-24",
         "value": 5.019
       }
     ],
@@ -6798,7 +6798,7 @@
         "value": 5.283
       },
       {
-        "period": "2026-10-23",
+        "period": "2026-10-24",
         "value": 5.213
       }
     ],
@@ -6948,7 +6948,7 @@
         "value": 4.922
       },
       {
-        "period": "2026-10-23",
+        "period": "2026-10-24",
         "value": 4.944
       }
     ],
