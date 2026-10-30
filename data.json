@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-29T22:44:21.553Z",
+  "updatedAt": "2026-10-30T05:44:35.728Z",
   "data": {
     "CHN": {
       "rate": {
@@ -18,13 +18,13 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.225,
-        "date": "2026-10-29",
+        "value": 1.244,
+        "date": "2026-10-30",
         "source": "TradingView · TVC:CN02Y (China 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 1.614,
-        "date": "2026-10-29",
+        "value": 1.629,
+        "date": "2026-10-30",
         "source": "TradingView · TVC:CN10Y (China 10 Year Government Bonds Yield)"
       },
       "deficit": {
@@ -45,13 +45,13 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.602,
-        "date": "2026-10-29",
+        "value": 4.575,
+        "date": "2026-10-30",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 4.937,
-        "date": "2026-10-29",
+        "value": 4.925,
+        "date": "2026-10-30",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -92,8 +92,8 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 2.842,
-        "date": "2026-10-29",
+        "value": 2.791,
+        "date": "2026-10-30",
         "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
       "inflation": {
@@ -102,8 +102,8 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.897,
-        "date": "2026-10-29",
+        "value": 1.882,
+        "date": "2026-10-30",
         "source": "TradingView · TVC:JP02Y (Japan 2 Year LSEG Government Bonds Yield)"
       },
       "deficit": {
@@ -115,7 +115,7 @@
     "FRA": {
       "rate": {
         "value": 2.5,
-        "date": "2026-10-29",
+        "date": "2026-10-30",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
@@ -125,7 +125,7 @@
       },
       "y10": {
         "value": 4.9061,
-        "date": "2026-10-29",
+        "date": "2026-10-30",
         "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -135,7 +135,7 @@
       },
       "y2": {
         "value": 3.6352,
-        "date": "2026-10-29",
+        "date": "2026-10-30",
         "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
       },
       "deficit": {
@@ -147,7 +147,7 @@
     "DEU": {
       "rate": {
         "value": 2.5,
-        "date": "2026-10-29",
+        "date": "2026-10-30",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
@@ -157,7 +157,7 @@
       },
       "y10": {
         "value": 3.3343,
-        "date": "2026-10-29",
+        "date": "2026-10-30",
         "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -167,7 +167,7 @@
       },
       "y2": {
         "value": 3.0501,
-        "date": "2026-10-29",
+        "date": "2026-10-30",
         "source": "TradingView · TVC:DE02Y (Germany 2 Year Government Bonds Yield)"
       },
       "deficit": {
@@ -188,8 +188,8 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 5.13,
-        "date": "2026-10-29",
+        "value": 5.128,
+        "date": "2026-10-30",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -198,8 +198,8 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.905,
-        "date": "2026-10-29",
+        "value": 4.921,
+        "date": "2026-10-30",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
       "deficit": {
@@ -1858,8 +1858,8 @@
         "value": 4.67
       },
       {
-        "period": "2026-10-29",
-        "value": 4.602
+        "period": "2026-10-30",
+        "value": 4.575
       }
     ],
     "USA-y10": [
@@ -2500,8 +2500,8 @@
         "value": 5.05
       },
       {
-        "period": "2026-10-29",
-        "value": 4.937
+        "period": "2026-10-30",
+        "value": 4.925
       }
     ],
     "DEU-y2": [
@@ -3142,7 +3142,7 @@
         "value": 3.06
       },
       {
-        "period": "2026-10-29",
+        "period": "2026-10-30",
         "value": 3.05
       }
     ],
@@ -3784,7 +3784,7 @@
         "value": 3.06
       },
       {
-        "period": "2026-10-29",
+        "period": "2026-10-30",
         "value": 3.635
       }
     ],
@@ -4426,8 +4426,8 @@
         "value": 1.952
       },
       {
-        "period": "2026-10-29",
-        "value": 1.897
+        "period": "2026-10-30",
+        "value": 1.882
       }
     ],
     "JPN-y10": [
@@ -5068,15 +5068,11 @@
         "value": 3.057
       },
       {
-        "period": "2026-10-29",
-        "value": 2.842
+        "period": "2026-10-30",
+        "value": 2.791
       }
     ],
     "CHN-y2": [
-      {
-        "period": "2024-05-01",
-        "value": 1.89
-      },
       {
         "period": "2024-05-07",
         "value": 1.857
@@ -5711,14 +5707,14 @@
       },
       {
         "period": "2026-10-29",
-        "value": 1.225
+        "value": 1.213
+      },
+      {
+        "period": "2026-10-30",
+        "value": 1.244
       }
     ],
     "CHN-y10": [
-      {
-        "period": "2024-05-01",
-        "value": 2.307
-      },
       {
         "period": "2024-05-07",
         "value": 2.291
@@ -6353,7 +6349,11 @@
       },
       {
         "period": "2026-10-29",
-        "value": 1.614
+        "value": 1.609
+      },
+      {
+        "period": "2026-10-30",
+        "value": 1.629
       }
     ],
     "DEU-y10": [
@@ -6502,7 +6502,7 @@
         "value": 3.47
       },
       {
-        "period": "2026-10-29",
+        "period": "2026-10-30",
         "value": 3.334
       }
     ],
@@ -6652,7 +6652,7 @@
         "value": 4.477
       },
       {
-        "period": "2026-10-29",
+        "period": "2026-10-30",
         "value": 4.906
       }
     ],
@@ -6802,8 +6802,8 @@
         "value": 5.283
       },
       {
-        "period": "2026-10-29",
-        "value": 5.13
+        "period": "2026-10-30",
+        "value": 5.128
       }
     ],
     "AUS-y2": [
@@ -6952,8 +6952,8 @@
         "value": 4.922
       },
       {
-        "period": "2026-10-29",
-        "value": 4.905
+        "period": "2026-10-30",
+        "value": 4.921
       }
     ],
     "USA-rate": [
