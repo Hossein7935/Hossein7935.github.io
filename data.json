@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-02T09:12:50.873Z",
+  "updatedAt": "2026-11-02T15:27:06.483Z",
   "data": {
     "CHN": {
       "rate": {
@@ -18,12 +18,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.275,
+        "value": 1.274,
         "date": "2026-11-02",
         "source": "TradingView · TVC:CN02Y (China 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 1.626,
+        "value": 1.631,
         "date": "2026-11-02",
         "source": "TradingView · TVC:CN10Y (China 10 Year Government Bonds Yield)"
       },
@@ -45,12 +45,12 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.585,
+        "value": 4.598,
         "date": "2026-11-02",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 4.91,
+        "value": 4.896,
         "date": "2026-11-02",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
@@ -80,18 +80,18 @@
         "source": "FRED · T10Y2Y · 10 Jahre"
       },
       "us3m": {
-        "value": 4.11,
+        "value": 4.105,
         "date": "2026-11-02",
         "source": "TradingView · TVC:US03MY (US 3M T-Bill)"
       },
       "sofrUs3mSpread": {
-        "value": -0.0594,
+        "value": -0.0544,
         "date": "2026-11-02",
         "source": "Term SOFR 3M − US 3M (TV)"
       },
       "bofaCcc": {
-        "value": 17.83,
-        "date": "2026-10-29",
+        "value": 17.86,
+        "date": "2026-10-30",
         "source": "FRED · BAMLH0A3HYCEY · ICE BofA CCC Yield (TV FRED:BAMLH0A3HYCEY)"
       },
       "hhDebt": {
@@ -127,7 +127,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 2.77,
+        "value": 2.776,
         "date": "2026-11-02",
         "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
@@ -159,7 +159,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 4.9236,
+        "value": 4.901,
         "date": "2026-11-02",
         "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
@@ -169,7 +169,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 3.6499,
+        "value": 3.6318,
         "date": "2026-11-02",
         "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
       },
@@ -191,7 +191,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 3.3143,
+        "value": 3.295,
         "date": "2026-11-02",
         "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
@@ -201,7 +201,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 3.0221,
+        "value": 3.0176,
         "date": "2026-11-02",
         "source": "TradingView · TVC:DE02Y (Germany 2 Year Government Bonds Yield)"
       },
@@ -223,7 +223,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 5.136,
+        "value": 5.107,
         "date": "2026-11-02",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
@@ -233,7 +233,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.94,
+        "value": 4.925,
         "date": "2026-11-02",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
@@ -3362,28 +3362,16 @@
     "USA-us3m": [
       {
         "period": "2026-11-02",
-        "value": 4.11
+        "value": 4.105
       }
     ],
     "USA-sofrUs3mSpread": [
       {
         "period": "2026-11-02",
-        "value": -0.0594
+        "value": -0.0544
       }
     ],
     "USA-bofaCcc": [
-      {
-        "period": "2023-10-31",
-        "value": 15.45
-      },
-      {
-        "period": "2023-11-01",
-        "value": 15.49
-      },
-      {
-        "period": "2023-11-02",
-        "value": 14.92
-      },
       {
         "period": "2023-11-03",
         "value": 14.76
@@ -6515,6 +6503,10 @@
       {
         "period": "2026-10-29",
         "value": 17.83
+      },
+      {
+        "period": "2026-10-30",
+        "value": 17.86
       }
     ],
     "USA-hhDebt": [
