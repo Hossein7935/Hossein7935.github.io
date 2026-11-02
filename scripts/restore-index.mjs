@@ -27,29 +27,34 @@ if (!html.includes('bindBigChartHover')) {
     html = html.replace(needle, repl);
     const fn = `\nfunction bindBigChartHover(body){\n  const svg=body.querySelector('svg.chart-hover')||body.querySelector('svg');\n  const tip=body.querySelector('#chartDlgTip');\n  if(!svg||!tip)return;\n  const ns='http://www.w3.org/2000/svg';\n  let v=svg.querySelector('.chart-crosshair-v'),h=svg.querySelector('.chart-crosshair-h'),d=svg.querySelector('.chart-crosshair-dot');\n  if(!v){v=document.createElementNS(ns,'line');v.setAttribute('class','chart-crosshair-v');h=document.createElementNS(ns,'line');h.setAttribute('class','chart-crosshair-h');d=document.createElementNS(ns,'circle');d.setAttribute('class','chart-crosshair-dot');d.setAttribute('r','5');svg.appendChild(v);svg.appendChild(h);svg.appendChild(d);}\n  const hits=[...svg.querySelectorAll('.hit')];\n  const vb=svg.viewBox.baseVal;\n  svg.onmousemove=(e)=>{\n    if(!hits.length)return;\n    const rect=svg.getBoundingClientRect();\n    const mx=(e.clientX-rect.left)*(vb.width/(rect.width||1));\n    let best=hits[0],bd=1e9;\n    for(const x of hits){const dd=Math.abs(+x.getAttribute('cx')-mx);if(dd<bd){bd=dd;best=x;}}\n    const cx=+best.getAttribute('cx'),cy=+best.getAttribute('cy');\n    v.setAttribute('x1',cx);v.setAttribute('x2',cx);v.setAttribute('y1',0);v.setAttribute('y2',vb.height);\n    h.setAttribute('y1',cy);h.setAttribute('y2',cy);h.setAttribute('x1',0);h.setAttribute('x2',vb.width);\n    d.setAttribute('cx',cx);d.setAttribute('cy',cy);\n    tip.innerHTML='<b>'+best.dataset.period+'</b><br>'+best.dataset.value;tip.classList.add('show');\n    const br=body.getBoundingClientRect();\n    let left=e.clientX-br.left+14,top=e.clientY-br.top-10;\n    if(left+140>br.width)left=e.clientX-br.left-150;if(top<0)top=8;\n    tip.style.left=left+'px';tip.style.top=top+'px';\n  };\n  svg.onmouseleave=()=>{tip.classList.remove('show');v.setAttribute('x1',-9);v.setAttribute('x2',-9);h.setAttribute('y1',-9);h.setAttribute('y2',-9);d.setAttribute('cx',-9);d.setAttribute('cy',-9);};\n}\n`;
     html = html.replace('function historyHTML', fn + 'function historyHTML');
-    console.log('TV crosshair patch applied');
   }
 }
 
-// Chart keys including bofaCcc
-const chartKeys = "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'";
+// Chart keys
 html = html.replace(
   /\|\|key==='sofr3m'\|\|key==='t10y2y'(\|\|key==='[^']+')*/,
-  chartKeys
+  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'"
 );
-if (!html.includes("bofaCcc:'")) {
-  html = html.replace(
-    "sofrUs3mSpread:'SOFR − US 3M Spread'",
-    "sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield'"
-  );
-  html = html.replace(
-    "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread'}",
-    "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield'}"
-  );
+if (!html.includes("bofaCcc:'BofA CCC Yield'")) {
+  if (html.includes('extraLabels={')) {
+    html = html.replace(
+      /extraLabels=\{[^}]*\}/,
+      "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield'}"
+    );
+  }
 }
 
-// HH + Business debt block
-const debtHtml = [
+// Replace entire faceB.innerHTML with full metric set
+const faceB = [
+  'faceB.innerHTML=`',
+  '<div class="metric has-chart"><div class="name">CME Term SOFR 3M</div>',
+  "<div class=\"value\">${sofr?fmt(sofr.value):'—'}</div>",
+  '<div class="date">global-rates · CME Term SOFR 3M</div>',
+  "${historyHTML('USA','sofr3m')}</div>",
+  '<div class="metric has-chart"><div class="name">Zinskurve · 10Y − 2Y Spread</div>',
+  "<div class=\"value\">${spr?fmt(spr.value):'—'}</div>",
+  '<div class="date">FRED · T10Y2Y · 10 Jahre</div>',
+  "${historyHTML('USA','t10y2y')}</div>",
   '<div class="metric has-chart"><div class="name">Households & Nonprofits Debt Growth</div>',
   "<div class=\"value\">${(()=>{const a=histories['USA-hhDebt']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
   '<div class="date">Fed Z.1 · SAAR · <a href="https://www.federalreserve.gov/releases/z1/dataviz/z1/nonfinancial_debt/chart/#units:growth" target="_blank" rel="noopener" style="color:var(--accent)">Fed ↗</a></div>',
@@ -57,60 +62,27 @@ const debtHtml = [
   '<div class="metric has-chart"><div class="name">Nonfinancial Business Debt Growth</div>',
   "<div class=\"value\">${(()=>{const a=histories['USA-bizDebt']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
   '<div class="date">Fed Z.1 · SAAR · <a href="https://www.federalreserve.gov/releases/z1/dataviz/z1/nonfinancial_debt/chart/#units:growth" target="_blank" rel="noopener" style="color:var(--accent)">Fed ↗</a></div>',
-  "${historyHTML('USA','bizDebt')}</div>"
+  "${historyHTML('USA','bizDebt')}</div>",
+  '<div class="metric has-chart"><div class="name">SOFR − US 3M Spread</div>',
+  "<div class=\"value\">${(()=>{const a=histories['USA-sofrUs3mSpread']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
+  '<div class="date">Term SOFR 3M − TVC:US03MY · TradingView</div>',
+  "${historyHTML('USA','sofrUs3mSpread')}</div>",
+  '<div class="metric has-chart"><div class="name">BofA CCC High Yield</div>',
+  "<div class=\"value\">${(()=>{const a=histories['USA-bofaCcc']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
+  '<div class="date">ICE BofA CCC · FRED/TradingView · <a href="https://fred.stlouisfed.org/series/BAMLH0A3HYCEY" target="_blank" rel="noopener" style="color:var(--accent)">FRED ↗</a></div>',
+  "${historyHTML('USA','bofaCcc')}</div>`;"
 ].join('');
 
-if (html.includes('Nonfinancial Debt Growth')) {
-  const start = html.indexOf('<div class="metric has-chart"><div class="name">Nonfinancial Debt Growth');
-  if (start >= 0) {
-    const endMarker = "historyHTML('USA','nonfinDebt')}</div>";
-    const end = html.indexOf(endMarker, start);
-    if (end > start) {
-      html = html.slice(0, start) + debtHtml + html.slice(end + endMarker.length);
-      console.log('replaced Nonfinancial Debt Growth block');
-    }
+const start = html.indexOf('faceB.innerHTML=`');
+if (start >= 0) {
+  const end = html.indexOf('`;', start);
+  if (end > start) {
+    html = html.slice(0, start) + faceB + html.slice(end + 2);
+    console.log('faceB template replaced');
   }
-} else if (!html.includes('Households & Nonprofits Debt Growth')) {
-  const marker = "historyHTML('USA','t10y2y')}</div>";
-  const idx = html.indexOf(marker);
-  if (idx >= 0) {
-    html = html.slice(0, idx + marker.length) + debtHtml + html.slice(idx + marker.length);
-    console.log('appended hh+biz after t10y2y');
-  }
-}
-
-// SOFR − US 3M spread
-if (!html.includes('SOFR − US 3M')) {
-  const spreadHtml = [
-    '<div class="metric has-chart"><div class="name">SOFR − US 3M Spread</div>',
-    "<div class=\"value\">${(()=>{const a=histories['USA-sofrUs3mSpread']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
-    '<div class="date">Term SOFR 3M − TVC:US03MY · TradingView</div>',
-    "${historyHTML('USA','sofrUs3mSpread')}</div>"
-  ].join('');
-  const after = "historyHTML('USA','bizDebt')}</div>";
-  if (html.includes(after)) {
-    html = html.replace(after, after + spreadHtml);
-  } else {
-    const m2 = "historyHTML('USA','t10y2y')}</div>";
-    if (html.includes(m2)) html = html.replace(m2, m2 + spreadHtml);
-  }
-}
-
-// BofA CCC yield
-if (!html.includes('BofA CCC') && !html.includes('bofaCcc')) {
-  const cccHtml = [
-    '<div class="metric has-chart"><div class="name">BofA CCC High Yield</div>',
-    "<div class=\"value\">${(()=>{const a=histories['USA-bofaCcc']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
-    '<div class="date">ICE BofA CCC · FRED/TradingView · <a href="https://fred.stlouisfed.org/series/BAMLH0A3HYCEY" target="_blank" rel="noopener" style="color:var(--accent)">FRED ↗</a></div>',
-    "${historyHTML('USA','bofaCcc')}</div>"
-  ].join('');
-  if (html.includes("historyHTML('USA','sofrUs3mSpread')}</div>")) {
-    html = html.replace("historyHTML('USA','sofrUs3mSpread')}</div>", "historyHTML('USA','sofrUs3mSpread')}</div>" + cccHtml);
-  } else if (html.includes("historyHTML('USA','bizDebt')}</div>")) {
-    html = html.replace("historyHTML('USA','bizDebt')}</div>", "historyHTML('USA','bizDebt')}</div>" + cccHtml);
-  }
-  console.log('bofaCcc metric added');
+} else {
+  console.log('faceB.innerHTML not found');
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'ccc', html.includes('bofaCcc'), 'spread', html.includes('sofrUs3mSpread'));
+console.log('done', html.length, 'ccc', html.includes('bofaCcc'), 'spread', html.includes('SOFR − US 3M'), 'faceB ok', html.includes('BofA CCC High Yield'));
