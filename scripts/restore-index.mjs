@@ -32,12 +32,12 @@ if (!html.includes('bindBigChartHover')) {
 
 html = html.replace(
   /\|\|key==='sofr3m'\|\|key==='t10y2y'(\|\|key==='[^']+')*/,
-  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'||key==='us10yTips'"
+  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'||key==='us10yTips'||key==='us5yTips'"
 );
 if (html.includes('extraLabels={')) {
   html = html.replace(
     /extraLabels=\{[^}]*\}/,
-    "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield',us10yTips:'US10Y − TIPS10Y'}"
+    "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield',us10yTips:'US10Y − TIPS10Y',us5yTips:'US5Y − TIPS5Y'}"
   );
 }
 
@@ -54,6 +54,10 @@ const faceBBody = [
   "<div class=\"value\">${(()=>{const a=histories['USA-us10yTips']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
   '<div class="date">Breakeven · FRED T10YIE · 5 Jahre · <a href="https://fred.stlouisfed.org/series/T10YIE" target="_blank" rel="noopener" style="color:var(--accent)">FRED ↗</a></div>',
   "${historyHTML('USA','us10yTips')}</div>",
+  '<div class="metric has-chart"><div class="name">US5Y − TIPS 5Y</div>',
+  "<div class=\"value\">${(()=>{const a=histories['USA-us5yTips']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
+  '<div class="date">Breakeven · FRED T5YIE · 5 Jahre · <a href="https://fred.stlouisfed.org/series/T5YIE" target="_blank" rel="noopener" style="color:var(--accent)">FRED ↗</a></div>',
+  "${historyHTML('USA','us5yTips')}</div>",
   '<div class="metric has-chart"><div class="name">Households & Nonprofits Debt Growth</div>',
   "<div class=\"value\">${(()=>{const a=histories['USA-hhDebt']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
   '<div class="date">Fed Z.1 · SAAR · <a href="https://www.federalreserve.gov/releases/z1/dataviz/z1/nonfinancial_debt/chart/#units:growth" target="_blank" rel="noopener" style="color:var(--accent)">Fed ↗</a></div>',
@@ -84,4 +88,4 @@ if (s >= 0 && e > s) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'us10yTips', html.includes('us10yTips'), 'label', html.includes('5 Jahre'));
+console.log('done', html.length, 'us5yTips', html.includes('us5yTips'), 'label', html.includes('US5Y − TIPS 5Y'));
