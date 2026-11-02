@@ -77,7 +77,7 @@ try {
 }
 
 try {
-  // Full 10+ years of 10Y−2Y spread (FRED T10Y2Y)
+  // Full 10 years of 10Y−2Y spread (FRED T10Y2Y), evenly sampled across the whole span
   const start = '2016-01-01';
   const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=T10Y2Y&cosd=${start}`;
   const r = await fetch(url, {
@@ -94,22 +94,35 @@ try {
       rows.push({ period: date.slice(0, 10), value: Math.round(Number(val) * 1000) / 1000 });
     }
   }
-  // ~10 years of trading days ≈ 2500; keep up to 1500 points (~weekly denser than before)
-  const targetPts = 1500;
-  const step = Math.max(1, Math.floor(rows.length / targetPts));
-  const sampled = [];
-  for (let i = 0; i < rows.length; i += step) sampled.push(rows[i]);
-  if (sampled.at(-1)?.period !== rows.at(-1)?.period) sampled.push(rows.at(-1));
-  histories['USA-t10y2y'] = sampled.slice(-targetPts);
-  const last = histories['USA-t10y2y'].at(-1);
-  if (last) {
-    data.USA = data.USA || {};
-    data.USA.t10y2y = {
-      value: last.value,
-      date: last.period,
-      source: 'FRED · T10Y2Y · 10 Jahre'
-    };
+  if (!rows.length) throw new Error('keine T10Y2Y-Punkte');
+
+  // Evenly sample across full 10y range (do not drop the early years)
+  const maxPts = 1600;
+  let sampled;
+  if (rows.length <= maxPts) {
+    sampled = rows;
+  } else {
+    sampled = [];
+    for (let i = 0; i < maxPts; i++) {
+      const idx = Math.round((i * (rows.length - 1)) / (maxPts - 1));
+      sampled.push(rows[idx]);
+    }
+    // de-dupe consecutive same period
+    const out = [];
+    for (const p of sampled) {
+      if (!out.length || out.at(-1).period !== p.period) out.push(p);
+    }
+    sampled = out;
   }
+
+  histories['USA-t10y2y'] = sampled;
+  const last = histories['USA-t10y2y'].at(-1);
+  data.USA = data.USA || {};
+  data.USA.t10y2y = {
+    value: last.value,
+    date: last.period,
+    source: 'FRED · T10Y2Y · 10 Jahre'
+  };
   console.log(
     'T10Y2Y:',
     histories['USA-t10y2y'].length,
