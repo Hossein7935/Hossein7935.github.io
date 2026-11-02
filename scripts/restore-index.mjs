@@ -31,28 +31,20 @@ if (!html.includes('bindBigChartHover')) {
   }
 }
 
-// Chart keys: hhDebt, bizDebt, sofrUs3mSpread
+// Chart keys including bofaCcc
+const chartKeys = "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'";
 html = html.replace(
-  "||key==='sofr3m'||key==='t10y2y'||key==='nonfinDebt'",
-  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'"
+  /\|\|key==='sofr3m'\|\|key==='t10y2y'(\|\|key==='[^']+')*/,
+  chartKeys
 );
-html = html.replace(
-  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'",
-  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'"
-);
-// dedupe
-html = html.replace(
-  "||key==='sofrUs3mSpread'||key==='sofrUs3mSpread'",
-  "||key==='sofrUs3mSpread'"
-);
-if (!html.includes("sofrUs3mSpread:'")) {
+if (!html.includes("bofaCcc:'")) {
   html = html.replace(
-    "hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth'",
-    "hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread'"
+    "sofrUs3mSpread:'SOFR − US 3M Spread'",
+    "sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield'"
   );
   html = html.replace(
     "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread'}",
-    "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread'}"
+    "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield'}"
   );
 }
 
@@ -87,8 +79,8 @@ if (html.includes('Nonfinancial Debt Growth')) {
   }
 }
 
-// SOFR − US 3M spread metric (after biz debt or after t10y2y)
-if (!html.includes('SOFR − US 3M') && !html.includes('sofrUs3mSpread')) {
+// SOFR − US 3M spread
+if (!html.includes('SOFR − US 3M')) {
   const spreadHtml = [
     '<div class="metric has-chart"><div class="name">SOFR − US 3M Spread</div>',
     "<div class=\"value\">${(()=>{const a=histories['USA-sofrUs3mSpread']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
@@ -98,15 +90,27 @@ if (!html.includes('SOFR − US 3M') && !html.includes('sofrUs3mSpread')) {
   const after = "historyHTML('USA','bizDebt')}</div>";
   if (html.includes(after)) {
     html = html.replace(after, after + spreadHtml);
-    console.log('spread metric added after bizDebt');
   } else {
     const m2 = "historyHTML('USA','t10y2y')}</div>";
-    if (html.includes(m2)) {
-      html = html.replace(m2, m2 + spreadHtml);
-      console.log('spread metric added after t10y2y');
-    }
+    if (html.includes(m2)) html = html.replace(m2, m2 + spreadHtml);
   }
 }
 
+// BofA CCC yield
+if (!html.includes('BofA CCC') && !html.includes('bofaCcc')) {
+  const cccHtml = [
+    '<div class="metric has-chart"><div class="name">BofA CCC High Yield</div>',
+    "<div class=\"value\">${(()=>{const a=histories['USA-bofaCcc']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
+    '<div class="date">ICE BofA CCC · FRED/TradingView · <a href="https://fred.stlouisfed.org/series/BAMLH0A3HYCEY" target="_blank" rel="noopener" style="color:var(--accent)">FRED ↗</a></div>',
+    "${historyHTML('USA','bofaCcc')}</div>"
+  ].join('');
+  if (html.includes("historyHTML('USA','sofrUs3mSpread')}</div>")) {
+    html = html.replace("historyHTML('USA','sofrUs3mSpread')}</div>", "historyHTML('USA','sofrUs3mSpread')}</div>" + cccHtml);
+  } else if (html.includes("historyHTML('USA','bizDebt')}</div>")) {
+    html = html.replace("historyHTML('USA','bizDebt')}</div>", "historyHTML('USA','bizDebt')}</div>" + cccHtml);
+  }
+  console.log('bofaCcc metric added');
+}
+
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'spread', html.includes('sofrUs3mSpread'), 'hh', html.includes('hhDebt'));
+console.log('done', html.length, 'ccc', html.includes('bofaCcc'), 'spread', html.includes('sofrUs3mSpread'));

@@ -38,6 +38,7 @@ jobs:
         run: |
           node --check scripts/fetch-nonfin-debt.mjs
           node --check scripts/fetch-sofr-muni-spread.mjs
+          node --check scripts/fetch-bofa-ccc.mjs
           node --check scripts/restore-index.mjs
       - name: Fetch official economic data
         env:
@@ -57,6 +58,8 @@ jobs:
         run: node scripts/fetch-sofr-term.mjs
       - name: SOFR − US 3M spread (TradingView)
         run: node scripts/fetch-sofr-muni-spread.mjs
+      - name: BofA CCC High Yield (FRED / TradingView)
+        run: node scripts/fetch-bofa-ccc.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
       - name: Build 3-year policy rate charts
