@@ -37,6 +37,7 @@ jobs:
       - name: Check updater syntax
         run: |
           node --check scripts/fetch-nonfin-debt.mjs
+          node --check scripts/fetch-sofr-muni-spread.mjs
           node --check scripts/restore-index.mjs
       - name: Fetch official economic data
         env:
@@ -54,6 +55,8 @@ jobs:
         run: node scripts/fetch-yield-charts.mjs
       - name: CME Term SOFR 3M + T10Y2Y (free)
         run: node scripts/fetch-sofr-term.mjs
+      - name: SOFR − US 3M spread (TradingView)
+        run: node scripts/fetch-sofr-muni-spread.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
       - name: Build 3-year policy rate charts
