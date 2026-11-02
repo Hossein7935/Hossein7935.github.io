@@ -31,43 +31,40 @@ if (!html.includes('bindBigChartHover')) {
   }
 }
 
-// Always map chart keys to hhDebt + bizDebt
+// Chart keys: hhDebt, bizDebt, sofrUs3mSpread
 html = html.replace(
   "||key==='sofr3m'||key==='t10y2y'||key==='nonfinDebt'",
-  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'"
+  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'"
 );
 html = html.replace(
-  "||key==='sofr3m'||key==='t10y2y'",
-  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'"
+  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'",
+  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'"
 );
-// avoid double-add
+// dedupe
 html = html.replace(
-  "||key==='hhDebt'||key==='bizDebt'||key==='hhDebt'||key==='bizDebt'",
-  "||key==='hhDebt'||key==='bizDebt'"
+  "||key==='sofrUs3mSpread'||key==='sofrUs3mSpread'",
+  "||key==='sofrUs3mSpread'"
 );
-html = html.replace(
-  "nonfinDebt:'Nonfinancial Debt Growth'",
-  "hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth'"
-);
-if (!html.includes("hhDebt:'Households Debt Growth'")) {
+if (!html.includes("sofrUs3mSpread:'")) {
+  html = html.replace(
+    "hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth'",
+    "hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread'"
+  );
   html = html.replace(
     "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread'}",
-    "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth'}"
+    "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread'}"
   );
 }
 
-// Replace face-B debt metric(s) with HH + Business only
-const twoDebt = `<div class="metric has-chart"><div class="name">Households & Nonprofits Debt Growth</div><div class="value">\[${'${'}(()=>{const a=histories['USA-hhDebt']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div><div class="date">Fed Z.1 · CMDEBT YoY · <a href="https://www.federalreserve.gov/releases/z1/dataviz/z1/nonfinancial_debt/chart/#units:growth" target="_blank" rel="noopener" style="color:var(--accent)">Fed ↗</a></div>\${historyHTML('USA','hhDebt')}</div><div class="metric has-chart"><div class="name">Nonfinancial Business Debt Growth</div><div class="value">\${(()=>{const a=histories['USA-bizDebt']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div><div class="date">Fed Z.1 · TBSDODNS YoY · <a href="https://www.federalreserve.gov/releases/z1/dataviz/z1/nonfinancial_debt/chart/#units:growth" target="_blank" rel="noopener" style="color:var(--accent)">Fed ↗</a></div>\${historyHTML('USA','bizDebt')}</div>`;
-
-// Fix the template - write without broken escaping
+// HH + Business debt block
 const debtHtml = [
   '<div class="metric has-chart"><div class="name">Households & Nonprofits Debt Growth</div>',
   "<div class=\"value\">${(()=>{const a=histories['USA-hhDebt']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
-  '<div class="date">Fed Z.1 · CMDEBT YoY · <a href="https://www.federalreserve.gov/releases/z1/dataviz/z1/nonfinancial_debt/chart/#units:growth" target="_blank" rel="noopener" style="color:var(--accent)">Fed ↗</a></div>',
+  '<div class="date">Fed Z.1 · SAAR · <a href="https://www.federalreserve.gov/releases/z1/dataviz/z1/nonfinancial_debt/chart/#units:growth" target="_blank" rel="noopener" style="color:var(--accent)">Fed ↗</a></div>',
   "${historyHTML('USA','hhDebt')}</div>",
   '<div class="metric has-chart"><div class="name">Nonfinancial Business Debt Growth</div>',
   "<div class=\"value\">${(()=>{const a=histories['USA-bizDebt']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
-  '<div class="date">Fed Z.1 · TBSDODNS YoY · <a href="https://www.federalreserve.gov/releases/z1/dataviz/z1/nonfinancial_debt/chart/#units:growth" target="_blank" rel="noopener" style="color:var(--accent)">Fed ↗</a></div>',
+  '<div class="date">Fed Z.1 · SAAR · <a href="https://www.federalreserve.gov/releases/z1/dataviz/z1/nonfinancial_debt/chart/#units:growth" target="_blank" rel="noopener" style="color:var(--accent)">Fed ↗</a></div>',
   "${historyHTML('USA','bizDebt')}</div>"
 ].join('');
 
@@ -87,8 +84,29 @@ if (html.includes('Nonfinancial Debt Growth')) {
   if (idx >= 0) {
     html = html.slice(0, idx + marker.length) + debtHtml + html.slice(idx + marker.length);
     console.log('appended hh+biz after t10y2y');
-  } else console.log('no insert point');
+  }
+}
+
+// SOFR − US 3M spread metric (after biz debt or after t10y2y)
+if (!html.includes('SOFR − US 3M') && !html.includes('sofrUs3mSpread')) {
+  const spreadHtml = [
+    '<div class="metric has-chart"><div class="name">SOFR − US 3M Spread</div>',
+    "<div class=\"value\">${(()=>{const a=histories['USA-sofrUs3mSpread']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
+    '<div class="date">Term SOFR 3M − TVC:US03MY · TradingView</div>',
+    "${historyHTML('USA','sofrUs3mSpread')}</div>"
+  ].join('');
+  const after = "historyHTML('USA','bizDebt')}</div>";
+  if (html.includes(after)) {
+    html = html.replace(after, after + spreadHtml);
+    console.log('spread metric added after bizDebt');
+  } else {
+    const m2 = "historyHTML('USA','t10y2y')}</div>";
+    if (html.includes(m2)) {
+      html = html.replace(m2, m2 + spreadHtml);
+      console.log('spread metric added after t10y2y');
+    }
+  }
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'hh', html.includes('hhDebt'), 'biz', html.includes('bizDebt'), 'label', html.includes('Households & Nonprofits'));
+console.log('done', html.length, 'spread', html.includes('sofrUs3mSpread'), 'hh', html.includes('hhDebt'));
