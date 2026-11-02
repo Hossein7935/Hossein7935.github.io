@@ -40,6 +40,7 @@ jobs:
           node --check scripts/fetch-sofr-muni-spread.mjs
           node --check scripts/fetch-bofa-ccc.mjs
           node --check scripts/fetch-us10y-tips-spread.mjs
+          node --check scripts/fetch-us5y-tips-spread.mjs
           node --check scripts/restore-index.mjs
       - name: Fetch official economic data
         env:
@@ -63,6 +64,8 @@ jobs:
         run: node scripts/fetch-bofa-ccc.mjs
       - name: US10Y − TIPS10Y spread (FRED T10YIE)
         run: node scripts/fetch-us10y-tips-spread.mjs
+      - name: US5Y − TIPS5Y spread (FRED T5YIE)
+        run: node scripts/fetch-us5y-tips-spread.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
       - name: Build 3-year policy rate charts
