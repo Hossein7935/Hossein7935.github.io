@@ -41,6 +41,7 @@ jobs:
           node --check scripts/fetch-bofa-ccc.mjs
           node --check scripts/fetch-us10y-tips-spread.mjs
           node --check scripts/fetch-us5y-tips-spread.mjs
+          node --check scripts/fetch-country-t10y2y.mjs
           node --check scripts/restore-index.mjs
       - name: Fetch official economic data
         env:
@@ -52,6 +53,8 @@ jobs:
         run: node scripts/fetch-y2.mjs
       - name: Fill 10Y yields
         run: node scripts/fetch-y10.mjs
+      - name: Country 10Y−2Y spreads (DEU FRA JPN AUS CHN)
+        run: node scripts/fetch-country-t10y2y.mjs
       - name: Fill US TIPS
         run: node scripts/fetch-tips.mjs
       - name: Build 6-month yield charts (2Y/10Y)
