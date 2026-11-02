@@ -30,6 +30,22 @@ if (!html.includes('bindBigChartHover')) {
   }
 }
 
+// Add t10y2y to defs if missing
+if (!html.includes("[\'t10y2y\'") && !html.includes('[\'t10y2y\'') && !html.includes("['t10y2y'")) {
+  html = html.replace(
+    "['y10','Staatsanleihen · 10 Jahre','TradingView']",
+    "['y10','Staatsanleihen · 10 Jahre','TradingView'],['t10y2y','Zinskurve · 10Y − 2Y','TradingView / FRED']"
+  );
+}
+
+// Spark charts for t10y2y on country cards
+if (html.includes("key==='y10'||key==='rate'")) {
+  html = html.replace(
+    "key==='y10'||key==='rate'",
+    "key==='y10'||key==='t10y2y'||key==='rate'"
+  );
+}
+
 html = html.replace(
   /\|\|key==='sofr3m'\|\|key==='t10y2y'(\|\|key==='[^']+')*/,
   "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'||key==='us10yTips'||key==='us5yTips'"
@@ -38,6 +54,14 @@ if (html.includes('extraLabels={')) {
   html = html.replace(
     /extraLabels=\{[^}]*\}/,
     "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield',us10yTips:'US10Y − TIPS10Y',us5yTips:'US5Y − TIPS5Y'}"
+  );
+}
+
+// Also pull t10y2y in refresh() value keys
+if (html.includes("'tips5','tips10','reservesGdp','deficit'")) {
+  html = html.replace(
+    "'tips5','tips10','reservesGdp','deficit'",
+    "'tips5','tips10','t10y2y','reservesGdp','deficit'"
   );
 }
 
@@ -88,4 +112,4 @@ if (s >= 0 && e > s) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'us5yTips', html.includes('us5yTips'), 'label', html.includes('US5Y − TIPS 5Y'));
+console.log('done', html.length, 't10y2y-def', html.includes("Zinskurve · 10Y − 2Y"), 'spark', html.includes("key==='t10y2y'"));
