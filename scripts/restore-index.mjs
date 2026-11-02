@@ -30,21 +30,33 @@ if (!html.includes('bindBigChartHover')) {
   }
 }
 
-// Add t10y2y to defs if missing
-if (!html.includes("[\'t10y2y\'") && !html.includes('[\'t10y2y\'') && !html.includes("['t10y2y'")) {
+// Force t10y2y into defs (only once)
+if (!/\['t10y2y'/.test(html)) {
+  const before = html;
   html = html.replace(
     "['y10','Staatsanleihen · 10 Jahre','TradingView']",
     "['y10','Staatsanleihen · 10 Jahre','TradingView'],['t10y2y','Zinskurve · 10Y − 2Y','TradingView / FRED']"
   );
+  if (html === before) {
+    // fallback without special middle-dot
+    html = html.replace(
+      /\['y10','Staatsanleihen[^']*','TradingView'\]/,
+      "['y10','Staatsanleihen · 10 Jahre','TradingView'],['t10y2y','Zinskurve · 10Y − 2Y','TradingView / FRED']"
+    );
+  }
+  console.log('defs patched', /\['t10y2y'/.test(html));
 }
 
-// Spark charts for t10y2y on country cards
-if (html.includes("key==='y10'||key==='rate'")) {
-  html = html.replace(
-    "key==='y10'||key==='rate'",
-    "key==='y10'||key==='t10y2y'||key==='rate'"
-  );
-}
+// Spark charts for t10y2y on country cards (all occurrences)
+html = html.replaceAll(
+  "key==='y10'||key==='rate'",
+  "key==='y10'||key==='t10y2y'||key==='rate'"
+);
+// undo double-insert if re-run
+html = html.replaceAll(
+  "key==='y10'||key==='t10y2y'||key==='t10y2y'||key==='rate'",
+  "key==='y10'||key==='t10y2y'||key==='rate'"
+);
 
 html = html.replace(
   /\|\|key==='sofr3m'\|\|key==='t10y2y'(\|\|key==='[^']+')*/,
@@ -57,11 +69,16 @@ if (html.includes('extraLabels={')) {
   );
 }
 
-// Also pull t10y2y in refresh() value keys
 if (html.includes("'tips5','tips10','reservesGdp','deficit'")) {
   html = html.replace(
     "'tips5','tips10','reservesGdp','deficit'",
     "'tips5','tips10','t10y2y','reservesGdp','deficit'"
+  );
+}
+if (html.includes("'tips5','tips10','t10y2y','t10y2y','reservesGdp'")) {
+  html = html.replace(
+    "'tips5','tips10','t10y2y','t10y2y','reservesGdp'",
+    "'tips5','tips10','t10y2y','reservesGdp'"
   );
 }
 
@@ -112,4 +129,4 @@ if (s >= 0 && e > s) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 't10y2y-def', html.includes("Zinskurve · 10Y − 2Y"), 'spark', html.includes("key==='t10y2y'"));
+console.log('done', html.length, 'def', /\['t10y2y'/.test(html), 'spark', html.includes("key==='t10y2y'||key==='rate'"));
