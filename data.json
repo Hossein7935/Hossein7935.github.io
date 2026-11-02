@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-02T16:40:25.906Z",
+  "updatedAt": "2026-11-02T16:43:06.432Z",
   "data": {
     "CHN": {
       "rate": {
@@ -45,12 +45,12 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.579,
+        "value": 4.577,
         "date": "2026-11-02",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 4.88,
+        "value": 4.884,
         "date": "2026-11-02",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
@@ -137,7 +137,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 2.787,
+        "value": 2.783,
         "date": "2026-11-02",
         "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
@@ -169,7 +169,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 4.9018,
+        "value": 4.8991,
         "date": "2026-11-02",
         "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
@@ -179,7 +179,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 3.6335,
+        "value": 3.6289,
         "date": "2026-11-02",
         "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
       },
@@ -201,7 +201,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 3.2949,
+        "value": 3.2918,
         "date": "2026-11-02",
         "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
@@ -211,7 +211,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 3.0195,
+        "value": 3.0111,
         "date": "2026-11-02",
         "source": "TradingView · TVC:DE02Y (Germany 2 Year Government Bonds Yield)"
       },
