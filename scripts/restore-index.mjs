@@ -32,12 +32,12 @@ if (!html.includes('bindBigChartHover')) {
 
 html = html.replace(
   /\|\|key==='sofr3m'\|\|key==='t10y2y'(\|\|key==='[^']+')*/,
-  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'"
+  "||key==='sofr3m'||key==='t10y2y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'||key==='us10yTips'"
 );
 if (html.includes('extraLabels={')) {
   html = html.replace(
     /extraLabels=\{[^}]*\}/,
-    "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield'}"
+    "extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield',us10yTips:'US10Y − TIPS10Y'}"
   );
 }
 
@@ -50,6 +50,10 @@ const faceBBody = [
   "<div class=\"value\">${spr?fmt(spr.value):'—'}</div>",
   '<div class="date">FRED · T10Y2Y · 10 Jahre</div>',
   "${historyHTML('USA','t10y2y')}</div>",
+  '<div class="metric has-chart"><div class="name">US10Y − TIPS 10Y</div>',
+  "<div class=\"value\">${(()=>{const a=histories['USA-us10yTips']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
+  '<div class="date">Breakeven · FRED T10YIE · 3 Jahre · <a href="https://fred.stlouisfed.org/series/T10YIE" target="_blank" rel="noopener" style="color:var(--accent)">FRED ↗</a></div>',
+  "${historyHTML('USA','us10yTips')}</div>",
   '<div class="metric has-chart"><div class="name">Households & Nonprofits Debt Growth</div>',
   "<div class=\"value\">${(()=>{const a=histories['USA-hhDebt']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
   '<div class="date">Fed Z.1 · SAAR · <a href="https://www.federalreserve.gov/releases/z1/dataviz/z1/nonfinancial_debt/chart/#units:growth" target="_blank" rel="noopener" style="color:var(--accent)">Fed ↗</a></div>',
@@ -74,10 +78,10 @@ const s = html.indexOf(markerStart);
 const e = html.indexOf(markerEnd);
 if (s >= 0 && e > s) {
   html = html.slice(0, s) + markerStart + faceBBody + '`;\n    ' + html.slice(e);
-  console.log('faceB replaced via faceA.after marker');
+  console.log('faceB replaced');
 } else {
   console.log('markers not found', s, e);
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'ccc', html.includes('BofA CCC High Yield'), 'spread', html.includes('SOFR − US 3M'));
+console.log('done', html.length, 'us10yTips', html.includes('us10yTips'), 'label', html.includes('US10Y − TIPS 10Y'));
