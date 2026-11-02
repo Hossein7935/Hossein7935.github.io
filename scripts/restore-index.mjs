@@ -52,7 +52,7 @@ const faceBBody = [
   "${historyHTML('USA','t10y2y')}</div>",
   '<div class="metric has-chart"><div class="name">US10Y − TIPS 10Y</div>',
   "<div class=\"value\">${(()=>{const a=histories['USA-us10yTips']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
-  '<div class="date">Breakeven · FRED T10YIE · 3 Jahre · <a href="https://fred.stlouisfed.org/series/T10YIE" target="_blank" rel="noopener" style="color:var(--accent)">FRED ↗</a></div>',
+  '<div class="date">Breakeven · FRED T10YIE · 5 Jahre · <a href="https://fred.stlouisfed.org/series/T10YIE" target="_blank" rel="noopener" style="color:var(--accent)">FRED ↗</a></div>',
   "${historyHTML('USA','us10yTips')}</div>",
   '<div class="metric has-chart"><div class="name">Households & Nonprofits Debt Growth</div>',
   "<div class=\"value\">${(()=>{const a=histories['USA-hhDebt']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
@@ -84,4 +84,4 @@ if (s >= 0 && e > s) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'us10yTips', html.includes('us10yTips'), 'label', html.includes('US10Y − TIPS 10Y'));
+console.log('done', html.length, 'us10yTips', html.includes('us10yTips'), 'label', html.includes('5 Jahre'));
