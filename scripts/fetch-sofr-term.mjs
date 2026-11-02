@@ -77,37 +77,51 @@ try {
 }
 
 try {
-  if (true) {
-    const start = '2015-01-01';
-    const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=T10Y2Y&cosd=${start}`;
-    const r = await fetch(url, {
-      headers: { 'User-Agent': 'MacroWatch/1.0' },
-      signal: AbortSignal.timeout(45000),
-      cache: 'no-store'
-    });
-    if (!r.ok) throw new Error(`FRED T10Y2Y HTTP ${r.status}`);
-    const text = await r.text();
-    const rows = [];
-    for (const line of text.trim().split(/\r?\n/).slice(1)) {
-      const [date, val] = line.split(',');
-      if (val && val !== '.' && Number.isFinite(Number(val))) {
-        rows.push({ period: date.slice(0, 10), value: Math.round(Number(val) * 1000) / 1000 });
-      }
+  // Full 10+ years of 10Y−2Y spread (FRED T10Y2Y)
+  const start = '2016-01-01';
+  const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=T10Y2Y&cosd=${start}`;
+  const r = await fetch(url, {
+    headers: { 'User-Agent': 'MacroWatch/1.0' },
+    signal: AbortSignal.timeout(45000),
+    cache: 'no-store'
+  });
+  if (!r.ok) throw new Error(`FRED T10Y2Y HTTP ${r.status}`);
+  const text = await r.text();
+  const rows = [];
+  for (const line of text.trim().split(/\r?\n/).slice(1)) {
+    const [date, val] = line.split(',');
+    if (val && val !== '.' && Number.isFinite(Number(val))) {
+      rows.push({ period: date.slice(0, 10), value: Math.round(Number(val) * 1000) / 1000 });
     }
-    const step = Math.max(1, Math.floor(rows.length / 520));
-    const sampled = [];
-    for (let i = 0; i < rows.length; i += step) sampled.push(rows[i]);
-    if (sampled.at(-1)?.period !== rows.at(-1)?.period) sampled.push(rows.at(-1));
-    histories['USA-t10y2y'] = sampled.slice(-520);
-    const last = histories['USA-t10y2y'].at(-1);
-    if (last) {
-      data.USA = data.USA || {};
-      data.USA.t10y2y = { value: last.value, date: last.period, source: 'FRED · T10Y2Y · 10 Jahre' };
-    }
-    console.log('T10Y2Y:', histories['USA-t10y2y'].length, 'Punkte');
   }
+  // ~10 years of trading days ≈ 2500; keep up to 1500 points (~weekly denser than before)
+  const targetPts = 1500;
+  const step = Math.max(1, Math.floor(rows.length / targetPts));
+  const sampled = [];
+  for (let i = 0; i < rows.length; i += step) sampled.push(rows[i]);
+  if (sampled.at(-1)?.period !== rows.at(-1)?.period) sampled.push(rows.at(-1));
+  histories['USA-t10y2y'] = sampled.slice(-targetPts);
+  const last = histories['USA-t10y2y'].at(-1);
+  if (last) {
+    data.USA = data.USA || {};
+    data.USA.t10y2y = {
+      value: last.value,
+      date: last.period,
+      source: 'FRED · T10Y2Y · 10 Jahre'
+    };
+  }
+  console.log(
+    'T10Y2Y:',
+    histories['USA-t10y2y'].length,
+    'Punkte, first',
+    histories['USA-t10y2y'][0]?.period,
+    'last',
+    last?.period,
+    last?.value
+  );
 } catch (e) {
   errors.push(`USA T10Y2Y: ${e.message}`);
+  console.error(e.message);
 }
 
 payload.histories = histories;
