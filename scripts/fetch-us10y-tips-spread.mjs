@@ -2,7 +2,7 @@ import fs from 'node:fs';
 
 /**
  * US 10Y nominal − TIPS 10Y = 10-Year Breakeven Inflation (FRED T10YIE).
- * Daily history ≥ 3 years; updates automatically on each workflow run.
+ * Daily history ≥ 5 years; updates automatically on each workflow run.
  */
 
 const payload = JSON.parse(fs.readFileSync('data.json', 'utf8'));
@@ -11,8 +11,8 @@ const data = payload.data || {};
 const errors = [];
 
 try {
-  // ~3.5 years to be safe
-  const url = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=T10YIE&cosd=2023-01-01';
+  // ≥ 5 years
+  const url = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=T10YIE&cosd=2021-01-01';
   const r = await fetch(url, {
     headers: { 'User-Agent': 'MacroWatch/1.0 (+https://hossein7935.github.io/)' },
     signal: AbortSignal.timeout(45000),
@@ -32,7 +32,6 @@ try {
   }
   if (points.length < 50) throw new Error(`Only ${points.length} T10YIE points`);
 
-  // Merge so history grows if FRED window moves
   const map = new Map();
   for (const p of histories['USA-us10yTips'] || []) {
     if (p?.period && Number.isFinite(Number(p.value))) map.set(String(p.period), Number(p.value));
@@ -42,18 +41,18 @@ try {
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([period, value]) => ({ period, value }));
 
-  // Keep ~3–4 years daily (~1000 pts)
-  histories['USA-us10yTips'] = merged.slice(-1200);
+  // Keep ~5+ years daily (~1300–1600 trading days)
+  histories['USA-us10yTips'] = merged.slice(-1800);
 
   const last = histories['USA-us10yTips'].at(-1);
   data.USA = data.USA || {};
   data.USA.us10yTips = {
     value: last.value,
     date: last.period,
-    source: 'FRED · T10YIE · US10Y − TIPS10Y (Breakeven)'
+    source: 'FRED · T10YIE · US10Y − TIPS10Y (Breakeven, 5y)'
   };
 
-  console.log('US10Y−TIPS10Y:', histories['USA-us10yTips'].length, 'pts, last', last.period, last.value);
+  console.log('US10Y−TIPS10Y:', histories['USA-us10yTips'].length, 'pts, first', histories['USA-us10yTips'][0]?.period, 'last', last.period, last.value);
 } catch (e) {
   errors.push(`US10Y−TIPS10Y: ${e.message}`);
   console.error(e.message);
