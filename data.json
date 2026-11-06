@@ -226,7 +226,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 3.2507,
+        "value": 3.2505,
         "date": "2026-11-06",
         "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
@@ -273,12 +273,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.838,
+        "value": 4.839,
         "date": "2026-11-06",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.173,
+        "value": 0.172,
         "date": "2026-11-06",
         "source": "TradingView · AUS 10Y − 2Y"
       },
@@ -3077,7 +3077,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 0.173
+        "value": 0.172
       }
     ],
     "CHN-t10y2y": [
