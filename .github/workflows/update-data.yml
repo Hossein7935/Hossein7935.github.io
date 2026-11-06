@@ -2,7 +2,7 @@ name: MacroWatch data update
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 */6 * * *'
+    - cron: '*/15 * * * *'
   push:
     branches: [main, master]
     paths-ignore:
