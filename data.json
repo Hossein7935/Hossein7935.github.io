@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-06T07:52:58.390Z",
+  "updatedAt": "2026-11-06T07:55:26.559Z",
   "data": {
     "CHN": {
       "rate": {
@@ -50,12 +50,12 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.464,
+        "value": 4.472,
         "date": "2026-11-06",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 4.831,
+        "value": 4.835,
         "date": "2026-11-06",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
@@ -85,12 +85,12 @@
         "source": "FRED · T10Y2Y · 10 Jahre"
       },
       "us3m": {
-        "value": 4.09,
+        "value": 4.093,
         "date": "2026-11-06",
         "source": "TradingView · TVC:US03MY (US 3M T-Bill)"
       },
       "sofrUs3mSpread": {
-        "value": -0.0339,
+        "value": -0.0369,
         "date": "2026-11-06",
         "source": "Term SOFR 3M − US 3M (TV)"
       },
@@ -179,7 +179,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 4.773,
+        "value": 4.7714,
         "date": "2026-11-06",
         "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
@@ -189,12 +189,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 3.4675,
+        "value": 3.4709,
         "date": "2026-11-06",
         "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 1.305,
+        "value": 1.301,
         "date": "2026-11-06",
         "source": "TradingView · FRA 10Y − 2Y"
       },
@@ -216,7 +216,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 3.2145,
+        "value": 3.2154,
         "date": "2026-11-06",
         "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
@@ -226,12 +226,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 2.9312,
+        "value": 2.9332,
         "date": "2026-11-06",
         "source": "TradingView · TVC:DE02Y (Germany 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.283,
+        "value": 0.282,
         "date": "2026-11-06",
         "source": "TradingView · DEU 10Y − 2Y"
       },
@@ -253,7 +253,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 4.991,
+        "value": 4.99,
         "date": "2026-11-06",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
@@ -268,7 +268,7 @@
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.184,
+        "value": 0.183,
         "date": "2026-11-06",
         "source": "TradingView · AUS 10Y − 2Y"
       },
@@ -1509,7 +1509,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 0.283
+        "value": 0.282
       }
     ],
     "FRA-t10y2y": [
@@ -2031,7 +2031,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 1.305
+        "value": 1.301
       }
     ],
     "JPN-t10y2y": [
@@ -3067,7 +3067,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 0.184
+        "value": 0.183
       }
     ],
     "CHN-t10y2y": [
@@ -9811,13 +9811,13 @@
     "USA-us3m": [
       {
         "period": "2026-11-06",
-        "value": 4.09
+        "value": 4.093
       }
     ],
     "USA-sofrUs3mSpread": [
       {
         "period": "2026-11-06",
-        "value": -0.0339
+        "value": -0.0369
       }
     ],
     "USA-bofaCcc": [
