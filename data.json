@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-06T18:35:39.666Z",
+  "updatedAt": "2026-11-06T18:37:55.135Z",
   "data": {
     "CHN": {
       "rate": {
@@ -50,12 +50,12 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.507,
+        "value": 4.505,
         "date": "2026-11-06",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 4.843,
+        "value": 4.841,
         "date": "2026-11-06",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
@@ -120,7 +120,7 @@
         "source": "Fed Z.1 · SAAR · Nonfinancial Business"
       },
       "cuAu": {
-        "value": 1.5330322061626191,
+        "value": 1.5320225471394218,
         "date": "2026-11-06",
         "source": "Yahoo HG=F / GC=F · Ratio×1000"
       },
@@ -184,7 +184,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 4.7656,
+        "value": 4.766,
         "date": "2026-11-06",
         "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
@@ -221,7 +221,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 3.25,
+        "value": 3.2498,
         "date": "2026-11-06",
         "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
@@ -268,12 +268,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.839,
+        "value": 4.838,
         "date": "2026-11-06",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.172,
+        "value": 0.173,
         "date": "2026-11-06",
         "source": "TradingView · AUS 10Y − 2Y"
       },
@@ -3072,7 +3072,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 0.172
+        "value": 0.173
       }
     ],
     "CHN-t10y2y": [
@@ -26230,7 +26230,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 1.5330322061626191
+        "value": 1.5320225471394218
       }
     ],
     "USA-rate": [
@@ -27563,6 +27563,7 @@
   },
   "errors": [
     "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer",
+    "US10Y−US5Y: FRED T10Y5Y HTTP 404",
     "Inflation-Chart JPN: keine YoY-Punkte"
   ]
 }
