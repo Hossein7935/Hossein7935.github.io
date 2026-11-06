@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-06T18:43:37.683Z",
+  "updatedAt": "2026-11-06T18:44:33.260Z",
   "data": {
     "CHN": {
       "rate": {
@@ -125,7 +125,7 @@
         "source": "Fed Z.1 · SAAR · Nonfinancial Business"
       },
       "cuAu": {
-        "value": 1.5348003954954046,
+        "value": 1.5346036937899095,
         "date": "2026-11-06",
         "source": "Yahoo HG=F / GC=F · Ratio×1000"
       },
@@ -189,7 +189,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 4.7687,
+        "value": 4.7686,
         "date": "2026-11-06",
         "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
@@ -226,7 +226,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 3.2507,
+        "value": 3.2505,
         "date": "2026-11-06",
         "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
@@ -273,12 +273,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.838,
+        "value": 4.839,
         "date": "2026-11-06",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.173,
+        "value": 0.172,
         "date": "2026-11-06",
         "source": "TradingView · AUS 10Y − 2Y"
       },
@@ -3077,7 +3077,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 0.173
+        "value": 0.172
       }
     ],
     "CHN-t10y2y": [
@@ -32637,7 +32637,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 1.5348003954954046
+        "value": 1.5346036937899095
       }
     ],
     "USA-rate": [
