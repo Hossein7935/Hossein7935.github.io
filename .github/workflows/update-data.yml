@@ -34,7 +34,7 @@ jobs:
           node-version: '22'
       - name: Restore index.html + debt UI
         run: node scripts/restore-index.mjs
-      - name: Inject Copper/Gold live chart (USA page 2)
+      - name: Inject Copper/Gold native chart (USA page 2)
         run: node scripts/inject-cuau.mjs
       - name: Check updater syntax
         run: |
@@ -46,6 +46,7 @@ jobs:
           node --check scripts/fetch-country-t10y2y.mjs
           node --check scripts/restore-index.mjs
           node --check scripts/inject-cuau.mjs
+          node --check scripts/fetch-cu-au.mjs
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
@@ -74,6 +75,8 @@ jobs:
         run: node scripts/fetch-us5y-tips-spread.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
+      - name: Copper/Gold ratio (Yahoo HG=F / GC=F)
+        run: node scripts/fetch-cu-au.mjs
       - name: Build 3-year policy rate charts
         run: node scripts/fetch-rate-charts.mjs
       - name: Build inflation charts (3y)
@@ -92,7 +95,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
-            git commit -m "Update MacroWatch data + Copper/Gold chart" || true
+            git commit -m "Update MacroWatch data + native Copper/Gold chart" || true
             git pull --no-rebase -X ours origin main || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
