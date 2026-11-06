@@ -1,8 +1,9 @@
 import fs from 'node:fs';
 
 /**
- * US 10Y − 5Y Treasury spread (FRED T10Y5Y).
- * Daily history ≥ 5 years; updates on each workflow run.
+ * US 10Y − 5Y Treasury spread = DGS10 − DGS5 (FRED).
+ * T10Y5Y does not exist on FRED; we compute it ourselves.
+ * Daily history from 2016; updates on each workflow run.
  */
 
 const payload = JSON.parse(fs.readFileSync('data.json', 'utf8'));
@@ -10,28 +11,46 @@ const histories = payload.histories || {};
 const data = payload.data || {};
 const errors = [];
 
-try {
-  const url = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=T10Y5Y&cosd=2016-01-01';
+async function fredCsv(id, start) {
+  const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=${start}`;
   const r = await fetch(url, {
     headers: { 'User-Agent': 'MacroWatch/1.0 (+https://hossein7935.github.io/)' },
     signal: AbortSignal.timeout(45000),
     cache: 'no-store'
   });
-  if (!r.ok) throw new Error(`FRED T10Y5Y HTTP ${r.status}`);
+  if (!r.ok) throw new Error(`FRED ${id} HTTP ${r.status}`);
   const text = await r.text();
-  if (text.includes('<html')) throw new Error('FRED T10Y5Y blocked or HTML response');
-
-  const points = [];
+  if (text.includes('<html')) throw new Error(`FRED ${id} blocked or HTML response`);
+  const map = new Map();
   for (const line of text.trim().split(/\r?\n/).slice(1)) {
     const [date, val] = line.split(',');
     if (val && val !== '.' && Number.isFinite(Number(val))) {
+      map.set(date.slice(0, 10), Number(val));
+    }
+  }
+  return map;
+}
+
+try {
+  const start = '2016-01-01';
+  const [map10, map5] = await Promise.all([
+    fredCsv('DGS10', start),
+    fredCsv('DGS5', start)
+  ]);
+
+  const points = [];
+  for (const [period, y10] of map10) {
+    const y5 = map5.get(period);
+    if (y5 != null && Number.isFinite(y5)) {
       points.push({
-        period: date.slice(0, 10),
-        value: Math.round(Number(val) * 1000) / 1000
+        period,
+        value: Math.round((y10 - y5) * 1000) / 1000
       });
     }
   }
-  if (points.length < 50) throw new Error(`Only ${points.length} T10Y5Y points`);
+  points.sort((a, b) => a.period.localeCompare(b.period));
+
+  if (points.length < 50) throw new Error(`Only ${points.length} computed 10Y−5Y points`);
 
   // Even sample across full range, keep last ~1600 points
   const maxPts = 1600;
@@ -57,11 +76,11 @@ try {
   data.USA.t10y5y = {
     value: last.value,
     date: last.period,
-    source: 'FRED · T10Y5Y · US10Y − US5Y'
+    source: 'FRED · DGS10 − DGS5 · US10Y − US5Y'
   };
 
   console.log(
-    'T10Y5Y:',
+    'US10Y−US5Y:',
     histories['USA-t10y5y'].length,
     'pts, first',
     histories['USA-t10y5y'][0]?.period,
