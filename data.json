@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-06T18:43:37.683Z",
+  "updatedAt": "2026-11-06T18:45:22.820Z",
   "data": {
     "CHN": {
       "rate": {
@@ -125,7 +125,7 @@
         "source": "Fed Z.1 · SAAR · Nonfinancial Business"
       },
       "cuAu": {
-        "value": 1.5348003954954046,
+        "value": 1.5346886656544483,
         "date": "2026-11-06",
         "source": "Yahoo HG=F / GC=F · Ratio×1000"
       },
@@ -189,7 +189,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 4.7687,
+        "value": 4.7678,
         "date": "2026-11-06",
         "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
@@ -204,7 +204,7 @@
         "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 1.251,
+        "value": 1.25,
         "date": "2026-11-06",
         "source": "TradingView · FRA 10Y − 2Y"
       },
@@ -2041,7 +2041,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 1.251
+        "value": 1.25
       }
     ],
     "JPN-t10y2y": [
@@ -32637,7 +32637,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 1.5348003954954046
+        "value": 1.5346886656544483
       }
     ],
     "USA-rate": [
