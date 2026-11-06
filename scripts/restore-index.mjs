@@ -87,7 +87,7 @@ const faceBBody = [
   "${historyHTML('USA','t10y2y')}</div>",
   '<div class="metric has-chart"><div class="name">Zinskurve · 10Y − 5Y Spread</div>',
   "<div class=\"value\">${(()=>{const a=histories['USA-t10y5y']||[];const last=a.at(-1);return last?fmt(last.value):(data.USA&&data.USA.t10y5y?fmt(data.USA.t10y5y.value):'—') })()}</div>",
-  '<div class="date">FRED · T10Y5Y · US10Y − US5Y · <a href="https://fred.stlouisfed.org/series/T10Y5Y" target="_blank" rel="noopener" style="color:var(--accent)">FRED ↗</a></div>',
+  '<div class="date">FRED · DGS10 − DGS5 · US10Y − US5Y · <a href="https://fred.stlouisfed.org/series/DGS10" target="_blank" rel="noopener" style="color:var(--accent)">FRED ↗</a></div>',
   "${historyHTML('USA','t10y5y')}</div>",
   '<div class="metric has-chart"><div class="name">US10Y − TIPS 10Y</div>',
   "<div class=\"value\">${(()=>{const a=histories['USA-us10yTips']||[];const last=a.at(-1);return last?fmt(last.value):'—' })()}</div>",
