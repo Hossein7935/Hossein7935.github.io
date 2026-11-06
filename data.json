@@ -199,7 +199,7 @@
         "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 1.248,
+        "value": 1.249,
         "date": "2026-11-06",
         "source": "TradingView · FRA 10Y − 2Y"
       },
@@ -2036,7 +2036,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 1.248
+        "value": 1.249
       }
     ],
     "JPN-t10y2y": [
