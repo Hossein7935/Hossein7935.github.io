@@ -3,31 +3,63 @@ import fs from 'fs';
 /** Additive: UST + TIPS dual curve on USA page 4 */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// Button label
 html = html.replaceAll('Seite 4 · SOFR Fwd', 'Seite 4 · Kurven');
 
-// Ensure UST panel in faceD builder
 if (!html.includes('ustCurvePanel')) {
-  const needle = "erscheinen ältere Kurven zum Vergleich.</div>';";
-  const extra =
-    "erscheinen ältere Kurven zum Vergleich.</div>'+\n" +
-    "      '<div class=\"metric has-chart sofr-fwd-panel\" id=\"ustCurvePanel\">" +
+  const panelHtml =
+    "'<div class=\"metric has-chart sofr-fwd-panel\" id=\"ustCurvePanel\">" +
     "<div class=\"name\">US-Zinsstruktur · Nominal + TIPS (rot)</div>" +
     "<div class=\"value\" id=\"ustCurveValue\">—</div>" +
     "<div class=\"date\" id=\"ustCurveDate\">3M · 1Y · 2Y · 5Y · 10Y · 30Y</div>" +
     "<div id=\"ustCurveChart\"></div>" +
     "<div class=\"sofr-fwd-bp\" id=\"ustCurveBp\"></div>" +
-    "<div class=\"sofr-fwd-meta\" id=\"ustCurveMeta\">Nominal: FRED DGS*. TIPS (rot): DFII5/10/30.</div></div>';";
-  if (html.includes(needle)) {
-    html = html.replace(needle, extra);
-    console.log('injected ustCurvePanel into faceD');
-  } else {
-    console.log('needle found?', html.includes(needle));
+    "<div class=\"sofr-fwd-meta\" id=\"ustCurveMeta\">Nominal: FRED DGS*. TIPS (rot): DFII5/10/30.</div></div>'";
+
+  let done = false;
+
+  // Pattern A: unescaped quotes in template literal builder
+  const a =
+    'id="sofrFwdHistMeta">Sobald mehrere Tage gespeichert sind, erscheinen ältere Kurven zum Vergleich.</div>\'+\n      \'</div>\';';
+  if (html.includes(a)) {
+    html = html.replace(
+      a,
+      'id="sofrFwdHistMeta">Sobald mehrere Tage gespeichert sind, erscheinen ältere Kurven zum Vergleich.</div>\'+\n      ' +
+        panelHtml +
+        '+\n      \'</div>\';'
+    );
+    done = true;
+    console.log('injected ustCurvePanel pattern A');
   }
+
+  // Pattern B: append before faceD anchor
+  if (!done) {
+    const anchor = "const _anchor=card.querySelector('.usa-face-c')||faceC;";
+    if (html.includes(anchor) && html.includes('usa-face-d')) {
+      html = html.replace(
+        anchor,
+        'faceD.innerHTML += ' + panelHtml + ';\n    ' + anchor
+      );
+      done = true;
+      console.log('injected ustCurvePanel via +=');
+    }
+  }
+
+  // Pattern C: escaped single quotes variant of anchor
+  if (!done) {
+    const anchor2 = "const _anchor=card.querySelector(\\'.usa-face-c\\')||faceC;";
+    // try simpler search
+    const idx = html.indexOf('const _anchor=card.querySelector');
+    if (idx >= 0 && html.includes('usa-face-d')) {
+      html = html.slice(0, idx) + 'faceD.innerHTML += ' + panelHtml + ';\n    ' + html.slice(idx);
+      done = true;
+      console.log('injected ustCurvePanel before _anchor');
+    }
+  }
+
+  if (!done) console.warn('could not inject ustCurvePanel');
 }
 
-// Call paintUstCurve with paintSofRFwd
-if (!html.includes('paintUstCurve')) {
+if (html.includes('paintSofRFwd') && !html.includes("paintUstCurve()")) {
   html = html.replace(
     "if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){}},50);",
     "if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);"
@@ -116,14 +148,13 @@ if (!html.includes('function paintUstCurve')) {
   }
 }
 
-// ALL_KEYS
 if (!html.includes("'ustCurve'")) {
   html = html.replace(/ALL_KEYS=\[([^\]]+)\]/, (m, inner) => {
     if (inner.includes('ustCurve')) return m;
     return `ALL_KEYS=[${inner},'ustCurve']`;
   });
 }
-if (!html.includes("ustCurve:")) {
+if (!html.includes('ustCurve:')) {
   html = html.replace(/extraLabels=\{([^}]*)\}/, (m, inner) => {
     if (inner.includes('ustCurve')) return m;
     return `extraLabels={${inner},ustCurve:'US Zinsstruktur'}`;
@@ -131,4 +162,9 @@ if (!html.includes("ustCurve:")) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'ustPanel', html.includes('ustCurvePanel'), 'paint', html.includes('paintUstCurve'), 'Kurven', html.includes('Seite 4 · Kurven'));
+console.log(
+  'done', html.length,
+  'ustPanel', html.includes('ustCurvePanel'),
+  'paint', html.includes('function paintUstCurve'),
+  'Kurven', html.includes('Seite 4 · Kurven')
+);
