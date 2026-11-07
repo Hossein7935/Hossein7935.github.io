@@ -271,6 +271,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(4,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -601,6 +602,7 @@ function paintEffrVol(){
   }
   if(!faceE)return;
   if(pageNow===4)faceE.classList.remove('hidden');
+  ['effrVolChgPanel','effrRatePanel'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();});
   if(!document.getElementById('effrVolPanel')){
     const box=document.createElement('div');
     box.innerHTML=
@@ -611,41 +613,17 @@ function paintEffrVol(){
         '<div class="sofr-fwd-bp" id="effrVolCards"></div>'+
         '<div id="effrVolChart"></div>'+
         '<div class="sofr-fwd-meta" id="effrVolMeta">FRED EFFRVOL · NY Fed</div>'+
-      '</div>'+
-      '<div class="metric has-chart sofr-fwd-panel" id="effrVolChgPanel">'+
-        '<div class="name">Tagesveränderung Volumen %</div>'+
-        '<div class="value" id="effrVolChgValue">—</div>'+
-        '<div class="date" id="effrVolChgDate">vs. vorheriger Handelstag</div>'+
-        '<div id="effrVolChgChart"></div>'+
-        '<div class="sofr-fwd-meta" id="effrVolChgMeta"></div>'+
-      '</div>'+
-      '<div class="metric has-chart sofr-fwd-panel" id="effrRatePanel">'+
-        '<div class="name">EFFR Zinssatz (Vergleich)</div>'+
-        '<div class="value" id="effrRateValue">—</div>'+
-        '<div class="date" id="effrRateDate">Effective Federal Funds Rate</div>'+
-        '<div id="effrRateChart"></div>'+
-        '<div class="sofr-fwd-meta">Gemeinsam mit Volumen betrachten: Rate vs. Aktivität</div>'+
       '</div>';
     while(box.firstChild) faceE.appendChild(box.firstChild);
   }
   const ev=(data.USA&&data.USA.effrVol)||{};
   const vol=histories['USA-effrVol']||[];
-  const chg=histories['USA-effrVolChg']||[];
-  const rate=histories['USA-effr']||[];
   const volShow=vol.length>1600?vol.slice(-1300):vol;
-  const chgShow=chg.length>1600?chg.slice(-800):chg;
-  const rateShow=rate.length>1600?rate.slice(-1300):rate;
   const valEl=document.getElementById('effrVolValue');
   const dateEl=document.getElementById('effrVolDate');
   const cards=document.getElementById('effrVolCards');
   const host=document.getElementById('effrVolChart');
   const meta=document.getElementById('effrVolMeta');
-  const chgVal=document.getElementById('effrVolChgValue');
-  const chgHost=document.getElementById('effrVolChgChart');
-  const chgMeta=document.getElementById('effrVolChgMeta');
-  const rateVal=document.getElementById('effrRateValue');
-  const rateDate=document.getElementById('effrRateDate');
-  const rateHost=document.getElementById('effrRateChart');
   if(valEl){
     const badge=ev.alert?('<span class="effrvol-alert '+ev.alert+'">'+(ev.alert==='high'?'Auffällig':ev.alert==='watch'?'Beobachten':'Normal')+'</span>'):'';
     valEl.innerHTML=(ev.value!=null?fmt(ev.value):'—')+badge;
@@ -666,22 +644,10 @@ function paintEffrVol(){
     else host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|effrVol|Fed Funds Volume" title="Chart vergrößern">'+renderLineChart(volShow,{w:360,h:150})+'</div>';
   }
   if(meta)meta.textContent=(ev.source||'FRED EFFRVOL')+' · '+(ev.points||vol.length)+' Handelstage';
-  if(chgVal)chgVal.textContent=ev.pctChange!=null?((ev.pctChange>=0?'+':'')+fmt(ev.pctChange)+' %'):'—';
-  if(chgHost){
-    if(!chgShow.length)chgHost.innerHTML='<div class="sparkempty">Keine Veränderung</div>';
-    else chgHost.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|effrVolChg|Fed Funds Vol Δ%" title="Chart vergrößern">'+renderLineChart(chgShow,{w:360,h:130})+'</div>';
-  }
-  if(chgMeta)chgMeta.textContent=ev.alertNote||'Tagesveränderung zum vorherigen verfügbaren Handelstag.';
-  if(rateVal)rateVal.textContent=ev.effr!=null?fmt(ev.effr)+' %':(rateShow.length?fmt(rateShow.at(-1).value)+' %':'—');
-  if(rateDate)rateDate.textContent=ev.effrDate?('Stand '+ev.effrDate):'Effective Federal Funds Rate';
-  if(rateHost){
-    if(!rateShow.length)rateHost.innerHTML='<div class="sparkempty">Keine EFFR-Daten</div>';
-    else rateHost.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|effr|EFFR" title="Chart vergrößern">'+renderLineChart(rateShow,{w:360,h:130})+'</div>';
-  }
 }
 
-
 bindUsaPages();
+
 
 
 

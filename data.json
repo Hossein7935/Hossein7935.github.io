@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-07T20:19:16.042Z",
+  "updatedAt": "2026-11-07T20:48:52.613Z",
   "data": {
     "CHN": {
       "rate": {
@@ -142,7 +142,7 @@
       "sofrFwd": {
         "value": 4.38,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-07T20:19:00.532Z",
+        "updatedAt": "2026-11-07T20:48:35.835Z",
         "source": "NY Fed SOFR + CME SR1/SR3 (Yahoo delayed)",
         "curve": [
           {
@@ -245,7 +245,7 @@
       "ustCurve": {
         "value": 4.84,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-07T20:19:02.067Z",
+        "updatedAt": "2026-11-07T20:48:38.052Z",
         "source": "FRED · DGS* + DFII* (TIPS real yields)",
         "nominal": [
           {
@@ -367,7 +367,7 @@
         "value": 798.428,
         "valueRaw": 798428,
         "date": "2026-09-30",
-        "updatedAt": "2026-11-07T20:19:03.794Z",
+        "updatedAt": "2026-11-07T20:48:41.809Z",
         "source": "FHLBanks Office of Finance · Combined Operating Highlights",
         "sourceUrl": "https://www.fhlb-of.com/",
         "absChangeQoq": -12.287,
@@ -397,7 +397,7 @@
         "prevDate": "2026-11-04",
         "absChange": -4,
         "pctChange": -3.48,
-        "updatedAt": "2026-11-07T20:19:08.837Z",
+        "updatedAt": "2026-11-07T20:48:44.429Z",
         "source": "FRED EFFRVOL · New York Fed Effective Federal Funds Volume",
         "sourceUrl": "https://www.newyorkfed.org/markets/reference-rates/effr",
         "unit": "USD Milliarden",
@@ -62780,7 +62780,7 @@
     ],
     "USA-sofrFwdSnapshots": [
       {
-        "asOf": "2026-11-07T20:19:00.532Z",
+        "asOf": "2026-11-07T20:48:35.835Z",
         "spotDate": "2026-11-05",
         "spot": 3.92,
         "points": [
@@ -91863,7 +91863,7 @@
     ],
     "USA-ustCurveSnapshots": [
       {
-        "asOf": "2026-11-07T20:19:02.067Z",
+        "asOf": "2026-11-07T20:48:38.052Z",
         "nominal": [
           {
             "period": "3M",
