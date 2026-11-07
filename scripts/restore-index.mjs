@@ -25,11 +25,16 @@ if ((html.match(/faceA\.after\(faceB\)/g) || []).length > 1 || html.includes('}g
 
 // CSS: page select + SOFR fwd
 if (!html.includes('usa-page-select')) {
-  const css = '.usa-page-select{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.usa-page-select button{padding:6px 10px;border-radius:8px;border:1px solid var(--control-line);background:var(--control);color:var(--text);font:inherit;cursor:pointer}.usa-page-select button.active{background:var(--accent);color:#09211e;border-color:var(--accent);font-weight:700}.diff-pick{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;color:var(--muted);cursor:pointer}.diff-pick input{width:14px;height:14px;accent-color:var(--accent)}.diff-panel{grid-column:1/-1;border:1px dashed var(--line);border-radius:10px;padding:10px;background:var(--metric)}.diff-hint{font-size:11px;color:var(--muted);margin-top:4px}.sofr-fwd-panel{grid-column:1/-1}.sofr-fwd-meta{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}.sofr-fwd-bp{font-size:12px;margin-top:4px}.sofr-fwd-bp span{margin-right:10px}';
+  const css = '.usa-page-select{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.usa-page-select button{padding:6px 10px;border-radius:8px;border:1px solid var(--control-line);background:var(--control);color:var(--text);font:inherit;cursor:pointer}.usa-page-select button.active{background:var(--accent);color:#09211e;border-color:var(--accent);font-weight:700}.diff-pick{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;color:var(--muted);cursor:pointer}.diff-pick input{width:14px;height:14px;accent-color:var(--accent)}.diff-panel{grid-column:1/-1;border:1px dashed var(--line);border-radius:10px;padding:10px;background:var(--metric)}.diff-hint{font-size:11px;color:var(--muted);margin-top:4px}.sofr-fwd-panel{grid-column:1/-1}#sofrFwdChart .yield-chart-wrap svg,#sofrFwdHistChart .yield-chart-wrap svg{width:100%;max-width:100%;height:auto}.sofr-fwd-meta{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}.sofr-fwd-bp{font-size:12px;margin-top:4px}.sofr-fwd-bp span{margin-right:10px}';
   html = html.replace('</style>', css + '</style>');
 } else if (!html.includes('sofr-fwd-panel')) {
-  const css = '.sofr-fwd-panel{grid-column:1/-1}.sofr-fwd-meta{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}.sofr-fwd-bp{font-size:12px;margin-top:4px}.sofr-fwd-bp span{margin-right:10px}';
+  const css = '.sofr-fwd-panel{grid-column:1/-1}#sofrFwdChart .yield-chart-wrap svg,#sofrFwdHistChart .yield-chart-wrap svg{width:100%;max-width:100%;height:auto}.sofr-fwd-meta{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}.sofr-fwd-bp{font-size:12px;margin-top:4px}.sofr-fwd-bp span{margin-right:10px}';
   html = html.replace('</style>', css + '</style>');
+} else if (!html.includes('#sofrFwdChart .yield-chart-wrap svg')) {
+  html = html.replace(
+    '.sofr-fwd-panel{grid-column:1/-1}',
+    '.sofr-fwd-panel{grid-column:1/-1}#sofrFwdChart .yield-chart-wrap svg,#sofrFwdHistChart .yield-chart-wrap svg{width:100%;max-width:100%;height:auto}'
+  );
 }
 
 // Page selector: 4 pages
@@ -39,13 +44,11 @@ if (html.includes('usaExtraToggle') && !html.includes('usaPageSelect')) {
     "${c.id==='USA'?`<div class=\"usa-flip-toggle\"><div class=\"usa-page-select\" id=\"usaPageSelect\"><button type=\"button\" data-page=\"0\" class=\"active\">Seite 1</button><button type=\"button\" data-page=\"1\">Seite 2</button><button type=\"button\" data-page=\"2\">Seite 3 · Rates</button><button type=\"button\" data-page=\"3\">Seite 4 · SOFR Fwd</button></div></div>`:''}"
   );
 }
-// Upgrade existing 3-button selector to 4
 if (html.includes('usaPageSelect') && !html.includes('Seite 4 · SOFR Fwd')) {
   html = html.replace(
     /(<div class=\"usa-page-select\" id=\"usaPageSelect\">[\s\S]*?Seite 3 · Rates<\/button>)(<\/div>)/,
     '$1<button type=\"button\" data-page=\"3\">Seite 4 · SOFR Fwd</button>$2'
   );
-  // also unescaped variant from base template
   html = html.replace(
     /(id="usaPageSelect">[\s\S]*?Seite 3 · Rates<\/button>)(<\/div>)/,
     '$1<button type="button" data-page="3">Seite 4 · SOFR Fwd</button>$2'
@@ -90,7 +93,6 @@ if (!html.includes('usa-face-c') && html.includes('faceA.after(faceB)')) {
 
 // faceD: SOFR forward curve (page 4)
 if (!html.includes('usa-face-d') && html.includes('usa-face-c')) {
-  // After faceC creation block, append faceD
   const faceD = `
     const faceD=document.createElement('div');
     faceD.className='metrics usa-face usa-face-d hidden';
@@ -116,11 +118,9 @@ if (!html.includes('usa-face-d') && html.includes('usa-face-c')) {
     const _anchor=card.querySelector('.usa-face-c')||faceC;
     if(_anchor&&_anchor.parentNode)_anchor.after(faceD);
 `;
-  // Insert after faceB.after(faceC) or after faceC block
   if (html.includes("faceB.after(faceC);")) {
     html = html.replace("faceB.after(faceC);", "faceB.after(faceC);\n" + faceD);
   } else if (html.includes('usa-face-c')) {
-    // append near end of USA block before closing of if(c.id==='USA')
     const marker = "/* pages via setUsaPage */";
     if (html.includes(marker)) {
       html = html.replace(marker, faceD + '\n    ' + marker);
@@ -128,13 +128,7 @@ if (!html.includes('usa-face-d') && html.includes('usa-face-c')) {
   }
 }
 
-// ALL_KEYS + labels
 if (html.includes("ALL_KEYS=") && !html.includes("'sofrFwd'")) {
-  html = html.replace(
-    "ALL_KEYS=['inflation'",
-    "ALL_KEYS=['inflation'"
-  );
-  // append sofrFwd before closing of array
   html = html.replace(
     /ALL_KEYS=\[([^\]]+)\]/,
     (m, inner) => {
@@ -153,7 +147,6 @@ if (html.includes('extraLabels=') && !html.includes("sofrFwd:")) {
   );
 }
 
-// Page logic with 4 pages + SOFR paint
 const pageLogic = `
 function setUsaPage(page){
   page=Math.max(0,Math.min(3,Number(page)||0));
@@ -225,10 +218,11 @@ function paintRateDiff(){
   const [k1,k2]=_rateDiffOrder;
   const a1=histories['USA-'+k1]||[];
   const a2=histories['USA-'+k2]||[];
-  const map2=new Map(a2.map(p=>[String(p.period),Number(p.value)]));
+  const map2=new Map(a2.map(p=>[String(p.period)]));
+  const map2v=new Map(a2.map(p=>[String(p.period),Number(p.value)]));
   const pts=[];
   for(const p of a1){
-    const v2=map2.get(String(p.period));
+    const v2=map2v.get(String(p.period));
     if(v2==null||!Number.isFinite(Number(p.value))||!Number.isFinite(v2))continue;
     pts.push({period:String(p.period),value:Math.round((Number(p.value)-v2)*10000)/10000});
   }
@@ -270,9 +264,8 @@ function paintSofRFwd(){
     const ts=fwd.updatedAt?fwd.updatedAt.replace('T',' ').slice(0,16)+' UTC':(fwd.date||'');
     dateEl.textContent=(ts?('Stand '+ts+' · '):'')+'12m-Horizont · '+pts.map(p=>p.period).join(' / ');
   }
-  // main curve chart
-  host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrFwd|SOFR Fwd" title="Chart vergrößern">'+renderLineChart(pts,{w:320,h:90})+'</div>';
-  // bp vs spot
+  // main curve chart — larger for readability
+  host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrFwd|SOFR Fwd" title="Chart vergrößern">'+renderLineChart(pts,{w:360,h:160})+'</div>';
   if(bpEl){
     const spot=pts.find(p=>p.period==='Heute');
     if(spot){
@@ -288,7 +281,6 @@ function paintSofRFwd(){
     const legs=det.filter(p=>p.contracts).map(p=>p.tenor+': '+(p.contracts||[]).join('+')).join(' · ');
     metaEl.textContent='Quelle: '+(fwd.source||'NY Fed + CME SR1')+'. '+(legs?('Kontrakte '+legs+'. '):'')+'SR1: R=100−Price = erwarteter Monatsdurchschnitt SOFR. Keine Fed-Prognose.';
   }
-  // Historical comparison: today vs ~30d vs ~90d
   if(histHost){
     const snaps=histories['USA-sofrFwdSnapshots']||[];
     function closest(daysAgo){
@@ -299,30 +291,27 @@ function paintSofRFwd(){
         const t=Date.parse(s.asOf||s.spotDate||'');
         if(!Number.isFinite(t))continue;
         const abs=Math.abs(t-target);
-        // prefer not-in-future and within 10d window of target for 30/90
         if(abs<bestAbs){bestAbs=abs;best=s;}
       }
       if(!best)return null;
-      if(daysAgo>0 && bestAbs>20*864e5)return null; // too far from requested lag
+      if(daysAgo>0 && bestAbs>20*864e5)return null;
       return best;
     }
     const today=snaps.at(-1)||{points:(fwd.detail||pts.map(p=>({tenor:p.period,value:p.value}))),asOf:fwd.updatedAt};
     const s30=closest(30);
     const s90=closest(90);
-    // Build multi-series overlay as separate mini charts (same scale via shared min/max)
     const series=[];
-    if(today&&today.points) series.push({label:'Heute',color:'var(--accent)',pts:today.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
-    if(s30&&s30!==today) series.push({label:'≈30d',color:'#6ea8fe',pts:s30.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
-    if(s90&&s90!==today&&s90!==s30) series.push({label:'≈90d',color:'#adb5bd',pts:s90.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
+    if(today&&today.points) series.push({label:'Heute',pts:today.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
+    if(s30&&s30!==today) series.push({label:'≈30d',pts:s30.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
+    if(s90&&s90!==today&&s90!==s30) series.push({label:'≈90d',pts:s90.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
     if(series.length<=1){
       histHost.innerHTML='<div class="sparkempty">Vergleich ab 2+ gespeicherten Tagen</div>';
       if(histVal)histVal.textContent='—';
       if(histMeta)histMeta.textContent='Snapshots: '+snaps.length+' Tag(e). Vergleich erscheint automatisch nach weiteren Datenläufen.';
     } else {
-      // render each series chart stacked with label
       histHost.innerHTML=series.map(s=>
-        '<div style="margin-top:6px"><div style="font-size:11px;color:var(--muted);margin-bottom:2px">'+s.label+(s===series[0]?'':' · '+String((s===series.find(x=>x.label===s.label)&& (s30&&s.label==='≈30d'?s30.asOf:s90&&s.label==='≈90d'?s90.asOf:'')).slice(0,10)))+'</div>'+
-        '<div class="yield-chart-wrap">'+renderLineChart(s.pts,{w:320,h:56})+'</div></div>'
+        '<div style="margin-top:8px"><div style="font-size:11px;color:var(--muted);margin-bottom:2px">'+s.label+(s.label==='≈30d'&&s30?' · '+String(s30.asOf).slice(0,10):'')+(s.label==='≈90d'&&s90?' · '+String(s90.asOf).slice(0,10):'')+'</div>'+
+        '<div class="yield-chart-wrap">'+renderLineChart(s.pts,{w:360,h:100})+'</div></div>'
       ).join('');
       const t12=(today.points.find(p=>(p.tenor||p.period)==='12m')||{}).value;
       const p12=s30?(s30.points.find(p=>(p.tenor||p.period)==='12m')||{}).value:null;
@@ -368,5 +357,5 @@ console.log(
   'faceD', html.includes('usa-face-d'),
   'page4', html.includes('Seite 4 · SOFR Fwd'),
   'paintSofRFwd', html.includes('paintSofRFwd'),
-  'max3', html.includes('Math.min(3')
+  'h160', html.includes('h:160')
 );
