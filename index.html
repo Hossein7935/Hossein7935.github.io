@@ -91,6 +91,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(2,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -179,6 +180,7 @@ function paintRateDiff(){
 }
 document.addEventListener('change',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('rate-diff-cb'))paintRateDiff()});
 bindUsaPages();
+
 
 
 
