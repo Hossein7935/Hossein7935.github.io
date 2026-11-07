@@ -38,6 +38,8 @@ jobs:
         run: node scripts/inject-cuau.mjs
       - name: Inject USA page 3 (EFFR/SOFR/IORB + diff)
         run: node scripts/inject-faceC.mjs
+      - name: Fix JS structure after injects
+        run: node scripts/fix-js-structure.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/fetch-nonfin-debt.mjs
@@ -53,6 +55,7 @@ jobs:
           node --check scripts/restore-index.mjs
           node --check scripts/inject-cuau.mjs
           node --check scripts/inject-faceC.mjs
+          node --check scripts/fix-js-structure.mjs
           node --check scripts/fetch-cu-au.mjs
       - name: Fetch official economic data
         env:
