@@ -52,6 +52,7 @@ jobs:
           node --check scripts/fetch-wresbal.mjs
           node --check scripts/fetch-effr-sofr-iorb.mjs
           node --check scripts/fetch-sofr-futures.mjs
+          node --check scripts/fetch-ust-curve.mjs
           node --check scripts/fetch-country-t10y2y.mjs
           node --check scripts/restore-index.mjs
           node --check scripts/inject-cuau.mjs
@@ -94,6 +95,8 @@ jobs:
         run: node scripts/fetch-effr-sofr-iorb.mjs
       - name: SOFR forward curve (SR1 + NY Fed, Seite 4)
         run: node scripts/fetch-sofr-futures.mjs
+      - name: US Treasury + TIPS curve (Seite 4)
+        run: node scripts/fetch-ust-curve.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
       - name: Copper/Gold ratio (Yahoo HG=F / GC=F)
@@ -116,7 +119,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
-            git commit -m "Update MacroWatch data + SOFR forward curve" || true
+            git commit -m "Update MacroWatch data + UST/TIPS curve" || true
             git pull --no-rebase -X ours origin main || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
