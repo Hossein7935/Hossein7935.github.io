@@ -44,6 +44,7 @@ jobs:
           node --check scripts/fetch-us10y-tips-spread.mjs
           node --check scripts/fetch-us5y-tips-spread.mjs
           node --check scripts/fetch-us10y5y.mjs
+          node --check scripts/fetch-sofr-iorb.mjs
           node --check scripts/fetch-country-t10y2y.mjs
           node --check scripts/restore-index.mjs
           node --check scripts/inject-cuau.mjs
@@ -74,8 +75,10 @@ jobs:
         run: node scripts/fetch-us10y-tips-spread.mjs
       - name: US5Y − TIPS5Y spread (FRED T5YIE)
         run: node scripts/fetch-us5y-tips-spread.mjs
-      - name: US10Y − US5Y spread (FRED T10Y5Y)
+      - name: US10Y − US5Y spread (FRED DGS10−DGS5)
         run: node scripts/fetch-us10y5y.mjs
+      - name: SOFR − IORB spread (FRED)
+        run: node scripts/fetch-sofr-iorb.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
       - name: Copper/Gold ratio (Yahoo HG=F / GC=F)
