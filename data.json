@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-07T19:33:48.695Z",
+  "updatedAt": "2026-11-07T19:50:36.763Z",
   "data": {
     "CHN": {
       "rate": {
@@ -142,7 +142,7 @@
       "sofrFwd": {
         "value": 4.38,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-07T19:33:40.245Z",
+        "updatedAt": "2026-11-07T19:50:26.548Z",
         "source": "NY Fed SOFR + CME SR1/SR3 (Yahoo delayed)",
         "curve": [
           {
@@ -245,7 +245,7 @@
       "ustCurve": {
         "value": 4.84,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-07T19:33:41.902Z",
+        "updatedAt": "2026-11-07T19:50:28.356Z",
         "source": "FRED · DGS* + DFII* (TIPS real yields)",
         "nominal": [
           {
@@ -58239,7 +58239,7 @@
     ],
     "USA-sofrFwdSnapshots": [
       {
-        "asOf": "2026-11-07T19:33:40.245Z",
+        "asOf": "2026-11-07T19:50:26.548Z",
         "spotDate": "2026-11-05",
         "spot": 3.92,
         "points": [
@@ -87322,7 +87322,7 @@
     ],
     "USA-ustCurveSnapshots": [
       {
-        "asOf": "2026-11-07T19:33:41.902Z",
+        "asOf": "2026-11-07T19:50:28.356Z",
         "nominal": [
           {
             "period": "3M",
