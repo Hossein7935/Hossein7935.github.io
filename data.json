@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-07T19:55:02.029Z",
+  "updatedAt": "2026-11-07T20:03:34.696Z",
   "data": {
     "CHN": {
       "rate": {
@@ -142,7 +142,7 @@
       "sofrFwd": {
         "value": 4.38,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-07T19:54:53.624Z",
+        "updatedAt": "2026-11-07T20:03:18.631Z",
         "source": "NY Fed SOFR + CME SR1/SR3 (Yahoo delayed)",
         "curve": [
           {
@@ -245,7 +245,7 @@
       "ustCurve": {
         "value": 4.84,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-07T19:54:56.014Z",
+        "updatedAt": "2026-11-07T20:03:20.785Z",
         "source": "FRED · DGS* + DFII* (TIPS real yields)",
         "nominal": [
           {
@@ -367,7 +367,7 @@
         "value": 798.428,
         "valueRaw": 798428,
         "date": "2026-09-30",
-        "updatedAt": "2026-11-07T19:54:56.937Z",
+        "updatedAt": "2026-11-07T20:03:23.881Z",
         "source": "FHLBanks Office of Finance · Combined Operating Highlights",
         "sourceUrl": "https://www.fhlb-of.com/",
         "absChangeQoq": -12.287,
@@ -58266,7 +58266,7 @@
     ],
     "USA-sofrFwdSnapshots": [
       {
-        "asOf": "2026-11-07T19:54:53.624Z",
+        "asOf": "2026-11-07T20:03:18.631Z",
         "spotDate": "2026-11-05",
         "spot": 3.92,
         "points": [
@@ -87349,7 +87349,7 @@
     ],
     "USA-ustCurveSnapshots": [
       {
-        "asOf": "2026-11-07T19:54:56.014Z",
+        "asOf": "2026-11-07T20:03:20.785Z",
         "nominal": [
           {
             "period": "3M",
