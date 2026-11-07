@@ -40,6 +40,8 @@ jobs:
         run: node scripts/inject-faceC.mjs
       - name: Fix JS structure after injects
         run: node scripts/fix-js-structure.mjs
+      - name: Inject UST + TIPS curve (USA page 4)
+        run: node scripts/inject-ust-curve.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/fetch-nonfin-debt.mjs
@@ -53,6 +55,7 @@ jobs:
           node --check scripts/fetch-effr-sofr-iorb.mjs
           node --check scripts/fetch-sofr-futures.mjs
           node --check scripts/fetch-ust-curve.mjs
+          node --check scripts/inject-ust-curve.mjs
           node --check scripts/fetch-country-t10y2y.mjs
           node --check scripts/restore-index.mjs
           node --check scripts/inject-cuau.mjs
