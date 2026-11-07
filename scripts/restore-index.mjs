@@ -73,15 +73,14 @@ if (!html.includes('usa-face-c') && html.includes('faceA.after(faceB)')) {
     "}"
   ].join('\n    ');
   html = html.replace('faceA.after(faceB);', faceC);
-  // if no semicolon variant
   if (!html.includes('usa-face-c')) html = html.replace('faceA.after(faceB)', faceC);
 }
 
-if (!html.includes('function setUsaPage')) {
-  const logic = `
+// Page logic: event delegation survives render(); re-apply page after every render
+const pageLogic = `
 function setUsaPage(page){
   page=Math.max(0,Math.min(2,Number(page)||0));
-  localStorage.setItem('macrowatch-usa-page',String(page));
+  try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
   document.querySelectorAll('.country').forEach(card=>{
     if(!card.querySelector('.usa-face-a'))return;
     const a=card.querySelector('.usa-face-a');
@@ -93,14 +92,31 @@ function setUsaPage(page){
     const sel=card.querySelector('#usaPageSelect');
     if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));
   });
-  if(page===1)setTimeout(()=>{try{paintCuAu&&paintCuAu()}catch(e){}},50);
-  if(page===2)setTimeout(()=>{try{paintRateDiff&&paintRateDiff()}catch(e){}},50);
+  if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);
+  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff()}catch(e){}},50);
 }
 function bindUsaPages(){
-  document.querySelectorAll('#usaPageSelect button').forEach(btn=>{
-    btn.addEventListener('click',()=>setUsaPage(btn.dataset.page));
-  });
-  setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'));
+  // Event delegation — buttons are recreated on every render()
+  if(!window.__usaPageClickBound){
+    window.__usaPageClickBound=true;
+    document.addEventListener('click',e=>{
+      const btn=e.target&&e.target.closest&&e.target.closest('#usaPageSelect button');
+      if(!btn)return;
+      e.preventDefault();
+      setUsaPage(btn.dataset.page);
+    });
+  }
+  setUsaPage(Number((()=>{try{return localStorage.getItem('macrowatch-usa-page')||'0'}catch(e){return '0'}})()));
+}
+// Re-apply face visibility after each render (faces are rebuilt hidden by default)
+if(!window.__usaRenderPatched){
+  window.__usaRenderPatched=true;
+  const _render=render;
+  render=function(){
+    const r=_render.apply(this,arguments);
+    try{setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'))}catch(e){}
+    return r;
+  };
 }
 let _rateDiffOrder=[];
 function paintRateDiff(){
@@ -151,8 +167,21 @@ function paintRateDiff(){
 document.addEventListener('change',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('rate-diff-cb'))paintRateDiff()});
 bindUsaPages();
 `;
+
+// Replace old page logic if present, else inject
+if (html.includes('function setUsaPage')) {
+  const start = html.indexOf('function setUsaPage');
+  const end = html.indexOf('bindUsaPages();', start);
+  if (start >= 0 && end > start) {
+    html = html.slice(0, start) + pageLogic + html.slice(end + 'bindUsaPages();'.length);
+    console.log('page logic replaced');
+  }
+} else {
   const idx = html.lastIndexOf('refresh();');
-  if (idx >= 0) html = html.slice(0, idx) + logic + '\n' + html.slice(idx);
+  if (idx >= 0) {
+    html = html.slice(0, idx) + pageLogic + '\n' + html.slice(idx);
+    console.log('page logic injected');
+  }
 }
 
 // Hygiene
@@ -161,4 +190,4 @@ html = html.replace(/\}grid\.querySelectorAll/g, 'grid.querySelectorAll');
 html = html.replace(/PLACEHOLDER_WILL_FAIL/g, '');
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'faceC', html.includes('usa-face-c'), 'pages', html.includes('usaPageSelect'), 'setUsaPage', html.includes('function setUsaPage'));
+console.log('done', html.length, 'faceC', html.includes('usa-face-c'), 'pages', html.includes('usaPageSelect'), 'delegation', html.includes('__usaPageClickBound'));
