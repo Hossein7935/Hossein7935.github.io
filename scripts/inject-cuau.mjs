@@ -1,6 +1,5 @@
 import fs from 'fs';
 
-// Work on the CURRENT index.html produced by restore-index.mjs.
 let html = fs.readFileSync('index.html', 'utf8');
 console.log('base index.html', html.length);
 
@@ -11,16 +10,16 @@ if (html.includes(oldNotice)) html = html.replace(oldNotice, newNotice);
 html = html.replace(/function loadCuAuChart\([\s\S]*?ensureCuAuOnFlip[\s\S]*?usaExtraToggle'\) setTimeout\(ensureCuAuOnFlip,250\);\n\}\);/g, '');
 html = html.replace(/<div class="metric has-chart" style="grid-column:1\/-1[\s\S]*?tradingview_cu_au[\s\S]*?<\/div><\/div>/g, '');
 
-function injectMetric(html, key, metricHtml, anchors) {
-  // Only skip if the chart key is already wired in faceB (not just labels)
-  if (html.includes(`historyHTML('USA','${key}')`)) return html;
-  for (const a of anchors) {
-    if (html.includes(a)) return html.replace(a, a + metricHtml);
-  }
-  const fallback = "${historyHTML('USA','bofaCcc')}</div>";
-  if (html.includes(fallback)) return html.replace(fallback, metricHtml + fallback);
-  console.warn(key + ': no insert marker');
-  return html;
+// Operate only inside faceB template so metrics land on USA page 2
+function patchFaceB(html, mutator) {
+  const start = html.indexOf('faceB.innerHTML=`');
+  if (start < 0) { console.warn('faceB start not found'); return html; }
+  const end = html.indexOf('`;', start + 20);
+  if (end < 0) { console.warn('faceB end not found'); return html; }
+  const before = html.slice(0, start);
+  const face = html.slice(start, end);
+  const after = html.slice(end);
+  return before + mutator(face) + after;
 }
 
 const sofrIorbMetric =
@@ -35,8 +34,24 @@ const wresbalMetric =
   '<div class="date">Fed H.4.1 · Wochenmittel · <a href="https://fred.stlouisfed.org/series/WRESBAL" target="_blank" rel="noopener" style="color:var(--accent)">FRED ↗</a></div>' +
   "${historyHTML('USA','wresbal')}</div>";
 
-html = injectMetric(html, 'sofrIorb', sofrIorbMetric, ["${historyHTML('USA','sofr3m')}</div>", "${historyHTML('USA','t10y5y')}</div>"]);
-html = injectMetric(html, 'wresbal', wresbalMetric, ["${historyHTML('USA','sofrIorb')}</div>", "${historyHTML('USA','sofr3m')}</div>"]);
+html = patchFaceB(html, (face) => {
+  if (!face.includes("historyHTML('USA','sofrIorb')")) {
+    const a = "${historyHTML('USA','sofr3m')}</div>";
+    if (face.includes(a)) face = face.replace(a, a + sofrIorbMetric);
+    else console.warn('sofrIorb: sofr3m anchor missing in faceB');
+  }
+  if (!face.includes("historyHTML('USA','wresbal')")) {
+    const a1 = "${historyHTML('USA','sofrIorb')}</div>";
+    const a2 = "${historyHTML('USA','sofr3m')}</div>";
+    if (face.includes(a1)) face = face.replace(a1, a1 + wresbalMetric);
+    else if (face.includes(a2)) face = face.replace(a2, a2 + wresbalMetric);
+    else console.warn('wresbal: no anchor in faceB');
+  }
+  return face;
+});
+
+// Remove any stray copies outside faceB (from earlier bugs)
+// (leave faceB intact; only strip duplicate metric blocks is hard — skip)
 
 // key whitelist for charts
 for (const key of ['sofrIorb', 'wresbal', 'cuAu']) {
@@ -46,7 +61,6 @@ for (const key of ['sofrIorb', 'wresbal', 'cuAu']) {
   }
 }
 
-// extraLabels
 if (!html.includes("sofrIorb:'SOFR")) {
   html = html.replace("us5yTips:'US5Y − TIPS5Y'}", "us5yTips:'US5Y − TIPS5Y',sofrIorb:'SOFR − IORB',wresbal:'Bankreserven (WRESBAL)'}");
   html = html.replace("t10y5y:'10Y − 5Y Spread'}", "t10y5y:'10Y − 5Y Spread',sofrIorb:'SOFR − IORB',wresbal:'Bankreserven (WRESBAL)'}");
@@ -55,7 +69,6 @@ if (!html.includes("wresbal:'Bankreserven") && html.includes("sofrIorb:'SOFR −
   html = html.replace("sofrIorb:'SOFR − IORB'}", "sofrIorb:'SOFR − IORB',wresbal:'Bankreserven (WRESBAL)'}");
 }
 
-// ALL_KEYS
 if (!html.includes("'sofrIorb'")) {
   html = html.replace("'hhDebt','bizDebt']", "'hhDebt','bizDebt','sofrIorb','wresbal']");
   html = html.replace("'hhDebt','bizDebt','cuAu']", "'hhDebt','bizDebt','sofrIorb','wresbal','cuAu']");
@@ -137,11 +150,14 @@ if (!html.includes('function paintCuAu')) {
 }
 
 fs.writeFileSync('index.html', html);
+
+// Verify faceB contents
+const fs2 = html.indexOf('faceB.innerHTML=`');
+const fe2 = html.indexOf('`;', fs2 + 20);
+const face = fs2 >= 0 && fe2 > fs2 ? html.slice(fs2, fe2) : '';
 console.log(
   'written', html.length,
-  'cuAu', html.includes('cuAuValue'),
-  'sofrIorb', html.includes("historyHTML('USA','sofrIorb')"),
-  'wresbal', html.includes("historyHTML('USA','wresbal')"),
-  't10y5y', html.includes('t10y5y') || html.includes('10Y − 5Y'),
-  'paintCuAu', html.includes('paintCuAu')
+  'faceB.sofrIorb', face.includes("historyHTML('USA','sofrIorb')"),
+  'faceB.wresbal', face.includes("historyHTML('USA','wresbal')"),
+  'cuAu', html.includes('cuAuValue')
 );
