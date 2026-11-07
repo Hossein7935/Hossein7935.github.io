@@ -3,7 +3,7 @@
 :root[data-theme="light"]{color-scheme:light;--bg:#f3f6fb;--page-top:#e8eef7;--panel:#ffffff;--line:#d5deea;--text:#172337;--muted:#5d6b80;--accent:#087f72;--warn:#8a5b00;--bad:#b42318;--control:#ffffff;--control-line:#c7d2e0;--metric:#f6f8fc;--metric-line:#dce4ef;--notice-bg:#fff7db;--notice-line:#e5cf82;--notice-text:#624b00;--link-line:#9ac9c1;--bar-label:#65758b}
 :root[data-theme="light"] body{background:linear-gradient(180deg,var(--page-top),var(--bg) 38%)}
 :root[data-theme="light"] .btn.primary{color:#fff}*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,var(--page-top),var(--bg) 38%);color:var(--text);font:15px system-ui,-apple-system,sans-serif}header{padding:25px 16px 14px;max-width:1200px;margin:auto}h1{font-size:30px;margin:0;letter-spacing:-.7px}h1 span{color:var(--accent)}.sub{color:var(--muted);margin-top:4px}.wrap{max-width:1200px;margin:auto;padding:0 12px 36px}.notice{border:1px solid var(--notice-line);background:var(--notice-bg);color:var(--notice-text);padding:12px;border-radius:12px;line-height:1.45;margin:8px 0 12px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.btn,select{background:var(--control);color:var(--text);border:1px solid var(--control-line);border-radius:10px;padding:10px 12px;font:inherit}.primary{background:var(--accent);color:#09211e;border-color:var(--accent);font-weight:700}.status{font-size:12px;color:var(--muted);margin:8px 2px 14px;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.country{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:13px;min-width:0}.ctop{display:flex;align-items:center;gap:10px;margin-bottom:12px}.flag{font-size:28px}.country h2{font-size:18px;margin:0}.code{font-size:12px;color:var(--muted)}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metric{background:var(--metric);border:1px solid var(--metric-line);border-radius:10px;padding:9px;min-height:94px;min-width:0}.metric.has-chart{min-height:118px}.name{font-size:12px;line-height:1.3;color:var(--muted);min-height:30px}.value{font-size:21px;font-weight:700;margin-top:4px;overflow-wrap:anywhere}.na{font-size:12px;font-weight:500;color:#aab7cc}.date{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.35}.metric button{margin-top:7px;font-size:11px;padding:5px 7px;border-radius:7px}.spark{height:27px;display:flex;align-items:flex-end;gap:3px;margin-top:6px;min-width:0}.barwrap{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:2px}.bar{width:100%;max-width:14px;min-height:2px;border-radius:3px 3px 1px 1px;background:var(--accent);opacity:.88}.bar.neg{background:#ffb2a8}.barlabel{font-size:8px;line-height:1;color:var(--bar-label);white-space:nowrap}.sparkcaption{font-size:9px;color:var(--bar-label);margin-top:2px}.sparkempty{font-size:9px;color:var(--bar-label);margin-top:7px}.yield-chart{width:100%;height:58px;margin-top:6px;display:block}.yield-chart-wrap{margin-top:4px;cursor:pointer;position:relative}.yield-chart-wrap:hover{opacity:.92}.yield-chart-wrap::after{content:'⤢';position:absolute;top:2px;right:2px;font-size:10px;opacity:.45}.yield-chart-caption{font-size:9px;color:var(--bar-label);margin-top:2px;display:flex;justify-content:space-between;gap:4px}.links{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.links a{color:var(--accent);font-size:11px;text-decoration:none;border:1px solid var(--link-line);border-radius:7px;padding:6px 8px}.footer{border-top:1px solid var(--line);margin-top:22px;padding-top:13px;color:var(--muted);font-size:12px;line-height:1.5}dialog{max-width:420px;width:calc(100% - 24px);border:1px solid var(--line);border-radius:15px;background:var(--panel);color:var(--text);padding:18px}dialog::backdrop{background:#0009}dialog#chartDlg{max-width:min(720px,96vw);width:96vw;padding:16px 18px 18px}dialog#chartDlg .chart-big{width:100%;height:auto;display:block;min-height:180px}dialog#chartDlg .chart-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 12px}dialog#chartDlg .chart-toolbar button{padding:8px 12px;border-radius:8px;border:1px solid var(--control-line);background:var(--control);color:var(--text);font:inherit;cursor:pointer}dialog#chartDlg .chart-toolbar button.active{background:var(--accent);color:#09211e;border-color:var(--accent);font-weight:700}dialog#chartDlg h3{margin:0;font-size:17px}dialog#chartDlg .chart-meta{font-size:12px;color:var(--muted);margin-top:8px}label{display:block;font-size:13px;color:var(--muted);margin:12px 0 5px}input{width:100%;padding:10px;border:1px solid var(--control-line);border-radius:8px;background:var(--metric);color:var(--text);font:inherit}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}.err{color:var(--bad)}.chart-tip{position:fixed;z-index:9999;pointer-events:none;background:var(--panel);border:1px solid var(--line);color:var(--text);padding:6px 10px;border-radius:8px;font-size:12px;line-height:1.35;box-shadow:0 8px 24px #0006;opacity:0;transition:opacity .12s;max-width:220px}.chart-tip.show{opacity:1}.usa-flip-toggle{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}.usa-flip-toggle label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--muted);margin:0;user-select:none}.usa-flip-toggle input{width:18px;height:18px;accent-color:var(--accent)}.usa-face{display:grid;grid-template-columns:1fr 1fr;gap:8px}.usa-face.hidden{display:none}.yield-chart .hit,.chart-big .hit{fill:transparent;stroke:none;cursor:crosshair}@media(min-width:760px){header{padding-top:34px}}
-svg.chart-hover{cursor:crosshair}.chart-crosshair-v,.chart-crosshair-h{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 3;opacity:.7;pointer-events:none}.chart-crosshair-dot{fill:var(--accent);stroke:var(--panel);stroke-width:2;pointer-events:none}#chartDlg .chart-big{min-height:260px}#chartDlg .chart-tip-inline{position:absolute;z-index:5;background:var(--panel);border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:10px;font-size:13px;line-height:1.4;box-shadow:0 8px 24px #0005;pointer-events:none;opacity:0;white-space:nowrap}#chartDlg .chart-tip-inline.show{opacity:1}#chartDlg #chartBody{position:relative}.usa-flip-toggle{flex-wrap:wrap;gap:8px 12px}.usa-page-select{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.usa-page-select button{padding:6px 10px;border-radius:8px;border:1px solid var(--control-line);background:var(--control);color:var(--text);font:inherit;cursor:pointer}.usa-page-select button.active{background:var(--accent);color:#09211e;border-color:var(--accent);font-weight:700}.diff-pick{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;color:var(--muted);cursor:pointer;user-select:none}.diff-pick input{width:14px;height:14px;accent-color:var(--accent)}.diff-panel{grid-column:1/-1;border:1px dashed var(--line);border-radius:10px;padding:10px;background:var(--metric)}.diff-panel .name{min-height:auto}.diff-hint{font-size:11px;color:var(--muted);margin-top:4px}.sofr-fwd-panel{grid-column:1/-1}.sofr-fwd-meta{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}.sofr-fwd-bp{font-size:12px;margin-top:4px}.sofr-fwd-bp span{margin-right:10px}</style></head><body>
+svg.chart-hover{cursor:crosshair}.chart-crosshair-v,.chart-crosshair-h{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 3;opacity:.7;pointer-events:none}.chart-crosshair-dot{fill:var(--accent);stroke:var(--panel);stroke-width:2;pointer-events:none}#chartDlg .chart-big{min-height:260px}#chartDlg .chart-tip-inline{position:absolute;z-index:5;background:var(--panel);border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:10px;font-size:13px;line-height:1.4;box-shadow:0 8px 24px #0005;pointer-events:none;opacity:0;white-space:nowrap}#chartDlg .chart-tip-inline.show{opacity:1}#chartDlg #chartBody{position:relative}.usa-flip-toggle{flex-wrap:wrap;gap:8px 12px}.usa-page-select{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.usa-page-select button{padding:6px 10px;border-radius:8px;border:1px solid var(--control-line);background:var(--control);color:var(--text);font:inherit;cursor:pointer}.usa-page-select button.active{background:var(--accent);color:#09211e;border-color:var(--accent);font-weight:700}.diff-pick{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;color:var(--muted);cursor:pointer;user-select:none}.diff-pick input{width:14px;height:14px;accent-color:var(--accent)}.diff-panel{grid-column:1/-1;border:1px dashed var(--line);border-radius:10px;padding:10px;background:var(--metric)}.diff-panel .name{min-height:auto}.diff-hint{font-size:11px;color:var(--muted);margin-top:4px}.sofr-fwd-panel{grid-column:1/-1}#sofrFwdChart .yield-chart-wrap svg,#sofrFwdHistChart .yield-chart-wrap svg{width:100%;max-width:100%;height:auto}.sofr-fwd-meta{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}.sofr-fwd-bp{font-size:12px;margin-top:4px}.sofr-fwd-bp span{margin-right:10px}</style></head><body>
 <header><h1>Macro<span>Watch</span></h1><div class="sub">Makro-Dashboard v10 · 6 Länder</div></header>
 <main class="wrap">
 <div class="notice"><b>Hinweis:</b> Maus über Chart → Zeitpunkt & Wert. Chart antippen → vergrößern. TIPS/Bankreserven nur USA. USA: Umschalter → SOFR, Spreads, Reserven, Schulden & <b>Kupfer/Gold</b>.</div>
@@ -119,6 +119,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(3,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -189,10 +190,11 @@ function paintRateDiff(){
   const [k1,k2]=_rateDiffOrder;
   const a1=histories['USA-'+k1]||[];
   const a2=histories['USA-'+k2]||[];
-  const map2=new Map(a2.map(p=>[String(p.period),Number(p.value)]));
+  const map2=new Map(a2.map(p=>[String(p.period)]));
+  const map2v=new Map(a2.map(p=>[String(p.period),Number(p.value)]));
   const pts=[];
   for(const p of a1){
-    const v2=map2.get(String(p.period));
+    const v2=map2v.get(String(p.period));
     if(v2==null||!Number.isFinite(Number(p.value))||!Number.isFinite(v2))continue;
     pts.push({period:String(p.period),value:Math.round((Number(p.value)-v2)*10000)/10000});
   }
@@ -234,9 +236,8 @@ function paintSofRFwd(){
     const ts=fwd.updatedAt?fwd.updatedAt.replace('T',' ').slice(0,16)+' UTC':(fwd.date||'');
     dateEl.textContent=(ts?('Stand '+ts+' · '):'')+'12m-Horizont · '+pts.map(p=>p.period).join(' / ');
   }
-  // main curve chart
-  host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrFwd|SOFR Fwd" title="Chart vergrößern">'+renderLineChart(pts,{w:320,h:90})+'</div>';
-  // bp vs spot
+  // main curve chart — larger for readability
+  host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrFwd|SOFR Fwd" title="Chart vergrößern">'+renderLineChart(pts,{w:360,h:160})+'</div>';
   if(bpEl){
     const spot=pts.find(p=>p.period==='Heute');
     if(spot){
@@ -252,7 +253,6 @@ function paintSofRFwd(){
     const legs=det.filter(p=>p.contracts).map(p=>p.tenor+': '+(p.contracts||[]).join('+')).join(' · ');
     metaEl.textContent='Quelle: '+(fwd.source||'NY Fed + CME SR1')+'. '+(legs?('Kontrakte '+legs+'. '):'')+'SR1: R=100−Price = erwarteter Monatsdurchschnitt SOFR. Keine Fed-Prognose.';
   }
-  // Historical comparison: today vs ~30d vs ~90d
   if(histHost){
     const snaps=histories['USA-sofrFwdSnapshots']||[];
     function closest(daysAgo){
@@ -263,30 +263,27 @@ function paintSofRFwd(){
         const t=Date.parse(s.asOf||s.spotDate||'');
         if(!Number.isFinite(t))continue;
         const abs=Math.abs(t-target);
-        // prefer not-in-future and within 10d window of target for 30/90
         if(abs<bestAbs){bestAbs=abs;best=s;}
       }
       if(!best)return null;
-      if(daysAgo>0 && bestAbs>20*864e5)return null; // too far from requested lag
+      if(daysAgo>0 && bestAbs>20*864e5)return null;
       return best;
     }
     const today=snaps.at(-1)||{points:(fwd.detail||pts.map(p=>({tenor:p.period,value:p.value}))),asOf:fwd.updatedAt};
     const s30=closest(30);
     const s90=closest(90);
-    // Build multi-series overlay as separate mini charts (same scale via shared min/max)
     const series=[];
-    if(today&&today.points) series.push({label:'Heute',color:'var(--accent)',pts:today.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
-    if(s30&&s30!==today) series.push({label:'≈30d',color:'#6ea8fe',pts:s30.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
-    if(s90&&s90!==today&&s90!==s30) series.push({label:'≈90d',color:'#adb5bd',pts:s90.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
+    if(today&&today.points) series.push({label:'Heute',pts:today.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
+    if(s30&&s30!==today) series.push({label:'≈30d',pts:s30.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
+    if(s90&&s90!==today&&s90!==s30) series.push({label:'≈90d',pts:s90.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
     if(series.length<=1){
       histHost.innerHTML='<div class="sparkempty">Vergleich ab 2+ gespeicherten Tagen</div>';
       if(histVal)histVal.textContent='—';
       if(histMeta)histMeta.textContent='Snapshots: '+snaps.length+' Tag(e). Vergleich erscheint automatisch nach weiteren Datenläufen.';
     } else {
-      // render each series chart stacked with label
       histHost.innerHTML=series.map(s=>
-        '<div style="margin-top:6px"><div style="font-size:11px;color:var(--muted);margin-bottom:2px">'+s.label+(s===series[0]?'':' · '+String((s===series.find(x=>x.label===s.label)&& (s30&&s.label==='≈30d'?s30.asOf:s90&&s.label==='≈90d'?s90.asOf:'')).slice(0,10)))+'</div>'+
-        '<div class="yield-chart-wrap">'+renderLineChart(s.pts,{w:320,h:56})+'</div></div>'
+        '<div style="margin-top:8px"><div style="font-size:11px;color:var(--muted);margin-bottom:2px">'+s.label+(s.label==='≈30d'&&s30?' · '+String(s30.asOf).slice(0,10):'')+(s.label==='≈90d'&&s90?' · '+String(s90.asOf).slice(0,10):'')+'</div>'+
+        '<div class="yield-chart-wrap">'+renderLineChart(s.pts,{w:360,h:100})+'</div></div>'
       ).join('');
       const t12=(today.points.find(p=>(p.tenor||p.period)==='12m')||{}).value;
       const p12=s30?(s30.points.find(p=>(p.tenor||p.period)==='12m')||{}).value:null;
@@ -304,6 +301,7 @@ function paintSofRFwd(){
   }
 }
 bindUsaPages();
+
 
 
 
