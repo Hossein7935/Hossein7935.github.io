@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-07T00:19:56.743Z",
+  "updatedAt": "2026-11-07T06:18:49.050Z",
   "data": {
     "CHN": {
       "rate": {
@@ -125,7 +125,7 @@
         "source": "Fed Z.1 · SAAR · Nonfinancial Business"
       },
       "cuAu": {
-        "value": 1.5345018332839406,
+        "value": 1.5307124936117464,
         "date": "2026-11-06",
         "source": "Yahoo HG=F / GC=F · Ratio×1000"
       },
@@ -180,7 +180,7 @@
     "FRA": {
       "rate": {
         "value": 2.5,
-        "date": "2026-11-06",
+        "date": "2026-11-07",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
@@ -217,7 +217,7 @@
     "DEU": {
       "rate": {
         "value": 2.5,
-        "date": "2026-11-06",
+        "date": "2026-11-07",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
@@ -32645,7 +32645,7 @@
       },
       {
         "period": "2026-11-06",
-        "value": 1.5345018332839406
+        "value": 1.5307124936117464
       }
     ],
     "USA-rate": [
