@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-07T18:59:47.717Z",
+  "updatedAt": "2026-11-07T19:01:52.536Z",
   "data": {
     "CHN": {
       "rate": {
@@ -138,6 +138,109 @@
         "value": 3.9,
         "date": "2026-11-09",
         "source": "FRED · IORB"
+      },
+      "sofrFwd": {
+        "value": 4.38,
+        "date": "2026-11-05",
+        "updatedAt": "2026-11-07T19:01:43.949Z",
+        "source": "NY Fed SOFR + CME SR1/SR3 (Yahoo delayed)",
+        "curve": [
+          {
+            "period": "Heute",
+            "value": 3.92
+          },
+          {
+            "period": "3m",
+            "value": 4.14
+          },
+          {
+            "period": "6m",
+            "value": 4.265
+          },
+          {
+            "period": "9m",
+            "value": 4.345
+          },
+          {
+            "period": "12m",
+            "value": 4.38
+          }
+        ],
+        "detail": [
+          {
+            "period": "Heute",
+            "tenor": "Heute",
+            "months": 0,
+            "value": 3.92,
+            "kind": "spot",
+            "note": "Veröffentlichter Overnight-SOFR (NY Fed)",
+            "contracts": [
+              "SOFR"
+            ],
+            "spotDate": "2026-11-05"
+          },
+          {
+            "period": "3m",
+            "tenor": "3m",
+            "months": 3,
+            "value": 4.14,
+            "kind": "sr1",
+            "note": "Erwarteter Monatsdurchschnitt SOFR (SR1, 100−Price)",
+            "contracts": [
+              "SR1F27.CME",
+              "SR1G27.CME"
+            ],
+            "price": 95.86,
+            "method": "interp",
+            "vsSpotBp": 22
+          },
+          {
+            "period": "6m",
+            "tenor": "6m",
+            "months": 6,
+            "value": 4.265,
+            "kind": "sr1",
+            "note": "Erwarteter Monatsdurchschnitt SOFR (SR1, 100−Price)",
+            "contracts": [
+              "SR1J27.CME",
+              "SR1K27.CME"
+            ],
+            "price": 95.735,
+            "method": "interp",
+            "vsSpotBp": 34.5
+          },
+          {
+            "period": "9m",
+            "tenor": "9m",
+            "months": 9,
+            "value": 4.345,
+            "kind": "sr1",
+            "note": "Erwarteter Monatsdurchschnitt SOFR (SR1, 100−Price)",
+            "contracts": [
+              "SR1N27.CME",
+              "SR1Q27.CME"
+            ],
+            "price": 95.655,
+            "method": "interp",
+            "vsSpotBp": 42.5
+          },
+          {
+            "period": "12m",
+            "tenor": "12m",
+            "months": 12,
+            "value": 4.38,
+            "kind": "sr1",
+            "note": "Erwarteter Monatsdurchschnitt SOFR (SR1, 100−Price)",
+            "contracts": [
+              "SR1V27.CME",
+              "SR1X27.CME"
+            ],
+            "price": 95.62,
+            "method": "interp",
+            "vsSpotBp": 46
+          }
+        ],
+        "vsSpotBp": 46
       },
       "hhDebt": {
         "value": 5.024,
@@ -57983,6 +58086,259 @@
       {
         "period": "2026-11-09",
         "value": 3.9
+      }
+    ],
+    "USA-sofrFwd": [
+      {
+        "period": "Heute",
+        "value": 3.92
+      },
+      {
+        "period": "3m",
+        "value": 4.14
+      },
+      {
+        "period": "6m",
+        "value": 4.265
+      },
+      {
+        "period": "9m",
+        "value": 4.345
+      },
+      {
+        "period": "12m",
+        "value": 4.38
+      }
+    ],
+    "USA-sofrFwd12": [
+      {
+        "period": "2026-11-07",
+        "value": 4.38
+      }
+    ],
+    "USA-sofrFwdSnapshots": [
+      {
+        "asOf": "2026-11-07T19:01:43.949Z",
+        "spotDate": "2026-11-05",
+        "spot": 3.92,
+        "points": [
+          {
+            "tenor": "Heute",
+            "months": 0,
+            "value": 3.92,
+            "contracts": [
+              "SOFR"
+            ],
+            "price": null,
+            "vsSpotBp": 0,
+            "kind": "spot"
+          },
+          {
+            "tenor": "3m",
+            "months": 3,
+            "value": 4.14,
+            "contracts": [
+              "SR1F27.CME",
+              "SR1G27.CME"
+            ],
+            "price": 95.86,
+            "vsSpotBp": 22,
+            "kind": "sr1"
+          },
+          {
+            "tenor": "6m",
+            "months": 6,
+            "value": 4.265,
+            "contracts": [
+              "SR1J27.CME",
+              "SR1K27.CME"
+            ],
+            "price": 95.735,
+            "vsSpotBp": 34.5,
+            "kind": "sr1"
+          },
+          {
+            "tenor": "9m",
+            "months": 9,
+            "value": 4.345,
+            "contracts": [
+              "SR1N27.CME",
+              "SR1Q27.CME"
+            ],
+            "price": 95.655,
+            "vsSpotBp": 42.5,
+            "kind": "sr1"
+          },
+          {
+            "tenor": "12m",
+            "months": 12,
+            "value": 4.38,
+            "contracts": [
+              "SR1V27.CME",
+              "SR1X27.CME"
+            ],
+            "price": 95.62,
+            "vsSpotBp": 46,
+            "kind": "sr1"
+          }
+        ],
+        "sr1": [
+          {
+            "monthsFromNow": 0,
+            "yearMonth": "2026-11",
+            "symbol": "SR1X26.CME",
+            "price": 96.103,
+            "rate": 3.897
+          },
+          {
+            "monthsFromNow": 1,
+            "yearMonth": "2026-12",
+            "symbol": "SR1Z26.CME",
+            "price": 95.965,
+            "rate": 4.035
+          },
+          {
+            "monthsFromNow": 2,
+            "yearMonth": "2027-01",
+            "symbol": "SR1F27.CME",
+            "price": 95.895,
+            "rate": 4.105
+          },
+          {
+            "monthsFromNow": 3,
+            "yearMonth": "2027-02",
+            "symbol": "SR1G27.CME",
+            "price": 95.86,
+            "rate": 4.14
+          },
+          {
+            "monthsFromNow": 4,
+            "yearMonth": "2027-03",
+            "symbol": "SR1H27.CME",
+            "price": 95.815,
+            "rate": 4.185
+          },
+          {
+            "monthsFromNow": 5,
+            "yearMonth": "2027-04",
+            "symbol": "SR1J27.CME",
+            "price": 95.765,
+            "rate": 4.235
+          },
+          {
+            "monthsFromNow": 6,
+            "yearMonth": "2027-05",
+            "symbol": "SR1K27.CME",
+            "price": 95.735,
+            "rate": 4.265
+          },
+          {
+            "monthsFromNow": 7,
+            "yearMonth": "2027-06",
+            "symbol": "SR1M27.CME",
+            "price": 95.69,
+            "rate": 4.31
+          },
+          {
+            "monthsFromNow": 8,
+            "yearMonth": "2027-07",
+            "symbol": "SR1N27.CME",
+            "price": 95.665,
+            "rate": 4.335
+          },
+          {
+            "monthsFromNow": 9,
+            "yearMonth": "2027-08",
+            "symbol": "SR1Q27.CME",
+            "price": 95.655,
+            "rate": 4.345
+          },
+          {
+            "monthsFromNow": 10,
+            "yearMonth": "2027-09",
+            "symbol": "SR1U27.CME",
+            "price": 95.635,
+            "rate": 4.365
+          },
+          {
+            "monthsFromNow": 11,
+            "yearMonth": "2027-10",
+            "symbol": "SR1V27.CME",
+            "price": 95.62,
+            "rate": 4.38
+          },
+          {
+            "monthsFromNow": 12,
+            "yearMonth": "2027-11",
+            "symbol": "SR1X27.CME",
+            "price": 95.62,
+            "rate": 4.38
+          },
+          {
+            "monthsFromNow": 13,
+            "yearMonth": "2027-12",
+            "symbol": "SR1Z27.CME",
+            "price": 95.625,
+            "rate": 4.375
+          }
+        ],
+        "sr3": [
+          {
+            "symbol": "SR3Z26.CME",
+            "yearMonth": "2026-12",
+            "price": 95.855,
+            "rate": 4.145
+          },
+          {
+            "symbol": "SR3H27.CME",
+            "yearMonth": "2027-03",
+            "price": 95.73,
+            "rate": 4.27
+          },
+          {
+            "symbol": "SR3M27.CME",
+            "yearMonth": "2027-06",
+            "price": 95.635,
+            "rate": 4.365
+          },
+          {
+            "symbol": "SR3U27.CME",
+            "yearMonth": "2027-09",
+            "price": 95.605,
+            "rate": 4.395
+          },
+          {
+            "symbol": "SR3Z27.CME",
+            "yearMonth": "2027-12",
+            "price": 95.615,
+            "rate": 4.385
+          },
+          {
+            "symbol": "SR3H28.CME",
+            "yearMonth": "2028-03",
+            "price": 95.625,
+            "rate": 4.375
+          },
+          {
+            "symbol": "SR3M28.CME",
+            "yearMonth": "2028-06",
+            "price": 95.635,
+            "rate": 4.365
+          },
+          {
+            "symbol": "SR3U28.CME",
+            "yearMonth": "2028-09",
+            "price": 95.64,
+            "rate": 4.36
+          },
+          {
+            "symbol": "SR3Z28.CME",
+            "yearMonth": "2028-12",
+            "price": 95.65,
+            "rate": 4.35
+          }
+        ],
+        "source": "NY Fed SOFR + CME SR1/SR3 (Yahoo delayed)"
       }
     ],
     "USA-hhDebt": [
