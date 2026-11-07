@@ -268,6 +268,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(4,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -288,7 +289,7 @@ function setUsaPage(page){
   });
   if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);
   if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff()}catch(e){}},50);
-  if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){}},50);
+  if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);
   if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);
 }
 function bindUsaPages(){
@@ -527,18 +528,20 @@ function paintUstCurve(){
 
 let _fhlbMode='qoq';
 function paintFhlb(){
-  // ensure faceE exists even if inject order failed
   let faceE=document.querySelector('.usa-face-e');
+  const pageNow=(()=>{try{return Number(localStorage.getItem('macrowatch-usa-page')||0)}catch(e){return 0}})();
   if(!faceE){
-    const card=[...document.querySelectorAll('.country')].find(c=>c.querySelector('.usa-face-d'));
+    const card=[...document.querySelectorAll('.country')].find(c=>c.querySelector('.usa-face-d')||c.querySelector('.usa-face-a'));
     if(card){
       faceE=document.createElement('div');
-      faceE.className='metrics usa-face usa-face-e hidden';
-      faceE.innerHTML='<div class="metric has-chart sofr-fwd-panel" id="fhlbPanel"><div class="name">Federal Home Loan Banks · Advances Outstanding</div><div class="value" id="fhlbValue">—</div><div class="date" id="fhlbDate">—</div><div class="sofr-fwd-bp" id="fhlbCards"></div><div id="fhlbAbsChart"></div><div class="sofr-fwd-meta" id="fhlbMeta"></div></div><div class="metric has-chart sofr-fwd-panel" id="fhlbChgPanel"><div class="name">Veränderung · QoQ / YoY</div><div class="value" id="fhlbChgValue">—</div><div class="date"><button type="button" class="fhlb-mode active" data-mode="qoq">QoQ</button> <button type="button" class="fhlb-mode" data-mode="yoy">YoY</button></div><div id="fhlbChgChart"></div><div class="sofr-fwd-meta" id="fhlbChgMeta"></div></div><div class="metric sofr-fwd-panel"><div class="name">Kurzanalyse</div><div class="date" id="fhlbNote" style="white-space:normal;line-height:1.45"></div></div>';
+      faceE.className='metrics usa-face usa-face-e'+(pageNow===4?'':' hidden');
+      faceE.innerHTML='<div class="metric has-chart sofr-fwd-panel" id="fhlbPanel"><div class="name">Federal Home Loan Banks · Advances Outstanding</div><div class="value" id="fhlbValue">—</div><div class="date" id="fhlbDate">—</div><div class="sofr-fwd-bp" id="fhlbCards"></div><div id="fhlbAbsChart"></div><div class="sofr-fwd-meta" id="fhlbMeta"></div></div><div class="metric has-chart sofr-fwd-panel" id="fhlbChgPanel"><div class="name">Veränderung · QoQ / YoY</div><div class="value" id="fhlbChgValue">—</div><div class="date"><button type="button" class="fhlb-mode active" data-mode="qoq">QoQ</button> <button type="button" class="fhlb-mode" data-mode="yoy">YoY</button></div><div id="fhlbChgChart"></div><div class="sofr-fwd-meta" id="fhlbChgMeta"></div></div><div class="metric sofr-fwd-panel" id="fhlbNotePanel"><div class="name">Kurzanalyse</div><div class="date" id="fhlbNote" style="white-space:normal;line-height:1.45"></div></div>';
       const d=card.querySelector('.usa-face-d');
-      if(d)d.after(faceE);
+      if(d)d.after(faceE); else card.appendChild(faceE);
     }
   }
+  if(faceE&&pageNow===4)faceE.classList.remove('hidden');
+
   const fh=(data.USA&&data.USA.fhlbAdv)||{};
   const abs=histories['USA-fhlbAdv']||[];
   const qoq=histories['USA-fhlbAdvQoq']||[];
@@ -589,11 +592,16 @@ function paintFhlb(){
 
 function paintEffrVol(){
   let faceE=document.querySelector('.usa-face-e');
+  const pageNow=(()=>{try{return Number(localStorage.getItem('macrowatch-usa-page')||0)}catch(e){return 0}})();
+  if(!faceE){
+    try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){}
+    faceE=document.querySelector('.usa-face-e');
+  }
   if(!faceE)return;
-  // inject panel once
+  if(pageNow===4)faceE.classList.remove('hidden');
   if(!document.getElementById('effrVolPanel')){
-    const wrap=document.createElement('div');
-    wrap.innerHTML=
+    const box=document.createElement('div');
+    box.innerHTML=
       '<div class="metric has-chart sofr-fwd-panel" id="effrVolPanel">'+
         '<div class="name">Federal Funds Market · Daily Volume</div>'+
         '<div class="value" id="effrVolValue">—</div>'+
@@ -616,25 +624,15 @@ function paintEffrVol(){
         '<div id="effrRateChart"></div>'+
         '<div class="sofr-fwd-meta">Gemeinsam mit Volumen betrachten: Rate vs. Aktivität</div>'+
       '</div>';
-    // insert after fhlb panels if present, else append
-    const after=document.getElementById('fhlbNotePanel')||document.getElementById('fhlbChgPanel')||faceE.lastElementChild;
-    if(after&&after.parentNode===faceE) after.insertAdjacentElement('afterend', wrap.firstChild);
-    // append all children from wrap
-    while(wrap.firstChild){
-      const el=wrap.firstChild;
-      if(!document.getElementById(el.id)) faceE.appendChild(el);
-      else wrap.removeChild(el);
-    }
+    while(box.firstChild) faceE.appendChild(box.firstChild);
   }
   const ev=(data.USA&&data.USA.effrVol)||{};
   const vol=histories['USA-effrVol']||[];
   const chg=histories['USA-effrVolChg']||[];
   const rate=histories['USA-effr']||[];
-  // sample for display speed: last ~5y daily is fine for renderLineChart; use full series, chart scales
   const volShow=vol.length>1600?vol.slice(-1300):vol;
   const chgShow=chg.length>1600?chg.slice(-800):chg;
   const rateShow=rate.length>1600?rate.slice(-1300):rate;
-
   const valEl=document.getElementById('effrVolValue');
   const dateEl=document.getElementById('effrVolDate');
   const cards=document.getElementById('effrVolCards');
@@ -646,7 +644,6 @@ function paintEffrVol(){
   const rateVal=document.getElementById('effrRateValue');
   const rateDate=document.getElementById('effrRateDate');
   const rateHost=document.getElementById('effrRateChart');
-
   if(valEl){
     const badge=ev.alert?('<span class="effrvol-alert '+ev.alert+'">'+(ev.alert==='high'?'Auffällig':ev.alert==='watch'?'Beobachten':'Normal')+'</span>'):'';
     valEl.innerHTML=(ev.value!=null?fmt(ev.value):'—')+badge;
@@ -666,7 +663,7 @@ function paintEffrVol(){
     if(!volShow.length)host.innerHTML='<div class="sparkempty">Keine Volumendaten</div>';
     else host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|effrVol|Fed Funds Volume" title="Chart vergrößern">'+renderLineChart(volShow,{w:360,h:150})+'</div>';
   }
-  if(meta)meta.textContent=(ev.source||'FRED EFFRVOL')+' · '+(ev.points||vol.length)+' Handelstage · COVID-03/2020 · SVB-03/2023 im Verlauf sichtbar';
+  if(meta)meta.textContent=(ev.source||'FRED EFFRVOL')+' · '+(ev.points||vol.length)+' Handelstage';
   if(chgVal)chgVal.textContent=ev.pctChange!=null?((ev.pctChange>=0?'+':'')+fmt(ev.pctChange)+' %'):'—';
   if(chgHost){
     if(!chgShow.length)chgHost.innerHTML='<div class="sparkempty">Keine Veränderung</div>';
@@ -681,7 +678,9 @@ function paintEffrVol(){
   }
 }
 
+
 bindUsaPages();
+
 
 
 
