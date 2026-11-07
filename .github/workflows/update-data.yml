@@ -48,6 +48,8 @@ jobs:
         run: node scripts/inject-chart-interact.mjs
       - name: Inject FHLBank Advances Monitor (USA page 5)
         run: node scripts/inject-fhlb.mjs
+      - name: Inject Fed Funds Volume Monitor (USA page 5)
+        run: node scripts/inject-effrvol.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/fetch-nonfin-debt.mjs
@@ -62,9 +64,11 @@ jobs:
           node --check scripts/fetch-sofr-futures.mjs
           node --check scripts/fetch-ust-curve.mjs
           node --check scripts/fetch-fhlb-advances.mjs
+          node --check scripts/fetch-effr-volume.mjs
           node --check scripts/inject-ust-curve.mjs
           node --check scripts/inject-chart-interact.mjs
           node --check scripts/inject-fhlb.mjs
+          node --check scripts/inject-effrvol.mjs
           node --check scripts/fetch-country-t10y2y.mjs
           node --check scripts/restore-index.mjs
           node --check scripts/inject-cuau.mjs
@@ -111,6 +115,8 @@ jobs:
         run: node scripts/fetch-ust-curve.mjs
       - name: FHLBank Advances (Office of Finance PDFs)
         run: node scripts/fetch-fhlb-advances.mjs
+      - name: Federal Funds Market Volume (FRED EFFRVOL)
+        run: node scripts/fetch-effr-volume.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
       - name: Copper/Gold ratio (Yahoo HG=F / GC=F)
@@ -133,7 +139,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
-            git commit -m "Update MacroWatch data + FHLB Advances" || true
+            git commit -m "Update MacroWatch data + Fed Funds Volume" || true
             git pull --no-rebase -X ours origin main || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
