@@ -1,14 +1,12 @@
 import fs from 'fs';
-import { execSync } from 'child_process';
 
-const BLOB = 'a6caa893a71d4a120f53ca5f6b639b22bacd7414';
-let raw = execSync(`curl -sL https://api.github.com/repos/Hossein7935/Hossein7935.github.io/git/blobs/${BLOB}`, {encoding:'utf8'});
-const j = JSON.parse(raw);
-let html = Buffer.from(j.content, 'base64').toString('utf8');
-console.log('blob', html.length);
+// Work on the CURRENT index.html produced by restore-index.mjs.
+// Do NOT restore from an old git blob — that was wiping newer faceB metrics.
+let html = fs.readFileSync('index.html', 'utf8');
+console.log('base index.html', html.length);
 
 const oldNotice = 'TIPS/Bankreserven nur USA. USA: Umschalter dreht die Karte → Term SOFR 3M & 10Y–2Y.';
-const newNotice = 'TIPS/Bankreserven nur USA. USA: Umschalter → SOFR, Spreads, Schulden & <b>Kupfer/Gold</b> (nativer Chart, auto-Update).';
+const newNotice = 'TIPS/Bankreserven nur USA. USA: Umschalter → SOFR, Spreads, Schulden, 10Y−5Y & <b>Kupfer/Gold</b> (nativer Chart, auto-Update).';
 if (html.includes(oldNotice)) html = html.replace(oldNotice, newNotice);
 
 html = html.replace(/function loadCuAuChart\([\s\S]*?ensureCuAuOnFlip[\s\S]*?usaExtraToggle'\) setTimeout\(ensureCuAuOnFlip,250\);\n\}\);/g, '');
@@ -17,18 +15,26 @@ html = html.replace(/<div class="metric has-chart" style="grid-column:1\/-1[\s\S
 const cuMetric = '<div class="metric has-chart"><div class="name">Kupfer / Gold Ratio ×1000</div><div class="value" id="cuAuValue">—</div><div class="date" id="cuAuDate">Yahoo HG=F ÷ GC=F</div><div id="cuAuChartHost"></div></div>';
 const marker = "${historyHTML('USA','bofaCcc')}</div>";
 if (!html.includes('id="cuAuValue"')) {
-  if (!html.includes(marker)) throw new Error('marker missing');
+  if (!html.includes(marker)) throw new Error('marker missing for cuAu inject');
   html = html.replace(marker, marker + cuMetric);
 }
 
 if (!html.includes("key==='cuAu'")) {
   html = html.replace("key==='us5yTips'){", "key==='us5yTips'||key==='cuAu'){");
+  html = html.replace("key==='t10y5y'){", "key==='t10y5y'||key==='cuAu'){");
 }
 if (!html.includes("cuAu:'Kupfer")) {
   html = html.replace("us5yTips:'US5Y − TIPS5Y'}", "us5yTips:'US5Y − TIPS5Y',cuAu:'Kupfer / Gold Ratio'}");
+  html = html.replace("t10y5y:'10Y − 5Y Spread'}", "t10y5y:'10Y − 5Y Spread',cuAu:'Kupfer / Gold Ratio'}");
 }
 if (!html.includes("'cuAu']")) {
   html = html.replace("'hhDebt','bizDebt']", "'hhDebt','bizDebt','cuAu']");
+  html = html.replace("'hhDebt','bizDebt','t10y5y']", "'hhDebt','bizDebt','t10y5y','cuAu']");
+}
+
+// Ensure t10y5y is in ALL_KEYS if missing
+if (!html.includes("'t10y5y'")) {
+  html = html.replace("'t10y2y','tips5'", "'t10y2y','t10y5y','tips5'");
 }
 
 const js = `
@@ -73,9 +79,16 @@ document.querySelector('#refresh')?.addEventListener('click',()=>setTimeout(()=>
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='usaExtraToggle')setTimeout(paintCuAu,250)});
 `;
 
-const idx = html.lastIndexOf('refresh();');
-if (idx < 0) throw new Error('refresh(); not found');
-html = html.slice(0, idx) + js + '\n' + html.slice(idx);
+if (!html.includes('function paintCuAu')) {
+  const idx = html.lastIndexOf('refresh();');
+  if (idx < 0) throw new Error('refresh(); not found');
+  html = html.slice(0, idx) + js + '\n' + html.slice(idx);
+}
 
 fs.writeFileSync('index.html', html);
-console.log('written', html.length, 'ok', html.includes('paintCuAu') && html.includes('cuAuValue'));
+console.log(
+  'written', html.length,
+  'cuAu', html.includes('cuAuValue'),
+  't10y5y', html.includes('t10y5y') || html.includes('10Y − 5Y'),
+  'paintCuAu', html.includes('paintCuAu')
+);
