@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-07T09:27:32.662Z",
+  "updatedAt": "2026-11-07T10:13:49.191Z",
   "data": {
     "CHN": {
       "rate": {
@@ -75,8 +75,8 @@
         "source": "FRED · DFII10 (US TIPS real yield, constant maturity)"
       },
       "sofr3m": {
-        "value": 4.06688,
-        "date": "2026-11-05",
+        "value": 4.04785,
+        "date": "2026-11-06",
         "source": "global-rates.com · CME Term SOFR 3M"
       },
       "t10y2y": {
@@ -90,7 +90,7 @@
         "source": "TradingView · TVC:US03MY (US 3M T-Bill)"
       },
       "sofrUs3mSpread": {
-        "value": -0.0411,
+        "value": -0.0601,
         "date": "2026-11-07",
         "source": "Term SOFR 3M − US 3M (TV)"
       },
@@ -3396,10 +3396,6 @@
     ],
     "USA-sofr3m": [
       {
-        "period": "2026-10-30",
-        "value": 4.05056
-      },
-      {
         "period": "2026-11-02",
         "value": 4.04057
       },
@@ -3414,6 +3410,10 @@
       {
         "period": "2026-11-05",
         "value": 4.06688
+      },
+      {
+        "period": "2026-11-06",
+        "value": 4.04785
       }
     ],
     "USA-t10y2y": [
@@ -9827,7 +9827,7 @@
     "USA-sofrUs3mSpread": [
       {
         "period": "2026-11-07",
-        "value": -0.0411
+        "value": -0.0601
       }
     ],
     "USA-bofaCcc": [
@@ -33548,6 +33548,32 @@
         "value": 4.6
       }
     ],
+    "CHN-gdp": [
+      {
+        "period": "2020",
+        "value": 2.34
+      },
+      {
+        "period": "2021",
+        "value": 8.57
+      },
+      {
+        "period": "2022",
+        "value": 3.13
+      },
+      {
+        "period": "2023",
+        "value": 5.42
+      },
+      {
+        "period": "2024",
+        "value": 4.96
+      },
+      {
+        "period": "2025",
+        "value": 4.96
+      }
+    ],
     "USA-reservesGdp": [
       {
         "period": "2023-10",
@@ -33952,7 +33978,6 @@
   },
   "errors": [
     "BIP-Quartale CHN: keine geprüfte aktuelle Quartalsreihe gefunden; Wert bleibt leer",
-    "Inflation-Chart JPN: keine YoY-Punkte",
-    "BIP-Chart WorldBank: The operation was aborted due to timeout"
+    "Inflation-Chart JPN: keine YoY-Punkte"
   ]
 }
