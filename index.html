@@ -272,6 +272,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(4,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -596,24 +597,13 @@ function paintFhlb(){
 function paintEffrVol(){
   let faceE=document.querySelector('.usa-face-e');
   const pageNow=(()=>{try{return Number(localStorage.getItem('macrowatch-usa-page')||0)}catch(e){return 0}})();
-  if(!faceE){
-    try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){}
-    faceE=document.querySelector('.usa-face-e');
-  }
+  if(!faceE){try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){}faceE=document.querySelector('.usa-face-e');}
   if(!faceE)return;
   if(pageNow===4)faceE.classList.remove('hidden');
   ['effrVolChgPanel','effrRatePanel'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();});
   if(!document.getElementById('effrVolPanel')){
     const box=document.createElement('div');
-    box.innerHTML=
-      '<div class="metric has-chart sofr-fwd-panel" id="effrVolPanel">'+
-        '<div class="name">Federal Funds Market · Daily Volume</div>'+
-        '<div class="value" id="effrVolValue">—</div>'+
-        '<div class="date" id="effrVolDate">—</div>'+
-        '<div class="sofr-fwd-bp" id="effrVolCards"></div>'+
-        '<div id="effrVolChart"></div>'+
-        '<div class="sofr-fwd-meta" id="effrVolMeta">FRED EFFRVOL · NY Fed</div>'+
-      '</div>';
+    box.innerHTML='<div class="metric has-chart sofr-fwd-panel" id="effrVolPanel"><div class="name">Federal Funds Market · Daily Volume</div><div class="value" id="effrVolValue">—</div><div class="date" id="effrVolDate">—</div><div class="sofr-fwd-bp" id="effrVolCards"></div><div id="effrVolChart"></div><div class="sofr-fwd-meta" id="effrVolMeta">FRED EFFRVOL · NY Fed</div></div>';
     while(box.firstChild) faceE.appendChild(box.firstChild);
   }
   const ev=(data.USA&&data.USA.effrVol)||{};
@@ -624,29 +614,15 @@ function paintEffrVol(){
   const cards=document.getElementById('effrVolCards');
   const host=document.getElementById('effrVolChart');
   const meta=document.getElementById('effrVolMeta');
-  if(valEl){
-    const badge=ev.alert?('<span class="effrvol-alert '+ev.alert+'">'+(ev.alert==='high'?'Auffällig':ev.alert==='watch'?'Beobachten':'Normal')+'</span>'):'';
-    valEl.innerHTML=(ev.value!=null?fmt(ev.value):'—')+badge;
-  }
-  if(dateEl){
-    const ts=ev.updatedAt?ev.updatedAt.replace('T',' ').slice(0,16)+' UTC':'';
-    dateEl.textContent=(ev.date?('Handelstag '+ev.date):'—')+(ts?(' · Abruf '+ts):'')+' · Mrd. USD';
-  }
-  if(cards){
-    const p=ev.pctChange,a=ev.absChange;
-    cards.innerHTML=
-      '<span><b>Δ %</b> '+(p!=null?((p>=0?'+':'')+fmt(p)+' %'):'—')+'</span>'+
-      '<span><b>Δ abs</b> '+(a!=null?((a>=0?'+':'')+fmt(a)+' Mrd.'):'—')+'</span>'+
-      '<span><b>Vortag</b> '+(ev.prevValue!=null?fmt(ev.prevValue)+' Mrd.':'—')+'</span>';
-  }
-  if(host){
-    if(!volShow.length)host.innerHTML='<div class="sparkempty">Keine Volumendaten</div>';
-    else host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|effrVol|Fed Funds Volume" title="Chart vergrößern">'+renderLineChart(volShow,{w:360,h:150})+'</div>';
-  }
+  if(valEl){const badge=ev.alert?('<span class="effrvol-alert '+ev.alert+'">'+(ev.alert==='high'?'Auffällig':ev.alert==='watch'?'Beobachten':'Normal')+'</span>'):'';valEl.innerHTML=(ev.value!=null?fmt(ev.value):'—')+badge;}
+  if(dateEl){const ts=ev.updatedAt?ev.updatedAt.replace('T',' ').slice(0,16)+' UTC':'';dateEl.textContent=(ev.date?('Handelstag '+ev.date):'—')+(ts?(' · Abruf '+ts):'')+' · Mrd. USD';}
+  if(cards){const p=ev.pctChange,a=ev.absChange;cards.innerHTML='<span><b>Δ %</b> '+(p!=null?((p>=0?'+':'')+fmt(p)+' %'):'—')+'</span><span><b>Δ abs</b> '+(a!=null?((a>=0?'+':'')+fmt(a)+' Mrd.'):'—')+'</span><span><b>Vortag</b> '+(ev.prevValue!=null?fmt(ev.prevValue)+' Mrd.':'—')+'</span>';}
+  if(host){if(!volShow.length)host.innerHTML='<div class="sparkempty">Keine Volumendaten</div>';else host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|effrVol|Fed Funds Volume" title="Chart vergrößern">'+renderLineChart(volShow,{w:360,h:150})+'</div>';}
   if(meta)meta.textContent=(ev.source||'FRED EFFRVOL')+' · '+(ev.points||vol.length)+' Handelstage';
 }
 
 bindUsaPages();
+
 
 
 
