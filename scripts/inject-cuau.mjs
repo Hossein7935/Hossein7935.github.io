@@ -12,7 +12,8 @@ html = html.replace(/function loadCuAuChart\([\s\S]*?ensureCuAuOnFlip[\s\S]*?usa
 html = html.replace(/<div class="metric has-chart" style="grid-column:1\/-1[\s\S]*?tradingview_cu_au[\s\S]*?<\/div><\/div>/g, '');
 
 function injectMetric(html, key, metricHtml, anchors) {
-  if (html.includes(`historyHTML('USA','${key}')`) || html.includes(metricHtml.slice(0, 40))) return html;
+  // Only skip if the chart key is already wired in faceB (not just labels)
+  if (html.includes(`historyHTML('USA','${key}')`)) return html;
   for (const a of anchors) {
     if (html.includes(a)) return html.replace(a, a + metricHtml);
   }
@@ -139,8 +140,8 @@ fs.writeFileSync('index.html', html);
 console.log(
   'written', html.length,
   'cuAu', html.includes('cuAuValue'),
-  'sofrIorb', html.includes('sofrIorb') || html.includes('SOFR − IORB'),
-  'wresbal', html.includes('wresbal') || html.includes('WRESBAL'),
+  'sofrIorb', html.includes("historyHTML('USA','sofrIorb')"),
+  'wresbal', html.includes("historyHTML('USA','wresbal')"),
   't10y5y', html.includes('t10y5y') || html.includes('10Y − 5Y'),
   'paintCuAu', html.includes('paintCuAu')
 );
