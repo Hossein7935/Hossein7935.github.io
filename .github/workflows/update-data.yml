@@ -32,6 +32,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install poppler (pdftotext) for FHLB OF PDFs
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
       - name: Restore index.html + debt UI
         run: node scripts/restore-index.mjs
       - name: Inject Copper/Gold native chart (USA page 2)
@@ -44,6 +46,8 @@ jobs:
         run: node scripts/inject-ust-curve.mjs
       - name: Chart dialog crosshair / axis interact
         run: node scripts/inject-chart-interact.mjs
+      - name: Inject FHLBank Advances Monitor (USA page 5)
+        run: node scripts/inject-fhlb.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/fetch-nonfin-debt.mjs
@@ -57,8 +61,10 @@ jobs:
           node --check scripts/fetch-effr-sofr-iorb.mjs
           node --check scripts/fetch-sofr-futures.mjs
           node --check scripts/fetch-ust-curve.mjs
+          node --check scripts/fetch-fhlb-advances.mjs
           node --check scripts/inject-ust-curve.mjs
           node --check scripts/inject-chart-interact.mjs
+          node --check scripts/inject-fhlb.mjs
           node --check scripts/fetch-country-t10y2y.mjs
           node --check scripts/restore-index.mjs
           node --check scripts/inject-cuau.mjs
@@ -103,6 +109,8 @@ jobs:
         run: node scripts/fetch-sofr-futures.mjs
       - name: US Treasury + TIPS curve (Seite 4)
         run: node scripts/fetch-ust-curve.mjs
+      - name: FHLBank Advances (Office of Finance PDFs)
+        run: node scripts/fetch-fhlb-advances.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
       - name: Copper/Gold ratio (Yahoo HG=F / GC=F)
@@ -125,7 +133,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
-            git commit -m "Update MacroWatch data + chart interact" || true
+            git commit -m "Update MacroWatch data + FHLB Advances" || true
             git pull --no-rebase -X ours origin main || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
