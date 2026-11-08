@@ -64,6 +64,8 @@ jobs:
         run: node scripts/fix-diff-range.mjs
       - name: Enable range on US2Y+SOFR dual chart
         run: node scripts/fix-us2y-sofr-range.mjs
+      - name: Fix JS syntax (orphan branches)
+        run: node scripts/fix-js-syntax.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/fetch-nonfin-debt.mjs
@@ -93,6 +95,7 @@ jobs:
           node --check scripts/inject-us2y-sofr.mjs
           node --check scripts/fix-diff-range.mjs
           node --check scripts/fix-us2y-sofr-range.mjs
+          node --check scripts/fix-js-syntax.mjs
           node --check scripts/fetch-country-t10y2y.mjs
           node --check scripts/restore-index.mjs
           node --check scripts/inject-cuau.mjs
@@ -169,7 +172,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
-            git commit -m "Update MacroWatch data + US2Y/SOFR ranges" || true
+            git commit -m "Update MacroWatch data + fix JS syntax" || true
             git pull --no-rebase -X ours origin main || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true

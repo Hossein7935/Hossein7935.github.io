@@ -1,63 +1,57 @@
 import fs from 'fs';
 
-/** Remove duplicated us2ySofrDual dialog branch that breaks entire page JS */
+/** Fix broken paintChartDlg (orphan us2y branch + missing closing brace) */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// Pattern: after a complete us2ySofrDual block (ending return; }), a second orphan
-// body.innerHTML=renderUs2ySofrChart... return; } appears.
+// 1) Remove orphan tail after a complete us2ySofrDual block
 const marker = "if(key==='us2ySofrDual'&&typeof renderUs2ySofrChart==='function')";
 const first = html.indexOf(marker);
-if (first < 0) {
-  console.log('no us2ySofrDual branch');
-} else {
-  const second = html.indexOf(marker, first + 1);
-  // Also handle orphan without second if: after first return;} leftover lines
-  const afterFirst = html.indexOf('return;', first);
-  // find closing of first block
-  let p = afterFirst;
-  // walk to the } after return;
-  const close1 = html.indexOf('}', afterFirst);
-  const next = html.slice(close1 + 1, close1 + 80).trimStart();
-  if (next.startsWith('body.innerHTML=renderUs2ySofrChart') || next.startsWith('body.innerHTML=renderUs2ySofrChart')) {
-    // remove from after close1 until next if(key=
-    const nextIf = html.indexOf("if(key==='iorbUs1yDual'", close1);
-    const nextIf2 = html.indexOf("if(key==='ustCurve'", close1);
-    const cutEnd = [nextIf, nextIf2].filter(x => x > close1).sort((a, b) => a - b)[0];
-    if (cutEnd > close1) {
-      html = html.slice(0, close1 + 1) + '\n  ' + html.slice(cutEnd);
-      console.log('removed orphan us2ySofrDual tail');
+if (first >= 0) {
+  const afterReturn = html.indexOf('return;', first);
+  const close1 = afterReturn >= 0 ? html.indexOf('}', afterReturn) : -1;
+  if (close1 > 0) {
+    const next = html.slice(close1 + 1, close1 + 120).replace(/^\s+/, '');
+    if (next.startsWith('body.innerHTML=renderUs2ySofrChart')) {
+      const nextIf =
+        ['if(key==\'iorbUs1yDual\'', 'if(key==\'ustCurve\'', 'const full=histories']
+          .map(s => html.indexOf(s, close1))
+          .filter(x => x > close1)
+          .sort((a, b) => a - b)[0];
+      if (nextIf > close1) {
+        html = html.slice(0, close1 + 1) + '\n  ' + html.slice(nextIf);
+        console.log('removed orphan us2ySofrDual tail');
+      }
     }
-  }
-  if (second > 0) {
-    console.log('second full branch at', second);
   }
 }
 
-// Broader cleanup: collapse double consecutive us2y blocks
-const dup =
-  /if\(key==='us2ySofrDual'&&typeof renderUs2ySofrChart==='function'\)\{[\s\S]*?return;\s*\}\s*body\.innerHTML=renderUs2ySofrChart[\s\S]*?return;\s*\}/;
-if (dup.test(html)) {
-  html = html.replace(
-    dup,
-    (m) => {
-      // keep only first complete if-block
-      const endFirst = m.indexOf('return;');
-      const brace = m.indexOf('}', endFirst);
-      return m.slice(0, brace + 1);
-    }
-  );
-  console.log('regex orphan stripped');
+// 2) Ensure paintChartDlg is closed before bindBigChartHover
+const dlg = html.indexOf('function paintChartDlg');
+const bind = html.indexOf('function bindBigChartHover');
+if (dlg >= 0 && bind > dlg) {
+  const between = html.slice(dlg, bind);
+  let depth = 0;
+  for (const ch of between) {
+    if (ch === '{') depth++;
+    else if (ch === '}') depth--;
+  }
+  console.log('paintChartDlg region depth before fix', depth);
+  if (depth > 0) {
+    // insert missing closing braces just before bindBigChartHover
+    const pad = '\n' + '}'.repeat(depth) + '\n';
+    html = html.slice(0, bind) + pad + html.slice(bind);
+    console.log('inserted', depth, 'closing brace(s) before bindBigChartHover');
+  } else if (depth < 0) {
+    // too many closers in region — leave for now
+    console.log('warning: extra closers in paintChartDlg region');
+  }
 }
 
 fs.writeFileSync('index.html', html);
 
-// Validate JS extracted from script tags
+// Validate extracted scripts
 const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
 const js = scripts.join('\n');
-fs.writeFileSync('/tmp/site-check.js', js);
-console.log('wrote /tmp/site-check.js', js.length);
-
-// brace balance
 let depth = 0, min = 0;
 for (const ch of js) {
   if (ch === '{') depth++;
@@ -66,6 +60,11 @@ for (const ch of js) {
     if (depth < min) min = depth;
   }
 }
-console.log('brace depth', depth, 'min', min);
-console.log('orphan renderUs2y after return count', (html.match(/return;\s*\}\s*body\.innerHTML=renderUs2ySofrChart/g) || []).length);
+console.log('final brace depth', depth, 'min', min);
+console.log('orphan left', (html.match(/return;\s*\}\s*body\.innerHTML=renderUs2ySofrChart/g) || []).length);
 console.log('done', html.length);
+
+if (depth !== 0 || min < 0) {
+  console.error('JS still unbalanced');
+  process.exitCode = 1;
+}
