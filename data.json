@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-08T23:10:16.885Z",
+  "updatedAt": "2026-11-08T23:16:31.169Z",
   "data": {
     "CHN": {
       "rate": {
@@ -142,7 +142,7 @@
       "sofrFwd": {
         "value": 4.38,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-08T23:10:00.075Z",
+        "updatedAt": "2026-11-08T23:16:11.902Z",
         "source": "NY Fed SOFR + CME SR1/SR3 (Yahoo delayed)",
         "curve": [
           {
@@ -245,7 +245,7 @@
       "ustCurve": {
         "value": 4.84,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-08T23:10:01.672Z",
+        "updatedAt": "2026-11-08T23:16:13.193Z",
         "source": "FRED · DGS* + DFII* (TIPS real yields)",
         "nominal": [
           {
@@ -367,7 +367,7 @@
         "value": 798.428,
         "valueRaw": 798428,
         "date": "2026-09-30",
-        "updatedAt": "2026-11-08T23:10:05.769Z",
+        "updatedAt": "2026-11-08T23:16:15.475Z",
         "source": "FHLBanks Office of Finance · Combined Operating Highlights",
         "sourceUrl": "https://www.fhlb-of.com/",
         "absChangeQoq": -12.287,
@@ -397,7 +397,7 @@
         "prevDate": "2026-11-04",
         "absChange": -4,
         "pctChange": -3.48,
-        "updatedAt": "2026-11-08T23:10:06.812Z",
+        "updatedAt": "2026-11-08T23:16:16.752Z",
         "source": "FRED EFFRVOL · New York Fed Effective Federal Funds Volume",
         "sourceUrl": "https://www.newyorkfed.org/markets/reference-rates/effr",
         "unit": "USD Milliarden",
@@ -414,7 +414,7 @@
         "us1y": 4.28,
         "us1yDate": "2026-11-05",
         "spread": null,
-        "updatedAt": "2026-11-08T23:10:08.265Z",
+        "updatedAt": "2026-11-08T23:16:17.674Z",
         "source": "FRED IORB + DGS1",
         "sourceUrl": "https://fred.stlouisfed.org/series/IORB",
         "iorbPoints": 1930,
@@ -427,7 +427,7 @@
         "prevValue": 97.92,
         "absChange": -5.15,
         "pctChange": -5.26,
-        "updatedAt": "2026-11-08T23:10:09.463Z",
+        "updatedAt": "2026-11-08T23:16:18.063Z",
         "source": "Yahoo Finance ^MOVE · ICE BofA MOVE Index",
         "sourceUrl": "https://finance.yahoo.com/quote/%5EMOVE/",
         "unit": "bp (ann.)",
@@ -440,7 +440,7 @@
         "sofr": 3.92,
         "sofrDate": "2026-11-05",
         "spread": 0.54,
-        "updatedAt": "2026-11-08T23:10:09.819Z",
+        "updatedAt": "2026-11-08T23:16:18.312Z",
         "source": "FRED DGS2 + SOFR",
         "us2yPoints": 2963,
         "sofrPoints": 2147,
@@ -595,7 +595,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 5.028,
+        "value": 5.029,
         "date": "2026-11-08",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
@@ -66326,7 +66326,7 @@
     ],
     "USA-sofrFwdSnapshots": [
       {
-        "asOf": "2026-11-08T23:10:00.075Z",
+        "asOf": "2026-11-08T23:16:11.902Z",
         "spotDate": "2026-11-05",
         "spot": 3.92,
         "points": [
@@ -95409,7 +95409,7 @@
     ],
     "USA-ustCurveSnapshots": [
       {
-        "asOf": "2026-11-08T23:10:01.672Z",
+        "asOf": "2026-11-08T23:16:13.193Z",
         "nominal": [
           {
             "period": "3M",
