@@ -54,6 +54,8 @@ jobs:
         run: node scripts/inject-fix-page5.mjs
       - name: Strip extra EFFRVOL charts (keep volume only)
         run: node scripts/strip-effrvol-extra.mjs
+      - name: Inject USA page 6 IORB + US 1Y
+        run: node scripts/inject-page6-iorb-us1y.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/fetch-nonfin-debt.mjs
@@ -69,12 +71,14 @@ jobs:
           node --check scripts/fetch-ust-curve.mjs
           node --check scripts/fetch-fhlb-advances.mjs
           node --check scripts/fetch-effr-volume.mjs
+          node --check scripts/fetch-iorb-us1y.mjs
           node --check scripts/inject-ust-curve.mjs
           node --check scripts/inject-chart-interact.mjs
           node --check scripts/inject-fhlb.mjs
           node --check scripts/inject-effrvol.mjs
           node --check scripts/inject-fix-page5.mjs
           node --check scripts/strip-effrvol-extra.mjs
+          node --check scripts/inject-page6-iorb-us1y.mjs
           node --check scripts/fetch-country-t10y2y.mjs
           node --check scripts/restore-index.mjs
           node --check scripts/inject-cuau.mjs
@@ -123,6 +127,8 @@ jobs:
         run: node scripts/fetch-fhlb-advances.mjs
       - name: Federal Funds Market Volume (FRED EFFRVOL)
         run: node scripts/fetch-effr-volume.mjs
+      - name: IORB + US 1Y (FRED)
+        run: node scripts/fetch-iorb-us1y.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
       - name: Copper/Gold ratio (Yahoo HG=F / GC=F)
@@ -145,7 +151,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
-            git commit -m "Update MacroWatch data + volume-only EFFRVOL" || true
+            git commit -m "Update MacroWatch data + page6 IORB/US1Y" || true
             git pull --no-rebase -X ours origin main || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
