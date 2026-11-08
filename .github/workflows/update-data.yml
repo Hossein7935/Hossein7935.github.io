@@ -41,7 +41,7 @@ jobs:
       - name: Inject USA page 3 (EFFR/SOFR/IORB + diff)
         run: node scripts/inject-faceC.mjs
       - name: Fix JS structure after injects
-        run: node scripts/fix-js-structure..mjs
+        run: node scripts/fix-js-structure.mjs
       - name: Inject UST + TIPS curve (USA page 4)
         run: node scripts/inject-ust-curve.mjs
       - name: Chart dialog crosshair / axis interact
