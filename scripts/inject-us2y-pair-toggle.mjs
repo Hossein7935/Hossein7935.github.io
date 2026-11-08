@@ -29,10 +29,9 @@ function setUs2yPairKey(k){
 
 if (html.includes('function paintUs2ySofr')) {
   const start = html.indexOf('function paintUs2ySofr');
-  const candidates = ['function paintMove', 'function paintIorbUs1y', 'function paintRateDiff', 'function bindUsaPages', 'function paintChartDlg', 'function getUs2yPairKey'];
+  const candidates = ['function paintMove', 'function paintIorbUs1y', 'function paintRateDiff', 'function bindUsaPages', 'function paintChartDlg'];
   let end = -1;
   for (const n of candidates) {
-    if (n === 'function getUs2yPairKey') continue;
     const p = html.indexOf(n, start + 10);
     if (p > start && (end < 0 || p < end)) end = p;
   }
@@ -123,38 +122,6 @@ if (html.includes('function paintUs2ySofr')) {
     html = html.slice(0, start) + newFn + '\n' + html.slice(end);
     console.log('paintUs2ySofr replaced');
   } else console.warn('could not find end of paintUs2ySofr');
-}
-
-// Optional legend label: only if exact SOFR legend text exists
-const legendNeedle = '>#e74c3c\">SOFR</text>';
-if (html.includes('fill=\"#e74c3c\">SOFR</text>') || html.includes("fill=\"#e74c3c\">SOFR</text>")) {
-  html = html.replace(
-    'fill=\"#e74c3c\">SOFR</text>',
-    'fill=\"#e74c3c\">'+(opts&&opts.redLabel?opts.redLabel:'SOFR')+'</text>'
-  );
-  // that replace is wrong in static html - skip if broken
-}
-// Safer: patch renderUs2ySofrChart function end legend line only inside function
-{
-  const rs = html.indexOf('function renderUs2ySofrChart');
-  if (rs >= 0) {
-    const re = html.indexOf('function ', rs + 10);
-    const chunk = html.slice(rs, re > rs ? re : rs + 5000);
-    if (chunk.includes('SOFR</text>') && !chunk.includes('opts.redLabel')) {
-      const fixed = chunk.replace(
-        'SOFR</text>',
-        "'+(opts.redLabel||'SOFR')+'</text>"
-      );
-      // only if it becomes valid JS string concat
-      if (fixed.includes("+'+(opts.redLabel")) {
-        // might already be inside quotes wrong - use simpler approach leave SOFR label
-        console.log('legend patch skipped for safety');
-      } else {
-        html = html.slice(0, rs) + fixed + html.slice(re > rs ? re : rs + chunk.length);
-        console.log('legend patched');
-      }
-    }
-  }
 }
 
 fs.writeFileSync('index.html', html);
