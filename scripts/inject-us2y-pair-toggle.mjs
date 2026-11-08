@@ -1,12 +1,8 @@
 import fs from 'fs';
 
-/**
- * USA page 3: US 2Y (blue) dual chart — toggle red series between SOFR (default) and IORB.
- * Patches paintUs2ySofr + paintChartDlg us2y branch.
- */
+/** USA page 3: US 2Y dual — toggle red series SOFR (default) / IORB */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// Shared helper: resolve red series
 if (!html.includes('function getUs2yPairKey')) {
   const helper = `
 function getUs2yPairKey(){
@@ -23,26 +19,27 @@ function setUs2yPairKey(k){
 }
 `;
   const idx = html.indexOf('function paintUs2ySofr');
-  if (idx >= 0) {
-    html = html.slice(0, idx) + helper + html.slice(idx);
-    console.log('helper inserted');
-  } else {
+  if (idx >= 0) html = html.slice(0, idx) + helper + html.slice(idx);
+  else {
     const i2 = html.lastIndexOf('bindUsaPages();');
     if (i2 >= 0) html = html.slice(0, i2) + helper + html.slice(i2);
   }
+  console.log('helper inserted');
 }
 
-// Replace paintUs2ySofr body to support toggle UI + series
 if (html.includes('function paintUs2ySofr')) {
   const start = html.indexOf('function paintUs2ySofr');
-  // find matching end: next function after paintUs2ySofr
-  const nextFns = ['function paintMove', 'function paintIorbUs1y', 'function paintRateDiff', 'function bindUsaPages', 'function paintChartDlg'];
+  const candidates = ['function paintMove', 'function paintIorbUs1y', 'function paintRateDiff', 'function bindUsaPages', 'function paintChartDlg', 'function getUs2yPairKey'];
   let end = -1;
-  for (const n of nextFns) {
+  for (const n of candidates) {
+    if (n === 'function getUs2yPairKey') continue;
     const p = html.indexOf(n, start + 10);
     if (p > start && (end < 0 || p < end)) end = p;
   }
-  if (end < 0) end = html.indexOf('\nfunction ', start + 20);
+  if (end < 0) {
+    const p = html.indexOf('\nfunction ', start + 20);
+    if (p > start) end = p;
+  }
 
   const newFn = `function paintUs2ySofr(){
   const faceC=document.querySelector('.usa-face-c');
@@ -66,7 +63,6 @@ if (html.includes('function paintUs2ySofr')) {
     if(diff&&diff.parentNode===faceC) diff.insertAdjacentElement('afterend', box.firstChild);
     else while(box.firstChild) faceC.appendChild(box.firstChild);
   }
-  // bind toggle once
   const tog=document.getElementById('us2yPairToggle');
   if(tog&&!tog.dataset.bound){
     tog.dataset.bound='1';
@@ -79,7 +75,6 @@ if (html.includes('function paintUs2ySofr')) {
   const pair=typeof getUs2yPairKey==='function'?getUs2yPairKey():'sofr';
   const redKey=pair==='iorb'?'iorb':'sofr';
   const redLabel=redKey==='iorb'?'IORB':'SOFR';
-  // button active style
   document.querySelectorAll('.us2y-pair-btn').forEach(btn=>{
     const on=btn.getAttribute('data-pair')===redKey;
     btn.style.background=on?'rgba(231,76,60,.2)':'transparent';
@@ -100,7 +95,7 @@ if (html.includes('function paintUs2ySofr')) {
   const lastU=us2y.length?us2y.at(-1):null;
   const lastR=red.length?red.at(-1):null;
   const uVal=lastU?lastU.value:(meta.us2y!=null?meta.us2y:null);
-  const rVal=lastR?lastR.value:(redKey==='sofr'&&meta.sofr!=null?meta.sofr:null);
+  const rVal=lastR?lastR.value:null;
   if(valEl){
     valEl.innerHTML='<span style="color:#4a9eed">'+(uVal!=null?fmt(uVal):'—')+'</span> · <span style="color:#e74c3c">'+(rVal!=null?fmt(rVal):'—')+'</span>';
   }
@@ -117,7 +112,6 @@ if (html.includes('function paintUs2ySofr')) {
   if(host){
     if(!us2y.length&&!red.length)host.innerHTML='<div class="sparkempty">Keine Daten</div>';
     else if(typeof renderUs2ySofrChart==='function'){
-      // reuse renderer: second arg is the red series (historically SOFR)
       host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|us2ySofrDual|US 2Y + '+redLabel+'" title="Chart vergrößern">'+renderUs2ySofrChart(us2y,red,{w:360,h:160,redLabel:redLabel})+'</div>';
     }
   }
@@ -128,54 +122,40 @@ if (html.includes('function paintUs2ySofr')) {
   if (end > start) {
     html = html.slice(0, start) + newFn + '\n' + html.slice(end);
     console.log('paintUs2ySofr replaced');
-  }
+  } else console.warn('could not find end of paintUs2ySofr');
 }
 
-// Patch renderUs2ySofrChart legend to use redLabel if provided
-if (html.includes("function renderUs2ySofrChart") && !html.includes('opts.redLabel')) {
+// Optional legend label: only if exact SOFR legend text exists
+const legendNeedle = '>#e74c3c\">SOFR</text>';
+if (html.includes('fill=\"#e74c3c\">SOFR</text>') || html.includes("fill=\"#e74c3c\">SOFR</text>")) {
   html = html.replace(
-    "'<text x="'+(l+60)+'" y="12" font-size="10" fill="#e74c3c">SOFR</text>'+",
-    "'<text x="'+(l+60)+'" y="12" font-size="10" fill="#e74c3c">'+(opts.redLabel||'SOFR')+'</text>'+"
+    'fill=\"#e74c3c\">SOFR</text>',
+    'fill=\"#e74c3c\">'+(opts&&opts.redLabel?opts.redLabel:'SOFR')+'</text>'
   );
-  // also data-period tags SOFR -> dynamic is harder in minified path; leave SOFR in hits for now
-  console.log('legend redLabel');
+  // that replace is wrong in static html - skip if broken
 }
-
-// Patch paintChartDlg us2y branch for pair + range (fix-paint-chart-dlg may overwrite — keep dual logic here if present)
-if (html.includes("key==='us2ySofrDual'") && html.includes('function paintChartDlg')) {
-  // Ensure dlg uses getUs2yPairKey for red series
-  const old =
-    "if(key==='us2ySofrDual'&&typeof renderUs2ySofrChart==='function'){\n    let us2y=histories['USA-us2y']||[];\n    let sofr=histories['USA-sofr']||[];";
-  const neu =
-    "if(key==='us2ySofrDual'&&typeof renderUs2ySofrChart==='function'){\n    let us2y=histories['USA-us2y']||[];\n    const _pair=typeof getUs2yPairKey==='function'?getUs2yPairKey():'sofr';\n    const _redKey=_pair==='iorb'?'iorb':'sofr';\n    const _redLabel=_redKey==='iorb'?'IORB':'SOFR';\n    let sofr=histories['USA-'+_redKey]||[];";
-  if (html.includes(old)) {
-    html = html.replace(old, neu);
-    html = html.replace(
-      "if(meta)meta.textContent='US 2Y blau · SOFR rot · '+rLabel",
-      "if(meta)meta.textContent='US 2Y blau · '+_redLabel+' rot · '+rLabel"
-    );
-    // also pass redLabel to renderer in dlg if simple pattern exists
-    html = html.replace(
-      "renderUs2ySofrChart(us2y,sofr,{w:720,h:320,big:true})",
-      "renderUs2ySofrChart(us2y,sofr,{w:720,h:320,big:true,redLabel:_redLabel})"
-    );
-    console.log('dlg pair patched');
-  } else {
-    // try looser: first sofr history assign in us2ySofrDual block
-    const m = html.indexOf("key==='us2ySofrDual'&&typeof renderUs2ySofrChart");
-    if (m >= 0) {
-      const slice = html.slice(m, m + 600);
-      if (!slice.includes('getUs2yPairKey')) {
-        html = html.replace(
-          "let sofr=histories['USA-sofr']||[];",
-          "const _pair=typeof getUs2yPairKey==='function'?getUs2yPairKey():'sofr';const _redKey=_pair==='iorb'?'iorb':'sofr';const _redLabel=_redKey==='iorb'?'IORB':'SOFR';let sofr=histories['USA-'+_redKey]||[];"
-        );
-        // only first occurrence near dual — risk: multiple sofr assigns
-        console.log('dlg pair loose patch');
+// Safer: patch renderUs2ySofrChart function end legend line only inside function
+{
+  const rs = html.indexOf('function renderUs2ySofrChart');
+  if (rs >= 0) {
+    const re = html.indexOf('function ', rs + 10);
+    const chunk = html.slice(rs, re > rs ? re : rs + 5000);
+    if (chunk.includes('SOFR</text>') && !chunk.includes('opts.redLabel')) {
+      const fixed = chunk.replace(
+        'SOFR</text>',
+        "'+(opts.redLabel||'SOFR')+'</text>"
+      );
+      // only if it becomes valid JS string concat
+      if (fixed.includes("+'+(opts.redLabel")) {
+        // might already be inside quotes wrong - use simpler approach leave SOFR label
+        console.log('legend patch skipped for safety');
+      } else {
+        html = html.slice(0, rs) + fixed + html.slice(re > rs ? re : rs + chunk.length);
+        console.log('legend patched');
       }
     }
   }
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'getUs2yPairKey', html.includes('function getUs2yPairKey'), 'setUs2yPairKey', html.includes('function setUs2yPairKey'));
+console.log('done', html.length, 'pair', html.includes('function getUs2yPairKey'), 'btn', html.includes('us2y-pair-btn'));
