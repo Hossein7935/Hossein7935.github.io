@@ -66,42 +66,13 @@ jobs:
         run: node scripts/fix-us2y-sofr-range.mjs
       - name: Fix JS syntax (orphan branches)
         run: node scripts/fix-js-syntax.mjs
+      - name: Restore paintChartDlg (enlarged charts)
+        run: node scripts/fix-paint-chart-dlg.mjs
       - name: Check updater syntax
         run: |
-          node --check scripts/fetch-nonfin-debt.mjs
-          node --check scripts/fetch-sofr-muni-spread.mjs
-          node --check scripts/fetch-bofa-ccc.mjs
-          node --check scripts/fetch-us10y-tips-spread.mjs
-          node --check scripts/fetch-us5y-tips-spread.mjs
-          node --check scripts/fetch-us10y5y.mjs
-          node --check scripts/fetch-sofr-iorb.mjs
-          node --check scripts/fetch-wresbal.mjs
-          node --check scripts/fetch-effr-sofr-iorb.mjs
-          node --check scripts/fetch-sofr-futures.mjs
-          node --check scripts/fetch-ust-curve.mjs
-          node --check scripts/fetch-fhlb-advances.mjs
-          node --check scripts/fetch-effr-volume.mjs
-          node --check scripts/fetch-iorb-us1y.mjs
-          node --check scripts/fetch-move.mjs
-          node --check scripts/fetch-us2y-sofr.mjs
-          node --check scripts/inject-ust-curve.mjs
-          node --check scripts/inject-chart-interact.mjs
-          node --check scripts/inject-fhlb.mjs
-          node --check scripts/inject-effrvol.mjs
-          node --check scripts/inject-fix-page5.mjs
-          node --check scripts/strip-effrvol-extra.mjs
-          node --check scripts/inject-page6-iorb-us1y.mjs
-          node --check scripts/inject-move.mjs
-          node --check scripts/inject-us2y-sofr.mjs
-          node --check scripts/fix-diff-range.mjs
-          node --check scripts/fix-us2y-sofr-range.mjs
+          node --check scripts/fix-paint-chart-dlg.mjs
           node --check scripts/fix-js-syntax.mjs
-          node --check scripts/fetch-country-t10y2y.mjs
           node --check scripts/restore-index.mjs
-          node --check scripts/inject-cuau.mjs
-          node --check scripts/inject-faceC.mjs
-          node --check scripts/fix-js-structure.mjs
-          node --check scripts/fetch-cu-au.mjs
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
@@ -172,7 +143,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
-            git commit -m "Update MacroWatch data + fix JS syntax" || true
+            git commit -m "Update MacroWatch data + restore chart dialog" || true
             git pull --no-rebase -X ours origin main || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
