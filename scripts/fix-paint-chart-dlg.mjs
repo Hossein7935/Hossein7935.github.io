@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** Replace broken paintChartDlg with a clean, complete implementation */
+/** Replace broken/outdated paintChartDlg with clean implementation (ranges for dual line charts) */
 let html = fs.readFileSync('index.html', 'utf8');
 
 const start = html.indexOf('function paintChartDlg');
@@ -13,18 +13,20 @@ if (start < 0 || end < 0 || end <= start) {
 const fn = `function paintChartDlg(){
   if(!chartCtx)return;
   const key=chartCtx.key;
-  const isCurve=key==='sofrFwd'||key==='ustCurve'||key==='tipsCurve'||key==='iorbUs1yDual';
+  // Dual time-series charts support 6m/1y/3y — only pure curve panels hide the range bar
+  const isCurve=key==='sofrFwd'||key==='ustCurve'||key==='tipsCurve';
   const rangeBar=document.querySelector('#chartRange');
   if(rangeBar)rangeBar.style.display=isCurve?'none':'flex';
 
   const body=document.querySelector('#chartBody');
   const meta=document.querySelector('#chartMeta');
   if(!body)return;
+  const range=chartCtx.range||'3y';
+  const rLabel={'6m':'6 Monate','1y':'1 Jahr','3y':'3 Jahre'}[range]||range;
 
   if(key==='us2ySofrDual'&&typeof renderUs2ySofrChart==='function'){
     let us2y=histories['USA-us2y']||[];
     let sofr=histories['USA-sofr']||[];
-    const range=chartCtx.range||'3y';
     if(typeof filterByRange==='function'){
       const u2=filterByRange(us2y,range); if(u2.length) us2y=u2;
       const s2=filterByRange(sofr,range); if(s2.length) sofr=s2;
@@ -35,23 +37,26 @@ const fn = `function paintChartDlg(){
       return;
     }
     body.innerHTML=renderUs2ySofrChart(us2y,sofr,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
-    bindBigChartHover(body);
-    const rLabel={'6m':'6 Monate','1y':'1 Jahr','3y':'3 Jahre'}[range]||range;
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
     if(meta)meta.textContent='US 2Y blau · SOFR rot · '+rLabel+' · Crosshair · '+(us2y.length)+'/'+(sofr.length)+' Punkte';
     return;
   }
 
   if(key==='iorbUs1yDual'&&typeof renderIorbUs1yChart==='function'){
-    const iorb=histories['USA-iorb']||[];
-    const us1y=histories['USA-us1y']||[];
+    let iorb=histories['USA-iorb']||[];
+    let us1y=histories['USA-us1y']||[];
+    if(typeof filterByRange==='function'){
+      const a=filterByRange(iorb,range); if(a.length) iorb=a;
+      const b=filterByRange(us1y,range); if(b.length) us1y=b;
+    }
     if(!iorb.length&&!us1y.length){
       body.innerHTML='<div class="sparkempty">Keine Daten</div>';
       if(meta)meta.textContent='';
       return;
     }
     body.innerHTML=renderIorbUs1yChart(iorb,us1y,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
-    bindBigChartHover(body);
-    if(meta)meta.textContent='IORB rot · US 1Y blau · Crosshair · '+(iorb.length)+'/'+(us1y.length)+' Punkte';
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
+    if(meta)meta.textContent='IORB rot · US 1Y blau · '+rLabel+' · Crosshair · '+(iorb.length)+'/'+(us1y.length)+' Punkte';
     return;
   }
 
@@ -65,35 +70,19 @@ const fn = `function paintChartDlg(){
       return;
     }
     body.innerHTML=renderDualTenorChart(nom,tips,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
-    const svg=body.querySelector('svg');
-    if(svg&&!svg.querySelector('.hit')){
-      svg.querySelectorAll('circle').forEach(c=>{
-        if(c.classList.contains('chart-crosshair-dot'))return;
-        c.classList.add('hit');
-        const title=c.querySelector('title');
-        if(title){
-          const t=title.textContent||'';
-          const m=t.match(/^(\\S+)\\s+(Nominal|TIPS)\\s+([\\d.]+)/);
-          if(m){c.setAttribute('data-period',m[1]+' '+m[2]);c.setAttribute('data-value',m[3]);}
-        }
-      });
-    }
-    bindBigChartHover(body);
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
     if(meta)meta.textContent=nom.length+' Nominal-Punkte · TIPS rot · Crosshair';
     return;
   }
 
-  if(key==='sofrFwd'&&typeof renderSofRFwdChart==='function'){
+  if(key==='sofrFwd'){
     const pts=histories['USA-sofrFwd']||((data.USA&&data.USA.sofrFwd&&data.USA.sofrFwd.points)||[]);
-    if(!pts.length){
-      body.innerHTML='<div class="sparkempty">Keine Daten</div>';
-      if(meta)meta.textContent='';
+    if(typeof renderSofRFwdChart==='function'&&pts.length){
+      body.innerHTML=renderSofRFwdChart(pts,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+      if(typeof bindBigChartHover==='function')bindBigChartHover(body);
+      if(meta)meta.textContent=pts.length+' Forward-Punkte · Crosshair';
       return;
     }
-    body.innerHTML=renderSofRFwdChart(pts,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
-    bindBigChartHover(body);
-    if(meta)meta.textContent=pts.length+' Forward-Punkte · Crosshair';
-    return;
   }
 
   const full=histories[chartCtx.country+'-'+chartCtx.key]||[];
@@ -101,7 +90,7 @@ const fn = `function paintChartDlg(){
   if(isCurve){
     arr=full.slice();
   }else{
-    arr=typeof filterByRange==='function'?filterByRange(full,chartCtx.range):full.slice();
+    arr=typeof filterByRange==='function'?filterByRange(full,range):full.slice();
     if(!arr.length)arr=full;
   }
   const pts=arr.map(x=>({period:String(x.period),value:Number(x.value)})).filter(x=>Number.isFinite(x.value));
@@ -117,9 +106,8 @@ const fn = `function paintChartDlg(){
   body.innerHTML=renderLineChart(pts,{w:720,h:isCurve?300:280,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
   if(typeof bindBigChartHover==='function')bindBigChartHover(body);
   if(isCurve){
-    if(meta)meta.textContent=pts.length+' Punkte · '+pts.map(p=>p.period).join(' · ')+' · Crosshair';
+    if(meta)meta.textContent=pts.length+' Punkte · Crosshair';
   }else{
-    const rLabel={'6m':'6 Monate','1y':'1 Jahr','3y':'3 Jahre'}[chartCtx.range]||chartCtx.range;
     if(meta)meta.textContent=pts.length+' Punkte · '+rLabel+' · '+esc(String(pts[0].period))+' → '+esc(String(pts.at(-1).period));
   }
 }
@@ -129,7 +117,6 @@ const fn = `function paintChartDlg(){
 html = html.slice(0, start) + fn + html.slice(end);
 fs.writeFileSync('index.html', html);
 
-// validate
 const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
 const js = scripts.join('\n');
 let depth = 0, min = 0;
@@ -140,7 +127,7 @@ for (const ch of js) {
     if (depth < min) min = depth;
   }
 }
-console.log('paintChartDlg restored', 'depth', depth, 'min', min, 'len', html.length);
+console.log('paintChartDlg restored', 'depth', depth, 'min', min, 'iorb range', js.includes("key==='iorbUs1yDual'") && js.includes('filterByRange(iorb'));
 if (depth !== 0 || min < 0) {
   console.error('unbalanced');
   process.exit(1);
