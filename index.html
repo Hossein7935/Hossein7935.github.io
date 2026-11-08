@@ -29,18 +29,20 @@ function openChart(country,key,label){chartCtx={country,key,label,range:'3y'};do
 function paintChartDlg(){
   if(!chartCtx)return;
   const key=chartCtx.key;
-  const isCurve=key==='sofrFwd'||key==='ustCurve'||key==='tipsCurve'||key==='iorbUs1yDual';
+  // Dual time-series charts support 6m/1y/3y — only pure curve panels hide the range bar
+  const isCurve=key==='sofrFwd'||key==='ustCurve'||key==='tipsCurve';
   const rangeBar=document.querySelector('#chartRange');
   if(rangeBar)rangeBar.style.display=isCurve?'none':'flex';
 
   const body=document.querySelector('#chartBody');
   const meta=document.querySelector('#chartMeta');
   if(!body)return;
+  const range=chartCtx.range||'3y';
+  const rLabel={'6m':'6 Monate','1y':'1 Jahr','3y':'3 Jahre'}[range]||range;
 
   if(key==='us2ySofrDual'&&typeof renderUs2ySofrChart==='function'){
     let us2y=histories['USA-us2y']||[];
     let sofr=histories['USA-sofr']||[];
-    const range=chartCtx.range||'3y';
     if(typeof filterByRange==='function'){
       const u2=filterByRange(us2y,range); if(u2.length) us2y=u2;
       const s2=filterByRange(sofr,range); if(s2.length) sofr=s2;
@@ -51,23 +53,26 @@ function paintChartDlg(){
       return;
     }
     body.innerHTML=renderUs2ySofrChart(us2y,sofr,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
-    bindBigChartHover(body);
-    const rLabel={'6m':'6 Monate','1y':'1 Jahr','3y':'3 Jahre'}[range]||range;
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
     if(meta)meta.textContent='US 2Y blau · SOFR rot · '+rLabel+' · Crosshair · '+(us2y.length)+'/'+(sofr.length)+' Punkte';
     return;
   }
 
   if(key==='iorbUs1yDual'&&typeof renderIorbUs1yChart==='function'){
-    const iorb=histories['USA-iorb']||[];
-    const us1y=histories['USA-us1y']||[];
+    let iorb=histories['USA-iorb']||[];
+    let us1y=histories['USA-us1y']||[];
+    if(typeof filterByRange==='function'){
+      const a=filterByRange(iorb,range); if(a.length) iorb=a;
+      const b=filterByRange(us1y,range); if(b.length) us1y=b;
+    }
     if(!iorb.length&&!us1y.length){
       body.innerHTML='<div class="sparkempty">Keine Daten</div>';
       if(meta)meta.textContent='';
       return;
     }
     body.innerHTML=renderIorbUs1yChart(iorb,us1y,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
-    bindBigChartHover(body);
-    if(meta)meta.textContent='IORB rot · US 1Y blau · Crosshair · '+(iorb.length)+'/'+(us1y.length)+' Punkte';
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
+    if(meta)meta.textContent='IORB rot · US 1Y blau · '+rLabel+' · Crosshair · '+(iorb.length)+'/'+(us1y.length)+' Punkte';
     return;
   }
 
@@ -81,35 +86,19 @@ function paintChartDlg(){
       return;
     }
     body.innerHTML=renderDualTenorChart(nom,tips,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
-    const svg=body.querySelector('svg');
-    if(svg&&!svg.querySelector('.hit')){
-      svg.querySelectorAll('circle').forEach(c=>{
-        if(c.classList.contains('chart-crosshair-dot'))return;
-        c.classList.add('hit');
-        const title=c.querySelector('title');
-        if(title){
-          const t=title.textContent||'';
-          const m=t.match(/^(\S+)\s+(Nominal|TIPS)\s+([\d.]+)/);
-          if(m){c.setAttribute('data-period',m[1]+' '+m[2]);c.setAttribute('data-value',m[3]);}
-        }
-      });
-    }
-    bindBigChartHover(body);
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
     if(meta)meta.textContent=nom.length+' Nominal-Punkte · TIPS rot · Crosshair';
     return;
   }
 
-  if(key==='sofrFwd'&&typeof renderSofRFwdChart==='function'){
+  if(key==='sofrFwd'){
     const pts=histories['USA-sofrFwd']||((data.USA&&data.USA.sofrFwd&&data.USA.sofrFwd.points)||[]);
-    if(!pts.length){
-      body.innerHTML='<div class="sparkempty">Keine Daten</div>';
-      if(meta)meta.textContent='';
+    if(typeof renderSofRFwdChart==='function'&&pts.length){
+      body.innerHTML=renderSofRFwdChart(pts,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+      if(typeof bindBigChartHover==='function')bindBigChartHover(body);
+      if(meta)meta.textContent=pts.length+' Forward-Punkte · Crosshair';
       return;
     }
-    body.innerHTML=renderSofRFwdChart(pts,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
-    bindBigChartHover(body);
-    if(meta)meta.textContent=pts.length+' Forward-Punkte · Crosshair';
-    return;
   }
 
   const full=histories[chartCtx.country+'-'+chartCtx.key]||[];
@@ -117,7 +106,7 @@ function paintChartDlg(){
   if(isCurve){
     arr=full.slice();
   }else{
-    arr=typeof filterByRange==='function'?filterByRange(full,chartCtx.range):full.slice();
+    arr=typeof filterByRange==='function'?filterByRange(full,range):full.slice();
     if(!arr.length)arr=full;
   }
   const pts=arr.map(x=>({period:String(x.period),value:Number(x.value)})).filter(x=>Number.isFinite(x.value));
@@ -133,9 +122,8 @@ function paintChartDlg(){
   body.innerHTML=renderLineChart(pts,{w:720,h:isCurve?300:280,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
   if(typeof bindBigChartHover==='function')bindBigChartHover(body);
   if(isCurve){
-    if(meta)meta.textContent=pts.length+' Punkte · '+pts.map(p=>p.period).join(' · ')+' · Crosshair';
+    if(meta)meta.textContent=pts.length+' Punkte · Crosshair';
   }else{
-    const rLabel={'6m':'6 Monate','1y':'1 Jahr','3y':'3 Jahre'}[chartCtx.range]||chartCtx.range;
     if(meta)meta.textContent=pts.length+' Punkte · '+rLabel+' · '+esc(String(pts[0].period))+' → '+esc(String(pts.at(-1).period));
   }
 }
@@ -300,6 +288,7 @@ function setValue(country,key,value,date,source){if(!Number.isFinite(Number(valu
 async function refresh(){const btn=document.querySelector('#refresh'),status=document.querySelector('#status');btn.disabled=true;status.textContent='Lade alle Daten …';try{const r=await fetch('./data.json?refresh='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('data.json HTTP '+r.status);const payload=await r.json();if(!payload||!payload.data)throw Error('data.json ungültig');const ALL_KEYS=['inflation','rate','y2','y10','t10y2y','t10y5y','tips5','tips10','reservesGdp','deficit','gdp','sofr3m','us3m','sofrUs3mSpread','bofaCcc','us10yTips','us5yTips','hhDebt','bizDebt','sofrIorb','wresbal','effr','sofr','iorb','cuAu','sofrFwd','ustCurve','fhlbAdv','fhlbAdvQoq','fhlbAdvYoy','effrVol','effrVolChg','effr','move'];for(const c of countries){const incoming=payload.data[c.id]||{};const next={};const prev=data[c.id]||{};for(const key of ALL_KEYS){if(incoming[key])next[key]=incoming[key];else if(prev[key]&&prev[key].source==='Manuell')next[key]=prev[key]}for(const key of Object.keys(incoming)){if(!next[key]&&incoming[key]&&typeof incoming[key]==='object'&&incoming[key].value!=null)next[key]=incoming[key]}data[c.id]=next}if(payload.histories&&typeof payload.histories==='object'){histories={...payload.histories}}const year=String(document.querySelector('#year').value);for(const c of countries){const v=payload.forecasts?.[c.id]?.[year];if(v!=null&&Number.isFinite(Number(v)))setValue(c.id,'gdp',Number(v),'IMF WEO · '+year,'IMF DataMapper · NGDP_RPCH')}persist();render();const counts={inflation:countries.filter(c=>!!data[c.id]?.inflation).length,y2:countries.filter(c=>!!data[c.id]?.y2).length,y10:countries.filter(c=>!!data[c.id]?.y10).length,t10y2y:countries.filter(c=>!!data[c.id]?.t10y2y).length,rate:countries.filter(c=>!!data[c.id]?.rate).length,tips10:countries.filter(c=>!!data[c.id]?.tips10).length};const stamp=payload.updatedAt?new Date(payload.updatedAt).toLocaleString('de-DE'):'?';const e=Array.isArray(payload.errors)?payload.errors:[];const histN=Object.keys(histories||{}).length;status.innerHTML='Datenstand: '+esc(stamp)+'. Inflation '+counts.inflation+'/6 · Leitzins '+counts.rate+'/6 · 2J '+counts.y2+'/6 · 10J '+counts.y10+'/6 · 10Y−2Y '+counts.t10y2y+'/6 · TIPS '+counts.tips10+'/6 · Charts '+histN+'.'+(e.length?'<br><span class="err">'+e.length+' Hinweise</span>':'');}catch(e){status.innerHTML='<span class="err">'+esc(e.message||e)+'</span>'}finally{btn.disabled=false}}
 function openEdit(token){const[country,key]=token.split('|');editTarget={country,key};const c=countries.find(x=>x.id===country),d=defs.find(x=>x[0]===key),old=valueFor(country,key);document.querySelector('#editTitle').textContent=c.name+': '+d[1];document.querySelector('#editHelp').textContent=d[2];document.querySelector('#editValue').value=old?.value??'';document.querySelector('#editDate').value=old?.date??'';document.querySelector('#edit').showModal()}
 document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefault();if(!editTarget)return;setValue(editTarget.country,editTarget.key,document.querySelector('#editValue').value,document.querySelector('#editDate').value,'Manuell');persist();render();document.querySelector('#edit').close()});document.querySelector('#cancel').addEventListener('click',()=>document.querySelector('#edit').close());document.querySelector('#refresh').addEventListener('click',refresh);document.querySelector('#themeToggle').addEventListener('click',()=>{const t=document.documentElement.dataset.theme==='light'?'dark':'light';document.documentElement.dataset.theme=t;try{localStorage.setItem('macrowatch-theme',t)}catch(e){};document.querySelector('#themeToggle').textContent=t==='light'?'🌙 Dunkles Design':'☀️ Helles Design'});document.querySelector('#inflRange').addEventListener('change',()=>render());document.querySelector('#year').addEventListener('change',()=>refresh());document.querySelector('#chartClose').addEventListener('click',()=>document.querySelector('#chartDlg').close());document.querySelector('#chartRange').addEventListener('click',e=>{const b=e.target.closest('button[data-range]');if(!b||!chartCtx)return;chartCtx.range=b.dataset.range;document.querySelectorAll('#chartRange button').forEach(x=>x.classList.toggle('active',x===b));paintChartDlg()});document.addEventListener('click',e=>{const w=e.target.closest('[data-chart]');if(!w)return;const[country,key,label]=w.dataset.chart.split('|');openChart(country,key,label)});document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.closest('[data-chart]'))e.target.click()});const tip=document.querySelector('#chartTip');document.addEventListener('mousemove',e=>{const hit=e.target.closest('.hit');if(!hit){tip.classList.remove('show');return}tip.textContent=hit.dataset.period+' · '+hit.dataset.value;tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY+12)+'px';tip.classList.add('show')});document.addEventListener('mouseleave',()=>tip.classList.remove('show'));
+
 
 
 
@@ -961,6 +950,7 @@ function paintUs2ySofr(){
 }
 
 bindUsaPages();
+
 
 
 
