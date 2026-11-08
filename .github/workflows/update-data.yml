@@ -58,6 +58,8 @@ jobs:
         run: node scripts/inject-page6-iorb-us1y.mjs
       - name: Inject MOVE Index (USA page 6)
         run: node scripts/inject-move.mjs
+      - name: Inject US 2Y + SOFR (USA page 3)
+        run: node scripts/inject-us2y-sofr.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/fetch-nonfin-debt.mjs
@@ -75,6 +77,7 @@ jobs:
           node --check scripts/fetch-effr-volume.mjs
           node --check scripts/fetch-iorb-us1y.mjs
           node --check scripts/fetch-move.mjs
+          node --check scripts/fetch-us2y-sofr.mjs
           node --check scripts/inject-ust-curve.mjs
           node --check scripts/inject-chart-interact.mjs
           node --check scripts/inject-fhlb.mjs
@@ -83,6 +86,7 @@ jobs:
           node --check scripts/strip-effrvol-extra.mjs
           node --check scripts/inject-page6-iorb-us1y.mjs
           node --check scripts/inject-move.mjs
+          node --check scripts/inject-us2y-sofr.mjs
           node --check scripts/fetch-country-t10y2y.mjs
           node --check scripts/restore-index.mjs
           node --check scripts/inject-cuau.mjs
@@ -135,6 +139,8 @@ jobs:
         run: node scripts/fetch-iorb-us1y.mjs
       - name: MOVE Index (Yahoo ^MOVE)
         run: node scripts/fetch-move.mjs
+      - name: US 2Y + SOFR dual (FRED)
+        run: node scripts/fetch-us2y-sofr.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
       - name: Copper/Gold ratio (Yahoo HG=F / GC=F)
@@ -157,7 +163,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
-            git commit -m "Update MacroWatch data + MOVE index" || true
+            git commit -m "Update MacroWatch data + US2Y/SOFR dual" || true
             git pull --no-rebase -X ours origin main || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
