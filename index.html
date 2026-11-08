@@ -310,6 +310,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(5,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -924,6 +925,7 @@ function paintUs2ySofr(){
 }
 
 bindUsaPages();
+
 
 
 
