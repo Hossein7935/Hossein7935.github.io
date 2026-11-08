@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-08T18:07:37.364Z",
+  "updatedAt": "2026-11-08T18:09:46.257Z",
   "data": {
     "CHN": {
       "rate": {
@@ -142,7 +142,7 @@
       "sofrFwd": {
         "value": 4.38,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-08T18:07:27.664Z",
+        "updatedAt": "2026-11-08T18:09:33.044Z",
         "source": "NY Fed SOFR + CME SR1/SR3 (Yahoo delayed)",
         "curve": [
           {
@@ -245,7 +245,7 @@
       "ustCurve": {
         "value": 4.84,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-08T18:07:29.821Z",
+        "updatedAt": "2026-11-08T18:09:34.676Z",
         "source": "FRED · DGS* + DFII* (TIPS real yields)",
         "nominal": [
           {
@@ -367,7 +367,7 @@
         "value": 798.428,
         "valueRaw": 798428,
         "date": "2026-09-30",
-        "updatedAt": "2026-11-08T18:07:31.129Z",
+        "updatedAt": "2026-11-08T18:09:36.551Z",
         "source": "FHLBanks Office of Finance · Combined Operating Highlights",
         "sourceUrl": "https://www.fhlb-of.com/",
         "absChangeQoq": -12.287,
@@ -397,7 +397,7 @@
         "prevDate": "2026-11-04",
         "absChange": -4,
         "pctChange": -3.48,
-        "updatedAt": "2026-11-08T18:07:32.257Z",
+        "updatedAt": "2026-11-08T18:09:38.848Z",
         "source": "FRED EFFRVOL · New York Fed Effective Federal Funds Volume",
         "sourceUrl": "https://www.newyorkfed.org/markets/reference-rates/effr",
         "unit": "USD Milliarden",
@@ -414,7 +414,7 @@
         "us1y": 4.28,
         "us1yDate": "2026-11-05",
         "spread": null,
-        "updatedAt": "2026-11-08T18:07:33.145Z",
+        "updatedAt": "2026-11-08T18:09:39.935Z",
         "source": "FRED IORB + DGS1",
         "sourceUrl": "https://fred.stlouisfed.org/series/IORB",
         "iorbPoints": 1930,
@@ -64113,7 +64113,7 @@
     ],
     "USA-sofrFwdSnapshots": [
       {
-        "asOf": "2026-11-08T18:07:27.664Z",
+        "asOf": "2026-11-08T18:09:33.044Z",
         "spotDate": "2026-11-05",
         "spot": 3.92,
         "points": [
@@ -93196,7 +93196,7 @@
     ],
     "USA-ustCurveSnapshots": [
       {
-        "asOf": "2026-11-08T18:07:29.821Z",
+        "asOf": "2026-11-08T18:09:34.676Z",
         "nominal": [
           {
             "period": "3M",
