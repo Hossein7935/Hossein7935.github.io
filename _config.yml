@@ -1,5 +1,6 @@
-# Static site — disable Jekyll processing
-plugin: []
+# Static MacroWatch site — avoid Jekyll plugin errors
+plugins: []
 exclude:
   - scripts
   - .github
+  - node_modules
