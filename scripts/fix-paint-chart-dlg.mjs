@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** Replace broken/outdated paintChartDlg with clean implementation (ranges for dual line charts) */
+/** Replace paintChartDlg: ranges for dual charts; US2Y red series SOFR/IORB via getUs2yPairKey */
 let html = fs.readFileSync('index.html', 'utf8');
 
 const start = html.indexOf('function paintChartDlg');
@@ -13,7 +13,6 @@ if (start < 0 || end < 0 || end <= start) {
 const fn = `function paintChartDlg(){
   if(!chartCtx)return;
   const key=chartCtx.key;
-  // Dual time-series charts support 6m/1y/3y — only pure curve panels hide the range bar
   const isCurve=key==='sofrFwd'||key==='ustCurve'||key==='tipsCurve';
   const rangeBar=document.querySelector('#chartRange');
   if(rangeBar)rangeBar.style.display=isCurve?'none':'flex';
@@ -26,19 +25,22 @@ const fn = `function paintChartDlg(){
 
   if(key==='us2ySofrDual'&&typeof renderUs2ySofrChart==='function'){
     let us2y=histories['USA-us2y']||[];
-    let sofr=histories['USA-sofr']||[];
+    const _pair=typeof getUs2yPairKey==='function'?getUs2yPairKey():'sofr';
+    const _redKey=_pair==='iorb'?'iorb':'sofr';
+    const _redLabel=_redKey==='iorb'?'IORB':'SOFR';
+    let red=histories['USA-'+_redKey]||[];
     if(typeof filterByRange==='function'){
       const u2=filterByRange(us2y,range); if(u2.length) us2y=u2;
-      const s2=filterByRange(sofr,range); if(s2.length) sofr=s2;
+      const s2=filterByRange(red,range); if(s2.length) red=s2;
     }
-    if(!us2y.length&&!sofr.length){
+    if(!us2y.length&&!red.length){
       body.innerHTML='<div class="sparkempty">Keine Daten</div>';
       if(meta)meta.textContent='';
       return;
     }
-    body.innerHTML=renderUs2ySofrChart(us2y,sofr,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    body.innerHTML=renderUs2ySofrChart(us2y,red,{w:720,h:320,big:true,redLabel:_redLabel})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
     if(typeof bindBigChartHover==='function')bindBigChartHover(body);
-    if(meta)meta.textContent='US 2Y blau · SOFR rot · '+rLabel+' · Crosshair · '+(us2y.length)+'/'+(sofr.length)+' Punkte';
+    if(meta)meta.textContent='US 2Y blau · '+_redLabel+' rot · '+rLabel+' · Crosshair · '+(us2y.length)+'/'+(red.length)+' Punkte';
     return;
   }
 
@@ -127,8 +129,5 @@ for (const ch of js) {
     if (depth < min) min = depth;
   }
 }
-console.log('paintChartDlg restored', 'depth', depth, 'min', min, 'iorb range', js.includes("key==='iorbUs1yDual'") && js.includes('filterByRange(iorb'));
-if (depth !== 0 || min < 0) {
-  console.error('unbalanced');
-  process.exit(1);
-}
+console.log('paintChartDlg ok', 'depth', depth, 'pair', js.includes('getUs2yPairKey'));
+if (depth !== 0 || min < 0) process.exit(1);
