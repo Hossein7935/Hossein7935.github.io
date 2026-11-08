@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** USA page 3: US 2Y dual — toggle red series SOFR (default) / IORB */
+/** USA page 3: US 2Y dual — toggle red series SOFR (default) / IORB / EFFR */
 let html = fs.readFileSync('index.html', 'utf8');
 
 if (!html.includes('function getUs2yPairKey')) {
@@ -8,12 +8,12 @@ if (!html.includes('function getUs2yPairKey')) {
 function getUs2yPairKey(){
   try{
     const v=localStorage.getItem('macrowatch-us2y-pair');
-    if(v==='iorb'||v==='sofr')return v;
+    if(v==='iorb'||v==='sofr'||v==='effr')return v;
   }catch(e){}
   return 'sofr';
 }
 function setUs2yPairKey(k){
-  if(k!=='iorb'&&k!=='sofr')k='sofr';
+  if(k!=='iorb'&&k!=='sofr'&&k!=='effr')k='sofr';
   try{localStorage.setItem('macrowatch-us2y-pair',k)}catch(e){}
   try{typeof paintUs2ySofr==='function'&&paintUs2ySofr()}catch(e){}
 }
@@ -25,6 +25,16 @@ function setUs2yPairKey(k){
     if (i2 >= 0) html = html.slice(0, i2) + helper + html.slice(i2);
   }
   console.log('helper inserted');
+} else {
+  // widen allowed keys if helper already present
+  html = html.replace(
+    "if(v==='iorb'||v==='sofr')return v;",
+    "if(v==='iorb'||v==='sofr'||v==='effr')return v;"
+  );
+  html = html.replace(
+    "if(k!=='iorb'&&k!=='sofr')k='sofr';",
+    "if(k!=='iorb'&&k!=='sofr'&&k!=='effr')k='sofr';"
+  );
 }
 
 if (html.includes('function paintUs2ySofr')) {
@@ -53,14 +63,25 @@ if (html.includes('function paintUs2ySofr')) {
         '<div class="sofr-fwd-bp" id="us2yPairToggle" style="gap:8px;flex-wrap:wrap">'+
           '<button type="button" class="us2y-pair-btn" data-pair="sofr" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.35);background:transparent;color:inherit;cursor:pointer">SOFR</button>'+
           '<button type="button" class="us2y-pair-btn" data-pair="iorb" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.35);background:transparent;color:inherit;cursor:pointer">IORB</button>'+
+          '<button type="button" class="us2y-pair-btn" data-pair="effr" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.35);background:transparent;color:inherit;cursor:pointer">EFFR</button>'+
         '</div>'+
         '<div class="sofr-fwd-bp" id="us2ySofrCards"></div>'+
         '<div id="us2ySofrChart"></div>'+
-        '<div class="sofr-fwd-meta" id="us2ySofrMeta">US 2Y blau · rot umschaltbar SOFR/IORB</div>'+
+        '<div class="sofr-fwd-meta" id="us2ySofrMeta">US 2Y blau · rot: SOFR / IORB / EFFR</div>'+
       '</div>';
     const diff=document.getElementById('rateDiffPanel');
     if(diff&&diff.parentNode===faceC) diff.insertAdjacentElement('afterend', box.firstChild);
     else while(box.firstChild) faceC.appendChild(box.firstChild);
+  } else {
+    // ensure EFFR button exists on older panels
+    const tog=document.getElementById('us2yPairToggle');
+    if(tog&&!tog.querySelector('[data-pair="effr"]')){
+      const b=document.createElement('button');
+      b.type='button';b.className='us2y-pair-btn';b.setAttribute('data-pair','effr');
+      b.style.cssText='padding:4px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.35);background:transparent;color:inherit;cursor:pointer';
+      b.textContent='EFFR';
+      tog.appendChild(b);
+    }
   }
   const tog=document.getElementById('us2yPairToggle');
   if(tog&&!tog.dataset.bound){
@@ -72,8 +93,8 @@ if (html.includes('function paintUs2ySofr')) {
     });
   }
   const pair=typeof getUs2yPairKey==='function'?getUs2yPairKey():'sofr';
-  const redKey=pair==='iorb'?'iorb':'sofr';
-  const redLabel=redKey==='iorb'?'IORB':'SOFR';
+  const redKey=(pair==='iorb'||pair==='effr')?pair:'sofr';
+  const redLabel=redKey==='iorb'?'IORB':(redKey==='effr'?'EFFR':'SOFR');
   document.querySelectorAll('.us2y-pair-btn').forEach(btn=>{
     const on=btn.getAttribute('data-pair')===redKey;
     btn.style.background=on?'rgba(231,76,60,.2)':'transparent';
@@ -114,7 +135,10 @@ if (html.includes('function paintUs2ySofr')) {
       host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|us2ySofrDual|US 2Y + '+redLabel+'" title="Chart vergrößern">'+renderUs2ySofrChart(us2y,red,{w:360,h:160,redLabel:redLabel})+'</div>';
     }
   }
-  if(metaEl)metaEl.textContent='US 2Y blau · '+redLabel+' rot · Umschalter oben · '+(us2y.length)+' / '+(red.length)+' Punkte';
+  if(metaEl){
+    const note=redKey==='iorb'?' (IORB+IOER Historie)':'';
+    metaEl.textContent='US 2Y blau · '+redLabel+' rot'+note+' · '+(us2y.length)+' / '+(red.length)+' Punkte';
+  }
 }
 `;
 
@@ -125,4 +149,4 @@ if (html.includes('function paintUs2ySofr')) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'pair', html.includes('function getUs2yPairKey'), 'btn', html.includes('us2y-pair-btn'));
+console.log('done', html.length, 'pair', html.includes('function getUs2yPairKey'), 'effr btn', html.includes('data-pair="effr"'));

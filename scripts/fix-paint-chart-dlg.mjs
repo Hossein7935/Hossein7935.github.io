@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** Replace paintChartDlg: ranges for dual charts; US2Y red series SOFR/IORB via getUs2yPairKey */
+/** paintChartDlg: dual ranges; US2Y red = SOFR/IORB/EFFR via getUs2yPairKey */
 let html = fs.readFileSync('index.html', 'utf8');
 
 const start = html.indexOf('function paintChartDlg');
@@ -26,8 +26,8 @@ const fn = `function paintChartDlg(){
   if(key==='us2ySofrDual'&&typeof renderUs2ySofrChart==='function'){
     let us2y=histories['USA-us2y']||[];
     const _pair=typeof getUs2yPairKey==='function'?getUs2yPairKey():'sofr';
-    const _redKey=_pair==='iorb'?'iorb':'sofr';
-    const _redLabel=_redKey==='iorb'?'IORB':'SOFR';
+    const _redKey=(_pair==='iorb'||_pair==='effr')?_pair:'sofr';
+    const _redLabel=_redKey==='iorb'?'IORB':(_redKey==='effr'?'EFFR':'SOFR');
     let red=histories['USA-'+_redKey]||[];
     if(typeof filterByRange==='function'){
       const u2=filterByRange(us2y,range); if(u2.length) us2y=u2;
@@ -58,7 +58,7 @@ const fn = `function paintChartDlg(){
     }
     body.innerHTML=renderIorbUs1yChart(iorb,us1y,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
     if(typeof bindBigChartHover==='function')bindBigChartHover(body);
-    if(meta)meta.textContent='IORB rot · US 1Y blau · '+rLabel+' · Crosshair · '+(iorb.length)+'/'+(us1y.length)+' Punkte';
+    if(meta)meta.textContent='IORB/IOER rot · US 1Y blau · '+rLabel+' · Crosshair · '+(iorb.length)+'/'+(us1y.length)+' Punkte';
     return;
   }
 
@@ -129,5 +129,5 @@ for (const ch of js) {
     if (depth < min) min = depth;
   }
 }
-console.log('paintChartDlg ok', 'depth', depth, 'pair', js.includes('getUs2yPairKey'));
+console.log('paintChartDlg ok', 'depth', depth, 'effr', js.includes("'effr'"));
 if (depth !== 0 || min < 0) process.exit(1);
