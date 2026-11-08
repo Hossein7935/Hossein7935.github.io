@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** USA page 3: dual US 2Y (blue) + SOFR (red) — no rate-diff checkboxes */
+/** USA page 3: dual US 2Y (blue) + SOFR (red) — no rate-diff checkboxes; enlarge supports 6m/1y/3y */
 let html = fs.readFileSync('index.html', 'utf8');
 
 if (!html.includes('function renderUs2ySofrChart')) {
@@ -71,7 +71,6 @@ function paintUs2ySofr(){
         '<div id="us2ySofrChart"></div>'+
         '<div class="sofr-fwd-meta" id="us2ySofrMeta">FRED DGS2 + SOFR · nicht in Δ-Auswahl</div>'+
       '</div>';
-    // append after diff panel if present, else end of faceC
     const diff=document.getElementById('rateDiffPanel');
     if(diff&&diff.parentNode===faceC) diff.insertAdjacentElement('afterend', box.firstChild);
     else while(box.firstChild) faceC.appendChild(box.firstChild);
@@ -112,7 +111,6 @@ function paintUs2ySofr(){
   }
 }
 
-// call on page 3 with paintRateDiff — but dual chart has no checkboxes
 if (!html.includes("typeof paintUs2ySofr==='function'&&paintUs2ySofr()")) {
   html = html.replace(
     /typeof paintRateDiff==='function'&&paintRateDiff\(\)/g,
@@ -121,18 +119,14 @@ if (!html.includes("typeof paintUs2ySofr==='function'&&paintUs2ySofr()")) {
   console.log('paintUs2ySofr hooked');
 }
 
-// enlarge dialog support
+// Dialog branch with range support — do NOT add to isCurve (range bar must stay visible)
 if (html.includes('function paintChartDlg') && !html.includes("key==='us2ySofrDual'")) {
-  html = html.replace(
-    "const isCurve=key==='sofrFwd'||key==='ustCurve'||key==='tipsCurve'||key==='diff'||key==='iorbUs1yDual';",
-    "const isCurve=key==='sofrFwd'||key==='ustCurve'||key==='tipsCurve'||key==='diff'||key==='iorbUs1yDual'||key==='us2ySofrDual';"
-  );
   if (html.includes("key==='iorbUs1yDual'")) {
     html = html.replace(
       "if(key==='iorbUs1yDual'",
-      `if(key==='us2ySofrDual'&&typeof renderUs2ySofrChart==='function'){\n    const us2y=histories['USA-us2y']||[];\n    const sofr=histories['USA-sofr']||[];\n    if(!us2y.length&&!sofr.length){body.innerHTML='<div class="sparkempty">Keine Daten</div>';if(meta)meta.textContent='';return;}\n    body.innerHTML=renderUs2ySofrChart(us2y,sofr,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';\n    bindBigChartHover(body);\n    if(meta)meta.textContent='US 2Y blau · SOFR rot · Crosshair · '+(us2y.length)+'/'+(sofr.length)+' Punkte';\n    return;\n  }\n  if(key==='iorbUs1yDual'`
+      `if(key==='us2ySofrDual'&&typeof renderUs2ySofrChart==='function'){\n    let us2y=histories['USA-us2y']||[];\n    let sofr=histories['USA-sofr']||[];\n    const range=chartCtx.range||'3y';\n    if(typeof filterByRange==='function'){const u2=filterByRange(us2y,range);if(u2.length)us2y=u2;const s2=filterByRange(sofr,range);if(s2.length)sofr=s2;}\n    if(!us2y.length&&!sofr.length){body.innerHTML='<div class="sparkempty">Keine Daten</div>';if(meta)meta.textContent='';return;}\n    body.innerHTML=renderUs2ySofrChart(us2y,sofr,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';\n    bindBigChartHover(body);\n    const rLabel={'6m':'6 Monate','1y':'1 Jahr','3y':'3 Jahre'}[range]||range;\n    if(meta)meta.textContent='US 2Y blau · SOFR rot · '+rLabel+' · Crosshair · '+(us2y.length)+'/'+(sofr.length)+' Punkte';\n    return;\n  }\n  if(key==='iorbUs1yDual'`
     );
-    console.log('dlg us2ySofr');
+    console.log('dlg us2ySofr with range');
   }
 }
 
