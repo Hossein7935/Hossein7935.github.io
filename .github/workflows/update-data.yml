@@ -60,6 +60,8 @@ jobs:
         run: node scripts/inject-move.mjs
       - name: Inject US 2Y + SOFR (USA page 3)
         run: node scripts/inject-us2y-sofr.mjs
+      - name: US2Y dual toggle SOFR/IORB
+        run: node scripts/inject-us2y-pair-toggle.mjs
       - name: Enable range on rate-diff chart
         run: node scripts/fix-diff-range.mjs
       - name: Enable range on US2Y+SOFR dual chart
@@ -71,6 +73,7 @@ jobs:
       - name: Check updater syntax
         run: |
           node --check scripts/fix-paint-chart-dlg.mjs
+          node --check scripts/inject-us2y-pair-toggle.mjs
           node --check scripts/fix-js-syntax.mjs
           node --check scripts/restore-index.mjs
       - name: Fetch official economic data
@@ -143,7 +146,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
-            git commit -m "Update MacroWatch data + restore chart dialog" || true
+            git commit -m "Update MacroWatch + US2Y SOFR/IORB toggle" || true
             git pull --no-rebase -X ours origin main || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
