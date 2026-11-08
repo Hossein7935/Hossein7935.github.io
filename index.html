@@ -29,14 +29,28 @@ function openChart(country,key,label){chartCtx={country,key,label,range:'3y'};do
 function paintChartDlg(){
   if(!chartCtx)return;
   const key=chartCtx.key;
-  const isCurve=key==='sofrFwd'||key==='ustCurve'||key==='tipsCurve'||key==='diff';
+  const isCurve=key==='sofrFwd'||key==='ustCurve'||key==='tipsCurve'||key==='diff'||key==='iorbUs1yDual';
   const rangeBar=document.querySelector('#chartRange');
   if(rangeBar)rangeBar.style.display=isCurve?'none':'flex';
 
   const body=document.querySelector('#chartBody');
   const meta=document.querySelector('#chartMeta');
 
-  if(key==='ustCurve'&&typeof renderDualTenorChart==='function'){
+  
+  if(key==='iorbUs1yDual'&&typeof renderIorbUs1yChart==='function'){
+    const iorb=histories['USA-iorb']||[];
+    const us1y=histories['USA-us1y']||[];
+    if(!iorb.length&&!us1y.length){
+      body.innerHTML='<div class="sparkempty">Keine Daten</div>';
+      if(meta)meta.textContent='';
+      return;
+    }
+    body.innerHTML=renderIorbUs1yChart(iorb,us1y,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    bindBigChartHover(body);
+    if(meta)meta.textContent='IORB rot · US 1Y blau · Maus bewegen für Crosshair · '+(iorb.length)+'/'+(us1y.length)+' Punkte';
+    return;
+  }
+if(key==='ustCurve'&&typeof renderDualTenorChart==='function'){
     const u=(data.USA&&data.USA.ustCurve)||{};
     const nom=histories['USA-ustCurve']||u.nominal||[];
     const tips=histories['USA-tipsCurve']||u.tips||[];
@@ -159,8 +173,8 @@ function bindBigChartHover(body){
 }
 
 
-function historyHTML(country,key){let arr=histories[country+'-'+key]||[];if(key==='inflation'){const range=(document.querySelector('#inflRange')||{}).value||'3y';arr=filterByRange(arr,range)}if(!arr.length)return '<div class="sparkempty">Verlauf nicht verfügbar</div>';const pts=arr.map(x=>({period:String(x.period),value:Number(x.value)})).filter(x=>Number.isFinite(x.value));if(!pts.length)return '<div class="sparkempty">Keine gültigen Werte</div>';if(key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='inflation'||key==='gdp'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit'||key==='sofr3m'||key==='t10y2y'||key==='t10y5y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'||key==='us10yTips'||key==='us5yTips'||key==='sofrIorb'||key==='wresbal'||key==='effr'||key==='sofr'||key==='iorb'||key==='cuAu'||key==='diff'){const extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',t10y5y:'10Y − 5Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield',us10yTips:'US10Y − TIPS10Y',us5yTips:'US5Y − TIPS5Y',sofrIorb:'SOFR − IORB',wresbal:'Bankreserven (WRESBAL)',effr:'EFFR',sofr:'SOFR',iorb:'IORB',cuAu:'Kupfer / Gold Ratio',diff:'Differenz',sofrFwd:'SOFR Erwartungskurve',ustCurve:'US Zinsstruktur',fhlbAdv:'FHLB Advances',fhlbAdvQoq:'FHLB Advances QoQ %',fhlbAdvYoy:'FHLB Advances YoY %',effrVol:'Fed Funds Volume',effrVolChg:'Fed Funds Vol Δ%',effr:'EFFR'};const label=extraLabels[key]||(defs.find(d=>d[0]===key)||[key,key])[1];const chart=renderLineChart(pts,{w:220,h:58});return `<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="${country}|${key}|${esc(label)}" title="Chart vergrößern">${chart}</div>`}let min=Math.min(0,...pts.map(p=>p.value)),max=Math.max(0,...pts.map(p=>p.value));if(max===min)max=min+1;const range=max-min||1;return `<div class="spark">${pts.slice(-5).map(x=>{const v=x.value,hh=Math.max(2,Math.round(((v-min)/range)*22));return `<div class="barwrap" title="${esc(x.period)}: ${fmt(v)}"><div class="bar ${v<0?'neg':''}" style="height:${hh}px"></div><div class="barlabel">${esc(String(x.period).replace(/^\d{4}-Q/,'Q').slice(0,7))}</div></div>`}).join('')}</div><div class="sparkcaption">Letzte ${Math.min(5,pts.length)} Werte</div>`}
-function render(){const grid=document.querySelector('#grid');grid.innerHTML='';for(const c of countries){const card=document.createElement('section');card.className='country';card.innerHTML=`<div class="ctop"><div class="flag">${c.flag}</div><div><h2>${c.name}</h2><div class="code">${c.id}</div></div></div><div class="metrics">${defs.map(([key,label])=>{if((key==='reservesGdp'||key==='tips5'||key==='tips10')&&c.id!=='USA')return'';const m=valueFor(c.id,key);const value=m?fmt(m.value):'Nicht verfügbar';const date=m?`${esc(m.source)} · ${esc(m.date)}`:'Quelle hat keinen Wert geliefert';const spark=key==='inflation'||key==='gdp'||key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit';return `<div class="metric${spark?' has-chart':''}"><div class="name">${label}</div><div class="value ${m?'':'na'}">${value}</div><div class="date">${date}</div>${spark?historyHTML(c.id,key):`<button class="btn" data-edit="${c.id}|${key}">Manuell eintragen</button>`}</div>`}).join('')}</div><div class="links"><a href="${c.links.inflation}" target="_blank" rel="noopener">Inflation ↗</a><a href="${c.links.rate}" target="_blank" rel="noopener">Leitzins ↗</a><a href="${c.links.bonds}" target="_blank" rel="noopener">Anleihen ↗</a><a href="${c.links.gdp}" target="_blank" rel="noopener">IMF-BIP ↗</a></div>${c.id==='USA'?`<div class="usa-flip-toggle"><div class="usa-page-select" id="usaPageSelect"><button type="button" data-page="0" class="active">Seite 1</button><button type="button" data-page="1">Seite 2</button><button type="button" data-page="2">Seite 3 · Rates</button><button type="button" data-page="3">Seite 4 · Kurven</button><button type="button" data-page="4">Seite 5 · FHLB</button></div></div>`:''}`;
+function historyHTML(country,key){let arr=histories[country+'-'+key]||[];if(key==='inflation'){const range=(document.querySelector('#inflRange')||{}).value||'3y';arr=filterByRange(arr,range)}if(!arr.length)return '<div class="sparkempty">Verlauf nicht verfügbar</div>';const pts=arr.map(x=>({period:String(x.period),value:Number(x.value)})).filter(x=>Number.isFinite(x.value));if(!pts.length)return '<div class="sparkempty">Keine gültigen Werte</div>';if(key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='inflation'||key==='gdp'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit'||key==='sofr3m'||key==='t10y2y'||key==='t10y5y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'||key==='us10yTips'||key==='us5yTips'||key==='sofrIorb'||key==='wresbal'||key==='effr'||key==='sofr'||key==='iorb'||key==='cuAu'||key==='diff'){const extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',t10y5y:'10Y − 5Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield',us10yTips:'US10Y − TIPS10Y',us5yTips:'US5Y − TIPS5Y',sofrIorb:'SOFR − IORB',wresbal:'Bankreserven (WRESBAL)',effr:'EFFR',sofr:'SOFR',iorb:'IORB',cuAu:'Kupfer / Gold Ratio',diff:'Differenz',sofrFwd:'SOFR Erwartungskurve',ustCurve:'US Zinsstruktur',fhlbAdv:'FHLB Advances',fhlbAdvQoq:'FHLB Advances QoQ %',fhlbAdvYoy:'FHLB Advances YoY %',effrVol:'Fed Funds Volume',effrVolChg:'Fed Funds Vol Δ%',effr:'EFFR',iorb:'IORB',us1y:'US 1Y',iorbUs1yDual:'IORB + US 1Y'};const label=extraLabels[key]||(defs.find(d=>d[0]===key)||[key,key])[1];const chart=renderLineChart(pts,{w:220,h:58});return `<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="${country}|${key}|${esc(label)}" title="Chart vergrößern">${chart}</div>`}let min=Math.min(0,...pts.map(p=>p.value)),max=Math.max(0,...pts.map(p=>p.value));if(max===min)max=min+1;const range=max-min||1;return `<div class="spark">${pts.slice(-5).map(x=>{const v=x.value,hh=Math.max(2,Math.round(((v-min)/range)*22));return `<div class="barwrap" title="${esc(x.period)}: ${fmt(v)}"><div class="bar ${v<0?'neg':''}" style="height:${hh}px"></div><div class="barlabel">${esc(String(x.period).replace(/^\d{4}-Q/,'Q').slice(0,7))}</div></div>`}).join('')}</div><div class="sparkcaption">Letzte ${Math.min(5,pts.length)} Werte</div>`}
+function render(){const grid=document.querySelector('#grid');grid.innerHTML='';for(const c of countries){const card=document.createElement('section');card.className='country';card.innerHTML=`<div class="ctop"><div class="flag">${c.flag}</div><div><h2>${c.name}</h2><div class="code">${c.id}</div></div></div><div class="metrics">${defs.map(([key,label])=>{if((key==='reservesGdp'||key==='tips5'||key==='tips10')&&c.id!=='USA')return'';const m=valueFor(c.id,key);const value=m?fmt(m.value):'Nicht verfügbar';const date=m?`${esc(m.source)} · ${esc(m.date)}`:'Quelle hat keinen Wert geliefert';const spark=key==='inflation'||key==='gdp'||key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit';return `<div class="metric${spark?' has-chart':''}"><div class="name">${label}</div><div class="value ${m?'':'na'}">${value}</div><div class="date">${date}</div>${spark?historyHTML(c.id,key):`<button class="btn" data-edit="${c.id}|${key}">Manuell eintragen</button>`}</div>`}).join('')}</div><div class="links"><a href="${c.links.inflation}" target="_blank" rel="noopener">Inflation ↗</a><a href="${c.links.rate}" target="_blank" rel="noopener">Leitzins ↗</a><a href="${c.links.bonds}" target="_blank" rel="noopener">Anleihen ↗</a><a href="${c.links.gdp}" target="_blank" rel="noopener">IMF-BIP ↗</a></div>${c.id==='USA'?`<div class="usa-flip-toggle"><div class="usa-page-select" id="usaPageSelect"><button type="button" data-page="0" class="active">Seite 1</button><button type="button" data-page="1">Seite 2</button><button type="button" data-page="2">Seite 3 · Rates</button><button type="button" data-page="3">Seite 4 · Kurven</button><button type="button" data-page="4">Seite 5 · FHLB</button><button type="button" data-page="5">Seite 6 · IORB/1Y</button></div></div>`:''}`;
 if(c.id==='USA'){
   const faceA=card.querySelector('.metrics');
   if(faceA){
@@ -277,8 +291,9 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
-  page=Math.max(0,Math.min(4,Number(page)||0));
+  page=Math.max(0,Math.min(5,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
   document.querySelectorAll('.country').forEach(card=>{
     if(!card.querySelector('.usa-face-a'))return;
@@ -287,16 +302,19 @@ function setUsaPage(page){
     const c=card.querySelector('.usa-face-c');
     const d=card.querySelector('.usa-face-d');
     const e=card.querySelector('.usa-face-e');
+    const f=card.querySelector('.usa-face-f');
     if(a)a.classList.toggle('hidden',page!==0);
     if(b)b.classList.toggle('hidden',page!==1);
     if(c)c.classList.toggle('hidden',page!==2);
     if(d)d.classList.toggle('hidden',page!==3);
     if(e)e.classList.toggle('hidden',page!==4);
+    if(f)f.classList.toggle('hidden',page!==5);
     const sel=card.querySelector('#usaPageSelect');
     if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));
   });
   if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);
   if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff()}catch(e){}},50);
+  if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y()}catch(e){}},50);
   if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);
   if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);
 }
@@ -625,7 +643,118 @@ function paintEffrVol(){
   if(meta)meta.textContent=(ev.source||'FRED EFFRVOL')+' · '+(ev.points||vol.length)+' Handelstage';
 }
 
+
+function renderIorbUs1yChart(iorb,us1y,opts){
+  opts=opts||{};
+  const w=opts.w||360,h=opts.h||(opts.big?300:160);
+  // align by date — use union of last N points for readability
+  const im=new Map((iorb||[]).map(p=>[p.period,Number(p.value)]));
+  const um=new Map((us1y||[]).map(p=>[p.period,Number(p.value)]));
+  let dates=[...new Set([...im.keys(),...um.keys()])].sort();
+  if(!opts.big && dates.length>900) dates=dates.slice(-900);
+  if(opts.big && dates.length>1800) dates=dates.slice(-1800);
+  const vals=[];
+  for(const d of dates){
+    const a=im.get(d),b=um.get(d);
+    if(Number.isFinite(a))vals.push(a);
+    if(Number.isFinite(b))vals.push(b);
+  }
+  if(vals.length<2)return '<div class="sparkempty">Keine Daten</div>';
+  let min=Math.min(...vals),max=Math.max(...vals);
+  const pad=(max-min)*0.12||0.1;min-=pad;max+=pad;
+  const l=opts.big?36:28,r=10,t=14,b=28,iw=w-l-r,ih=h-t-b;
+  const xAt=i=>l+(dates.length===1?iw/2:(i/(dates.length-1))*iw);
+  const yAt=v=>t+ih-((v-min)/(max-min||1))*ih;
+  function pathOf(map){
+    const pts=[];
+    dates.forEach((d,i)=>{const v=map.get(d);if(Number.isFinite(v))pts.push([xAt(i),yAt(v),d,v]);});
+    if(pts.length<2)return {d:'',dots:pts};
+    return {d:'M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L'),dots:pts};
+  }
+  const pi=pathOf(im), pu=pathOf(um);
+  // sparse x labels
+  const labelIdx=[0,Math.floor(dates.length/2),dates.length-1].filter((v,i,a)=>a.indexOf(v)===i);
+  const xLabs=labelIdx.map(i=>{
+    const d=dates[i];
+    return '<text x="'+xAt(i).toFixed(1)+'" y="'+(h-6)+'" text-anchor="middle" font-size="9" fill="currentColor" opacity="0.65">'+String(d).slice(0,7)+'</text>';
+  }).join('');
+  const yLabs=[max,(max+min)/2,min].map(v=>{
+    const y=yAt(v);
+    return '<text x="4" y="'+(y+3).toFixed(1)+'" font-size="9" fill="currentColor" opacity="0.55">'+Number(v).toFixed(2)+'</text>';
+  }).join('');
+  // hit points: prefer denser series for crosshair — sample every k
+  const step=Math.max(1,Math.floor(dates.length/120));
+  const hits=[];
+  dates.forEach((d,i)=>{
+    if(i%step&&i!==dates.length-1)return;
+    const iv=im.get(d),uv=um.get(d);
+    if(Number.isFinite(uv)) hits.push('<circle class="hit" cx="'+xAt(i).toFixed(1)+'" cy="'+yAt(uv).toFixed(1)+'" r="'+(opts.big?12:8)+'" fill="transparent" data-period="'+d+' US1Y" data-value="'+Number(uv).toFixed(2)+'"/>');
+    if(Number.isFinite(iv)) hits.push('<circle class="hit" cx="'+xAt(i).toFixed(1)+'" cy="'+yAt(iv).toFixed(1)+'" r="'+(opts.big?12:8)+'" fill="transparent" data-period="'+d+' IORB" data-value="'+Number(iv).toFixed(2)+'"/>');
+  });
+  return '<svg class="chart-hover" viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'" style="max-width:100%;height:auto;cursor:crosshair" role="img">'+
+    '<line x1="'+l+'" y1="'+t+'" x2="'+l+'" y2="'+(t+ih)+'" stroke="currentColor" opacity="0.12"/>'+
+    '<line x1="'+l+'" y1="'+(t+ih)+'" x2="'+(l+iw)+'" y2="'+(t+ih)+'" stroke="currentColor" opacity="0.12"/>'+
+    yLabs+xLabs+
+    (pu.d?'<path d="'+pu.d+'" fill="none" stroke="#4a9eed" stroke-width="'+(opts.big?2.6:2.1)+'"/>':'')+
+    (pi.d?'<path d="'+pi.d+'" fill="none" stroke="#e74c3c" stroke-width="'+(opts.big?2.6:2.1)+'"/>':'')+
+    hits.join('')+
+    '<text x="'+(l+4)+'" y="12" font-size="10" fill="#4a9eed">US 1Y</text>'+
+    '<text x="'+(l+60)+'" y="12" font-size="10" fill="#e74c3c">IORB</text>'+
+    '</svg>';
+}
+function paintIorbUs1y(){
+  let faceF=document.querySelector('.usa-face-f');
+  const pageNow=(()=>{try{return Number(localStorage.getItem('macrowatch-usa-page')||0)}catch(e){return 0}})();
+  if(!faceF){
+    const card=[...document.querySelectorAll('.country')].find(c=>c.querySelector('.usa-face-a'));
+    if(!card)return;
+    faceF=document.createElement('div');
+    faceF.className='metrics usa-face usa-face-f'+(pageNow===5?'':' hidden');
+    faceF.innerHTML=
+      '<div class="metric has-chart sofr-fwd-panel" id="iorbUs1yPanel">'+
+        '<div class="name">IORB (rot) · US 1Y Treasury (blau)</div>'+
+        '<div class="value" id="iorbUs1yValue">—</div>'+
+        '<div class="date" id="iorbUs1yDate">—</div>'+
+        '<div class="sofr-fwd-bp" id="iorbUs1yCards"></div>'+
+        '<div id="iorbUs1yChart"></div>'+
+        '<div class="sofr-fwd-meta" id="iorbUs1yMeta">FRED IORB + DGS1 · Maus im Großchart = Crosshair</div>'+
+      '</div>';
+    const e=card.querySelector('.usa-face-e');
+    if(e)e.after(faceF); else card.appendChild(faceF);
+  }
+  if(pageNow===5)faceF.classList.remove('hidden');
+  const meta=(data.USA&&data.USA.iorbUs1y)||{};
+  const iorb=histories['USA-iorb']||[];
+  const us1y=histories['USA-us1y']||[];
+  const valEl=document.getElementById('iorbUs1yValue');
+  const dateEl=document.getElementById('iorbUs1yDate');
+  const cards=document.getElementById('iorbUs1yCards');
+  const host=document.getElementById('iorbUs1yChart');
+  const metaEl=document.getElementById('iorbUs1yMeta');
+  if(valEl){
+    const a=meta.us1y!=null?fmt(meta.us1y):'—';
+    const b=meta.iorb!=null?fmt(meta.iorb):'—';
+    valEl.innerHTML='<span style="color:#4a9eed">'+a+'</span> · <span style="color:#e74c3c">'+b+'</span>';
+  }
+  if(dateEl){
+    const ts=meta.updatedAt?meta.updatedAt.replace('T',' ').slice(0,16)+' UTC':'';
+    dateEl.textContent='1Y '+(meta.us1yDate||'—')+' · IORB '+(meta.iorbDate||'—')+(ts?(' · '+ts):'');
+  }
+  if(cards){
+    cards.innerHTML=
+      '<span style="color:#4a9eed"><b>US 1Y</b> '+(meta.us1y!=null?fmt(meta.us1y)+' %':'—')+'</span>'+
+      '<span style="color:#e74c3c"><b>IORB</b> '+(meta.iorb!=null?fmt(meta.iorb)+' %':'—')+'</span>'+
+      '<span><b>Spread</b> '+(meta.spread!=null?((meta.spread>=0?'+':'')+fmt(meta.spread)+' pp'):'—')+'</span>';
+  }
+  if(host){
+    if(!iorb.length&&!us1y.length)host.innerHTML='<div class="sparkempty">Keine Daten</div>';
+    else host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|iorbUs1yDual|IORB + US 1Y" title="Chart vergrößern">'+renderIorbUs1yChart(iorb,us1y,{w:360,h:170})+'</div>';
+  }
+  if(metaEl)metaEl.textContent=(meta.source||'FRED IORB + DGS1')+' · '+(meta.iorbPoints||iorb.length)+' / '+(meta.us1yPoints||us1y.length)+' Punkte · Klick = vergrößern mit Crosshair';
+}
+
 bindUsaPages();
+
 
 
 
