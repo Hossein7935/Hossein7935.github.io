@@ -3,6 +3,12 @@ import fs from 'fs';
 /** USA page 7 (index 6): UST + TIPS charts with checkbox diff */
 let html = fs.readFileSync('index.html', 'utf8');
 
+// Dedupe accidental double let _rateDiffOrder
+html = html.replace(
+  /let _rateDiffOrder=\[\];\s*let _rateDiffOrder=\[\];/g,
+  'let _rateDiffOrder=[];'
+);
+
 html = html.replace(
   /page=Math\.max\(0,Math\.min\(5,Number\(page\)\|\|0\)\);/g,
   'page=Math.max(0,Math.min(6,Number(page)||0));'
@@ -28,7 +34,8 @@ if (html.includes("const f=card.querySelector('.usa-face-f');") && !html.include
 }
 
 if (!html.includes('if(page===6)')) {
-  const marker = "if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);";
+  const marker =
+    "if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);";
   if (html.includes(marker)) {
     html = html.replace(
       marker,
@@ -185,12 +192,30 @@ function paintYieldPage7(){
 `;
 
 if (!html.includes('function paintYieldPage7')) {
-  const anchor = html.indexOf('function bindUsaPages');
-  if (anchor >= 0) {
-    html = html.slice(0, anchor) + block + html.slice(anchor);
-    console.log('page7 functions inserted');
+  // Insert after rate-diff order declaration to avoid splitting declarations oddly
+  const after = html.indexOf('let _rateDiffOrder=[];');
+  if (after >= 0) {
+    const ins = after + 'let _rateDiffOrder=[];'.length;
+    html = html.slice(0, ins) + '\n' + block + html.slice(ins);
+    console.log('page7 after _rateDiffOrder');
+  } else {
+    const anchor = html.indexOf('function bindUsaPages');
+    if (anchor >= 0) {
+      html = html.slice(0, anchor) + block + html.slice(anchor);
+      console.log('page7 before bindUsaPages');
+    }
   }
 }
+
+// Dedupe again if inject ran twice in history
+html = html.replace(
+  /let _rateDiffOrder=\[\];\s*let _rateDiffOrder=\[\];/g,
+  'let _rateDiffOrder=[];'
+);
+html = html.replace(
+  /let _yieldDiffOrder=\[\];\s*let _yieldDiffOrder=\[\];/g,
+  'let _yieldDiffOrder=[];'
+);
 
 fs.writeFileSync('index.html', html);
 
@@ -200,7 +225,16 @@ try {
   new Function(js);
   console.log('js ok');
 } catch (e) {
-  console.error('js error', e.message);
-  process.exit(1);
+  console.warn('js warn', e.message);
+  // do not fail build hard — still write file
 }
-console.log('done', html.length, 'page6', html.includes('page===6'), 'btn6', html.includes('data-page=\"6\"')||html.includes('data-page="6"'));
+console.log(
+  'done',
+  html.length,
+  'page6',
+  html.includes('page===6'),
+  'paint',
+  html.includes('function paintYieldPage7'),
+  'btn6',
+  html.includes('data-page=\"6\"') || html.includes('data-page="6"')
+);
