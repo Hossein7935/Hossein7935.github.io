@@ -50,7 +50,6 @@ function paintDxy(){
   if(meta)meta.textContent=(dx.source||'Yahoo DXY')+' · '+(ser.length)+' Tage'+(ser[0]?(' ab '+ser[0].period):'')+' · USD-Korb';
 }
 `;
-  // insert before bindUsaPages or after paintMove
   if (html.includes('function bindUsaPages')) {
     html = html.replace('function bindUsaPages', fn + '\nfunction bindUsaPages');
     console.log('paintDxy inserted');
@@ -59,33 +58,28 @@ function paintDxy(){
   }
 }
 
-// Call on page 0 (Seite 1) and after initial USA render
-if (!html.includes("typeof paintDxy==='function'&&paintDxy()")) {
-  // after setUsaPage page handlers - call for page 0
-  if (html.includes('function setUsaPage')) {
+// Always ensure page-0 call in setUsaPage
+if (!html.includes('typeof paintDxy===\'function\'&&paintDxy()') && !html.includes("typeof paintDxy==='function'&&paintDxy()")) {
+  // noop - check below with simpler includes
+}
+if (!html.includes("page===0)setTimeout(()=>{try{typeof paintDxy")) {
+  if (html.includes('if(page===1)setTimeout')) {
     html = html.replace(
-      /if\(page===1\)setTimeout/,
+      'if(page===1)setTimeout',
       "if(page===0)setTimeout(()=>{try{typeof paintDxy==='function'&&paintDxy()}catch(e){}},50);\n  if(page===1)setTimeout"
     );
     console.log('page0 paintDxy hooked');
   }
-  // also after face-a creation / USA patch
-  if (html.includes('faceB.after(faceC)')) {
-    html = html.replace(
-      'faceB.after(faceC);',
-      "faceB.after(faceC);try{typeof paintDxy==='function'&&paintDxy()}catch(e){}"
-    );
-  }
-  // after bindUsaPages start setUsaPage(0)
-  if (html.includes('bindUsaPages();') && !html.includes('paintDxy();bindUsaPages')) {
-    // call once after data load - look for refresh pattern
-    if (html.includes("if(page===0)setTimeout(()=>{try{typeof paintDxy")) {
-      // ok
-    }
-  }
 }
 
-// ALL_KEYS / extraLabels
+if (html.includes('faceB.after(faceC)') && !html.includes("faceB.after(faceC);try{typeof paintDxy")) {
+  html = html.replace(
+    'faceB.after(faceC);',
+    "faceB.after(faceC);try{typeof paintDxy==='function'&&paintDxy()}catch(e){}"
+  );
+  console.log('faceC after paintDxy');
+}
+
 if (!html.includes("'dxy'")) {
   html = html.replace(/ALL_KEYS=\[([^\]]+)\]/, (m, inner) => {
     if (inner.includes("'dxy'")) return m;
@@ -100,4 +94,11 @@ if (!html.includes('dxy:')) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'paintDxy', html.includes('function paintDxy'), 'hook', html.includes("paintDxy()"))
+console.log(
+  'done',
+  html.length,
+  'paintDxy',
+  html.includes('function paintDxy'),
+  'page0',
+  html.includes('page===0') && html.includes('paintDxy')
+);
