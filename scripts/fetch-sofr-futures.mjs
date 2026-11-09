@@ -1,9 +1,16 @@
 import fs from 'node:fs';
 
 /**
- * SOFR expectation curve + tenor catalog with histories
- * Spot: NY Fed | Forwards: CME SR1/SR3 via Yahoo
- * Histories: Yahoo range=max, merged with previous runs (grows over time)
+ * SOFR expectation curve + tenor catalog with ≥5y histories
+ *
+ * Free public sources:
+ * - NY Fed SOFR + SOFR averages (SOFRAI)
+ * - Yahoo continuous 30-Day Fed Funds futures ZQ=F (rate = 100 − price)
+ * - Yahoo CME SR1/SR3 (live levels; limited native history)
+ *
+ * For individual SR1/SR3 contracts without long Yahoo history:
+ * backfill with ZQ history + constant basis (contract − ZQ on as-of day).
+ * Documented as approximation in data.USA.sofrFwd.histNote.
  */
 
 const MONTH_CODES = ['F', 'G', 'H', 'J', 'K', 'M', 'N', 'Q', 'U', 'V', 'X', 'Z'];
@@ -33,7 +40,7 @@ function mergeSeries(oldPts, newPts) {
   }
   return [...map.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([period, value]) => ({ period, value }));
+    .map(([period, value]) => ({ period, value: Math.round(value * 10000) / 10000 }));
 }
 
 async function fetchJson(url, label) {
@@ -42,7 +49,7 @@ async function fetchJson(url, label) {
       'User-Agent': 'Mozilla/5.0 MacroWatch/1.0',
       Accept: 'application/json'
     },
-    signal: AbortSignal.timeout(30000),
+    signal: AbortSignal.timeout(45000),
     cache: 'no-store'
   });
   if (!r.ok) throw new Error(`${label} HTTP ${r.status}`);
@@ -62,6 +69,63 @@ async function fetchSpotSofR() {
   };
 }
 
+/** Full SOFR history via NY Fed search (chunked by year). */
+async function fetchSofRHistory(startYear = 2019) {
+  const out = [];
+  const endY = new Date().getUTCFullYear();
+  for (let y = startYear; y <= endY; y++) {
+    const start = `${y}-01-01`;
+    const end = `${y}-12-31`;
+    try {
+      const j = await fetchJson(
+        `https://markets.newyorkfed.org/api/rates/secured/sofr/search.json?startDate=${start}&endDate=${end}`,
+        `SOFR ${y}`
+      );
+      for (const row of j?.refRates || []) {
+        if (!Number.isFinite(Number(row.percentRate))) continue;
+        out.push({
+          period: String(row.effectiveDate).slice(0, 10),
+          value: Math.round(Number(row.percentRate) * 10000) / 10000
+        });
+      }
+      console.log('SOFR year', y, (j?.refRates || []).length);
+    } catch (e) {
+      console.warn('SOFR year fail', y, e.message);
+    }
+  }
+  return mergeSeries([], out);
+}
+
+/** SOFR 30/90/180 averages (SOFRAI) */
+async function fetchSofRAveragesHistory(startYear = 2019) {
+  const a30 = [], a90 = [], a180 = [];
+  const endY = new Date().getUTCFullYear();
+  for (let y = startYear; y <= endY; y++) {
+    try {
+      const j = await fetchJson(
+        `https://markets.newyorkfed.org/api/rates/secured/sofrai/search.json?startDate=${y}-01-01&endDate=${y}-12-31`,
+        `SOFRAI ${y}`
+      );
+      for (const row of j?.refRates || []) {
+        const p = String(row.effectiveDate).slice(0, 10);
+        if (Number.isFinite(Number(row.average30day)))
+          a30.push({ period: p, value: Math.round(Number(row.average30day) * 10000) / 10000 });
+        if (Number.isFinite(Number(row.average90day)))
+          a90.push({ period: p, value: Math.round(Number(row.average90day) * 10000) / 10000 });
+        if (Number.isFinite(Number(row.average180day)))
+          a180.push({ period: p, value: Math.round(Number(row.average180day) * 10000) / 10000 });
+      }
+    } catch (e) {
+      console.warn('SOFRAI fail', y, e.message);
+    }
+  }
+  return {
+    sofr30: mergeSeries([], a30),
+    sofr90: mergeSeries([], a90),
+    sofr180: mergeSeries([], a180)
+  };
+}
+
 async function fetchYahooPrice(symbol) {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=10d`;
   const j = await fetchJson(url, symbol);
@@ -75,12 +139,11 @@ async function fetchYahooPrice(symbol) {
   };
 }
 
-/** Prefer range=max — CME futures often only sparse history on Yahoo */
-async function fetchYahooHistory(symbol) {
+async function fetchYahooRateHistory(symbol, asRateFromPrice = true) {
   const urls = [
     `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=max`,
-    `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=max`,
-    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2y`
+    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5y`,
+    `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=max`
   ];
   for (const url of urls) {
     try {
@@ -93,9 +156,12 @@ async function fetchYahooHistory(symbol) {
         const c = closes[i];
         if (c == null || !Number.isFinite(Number(c))) continue;
         const period = new Date(res.timestamp[i] * 1000).toISOString().slice(0, 10);
-        map.set(period, Math.round((100 - Number(c)) * 10000) / 10000);
+        const value = asRateFromPrice
+          ? Math.round((100 - Number(c)) * 10000) / 10000
+          : Math.round(Number(c) * 10000) / 10000;
+        map.set(period, value);
       }
-      if (map.size >= 1) {
+      if (map.size >= 10) {
         return [...map.entries()]
           .sort((a, b) => a[0].localeCompare(b[0]))
           .map(([period, value]) => ({ period, value }));
@@ -129,6 +195,20 @@ function interpolateAtMonths(strip, months) {
   };
 }
 
+/** Backfill short series with ZQ path + constant basis to reach ≥5y. */
+function backfillWithZq(shortPts, zqPts, lastRate) {
+  if (!zqPts.length) return shortPts || [];
+  const zqLast = zqPts.at(-1).value;
+  const target = Number.isFinite(lastRate) ? lastRate : (shortPts?.at(-1)?.value ?? zqLast);
+  const basis = target - zqLast;
+  const fromZq = zqPts.map(p => ({
+    period: p.period,
+    value: Math.round((p.value + basis) * 10000) / 10000
+  }));
+  // Prefer actual observations over backfill on same dates
+  return mergeSeries(fromZq, shortPts || []);
+}
+
 const payload = JSON.parse(fs.readFileSync('data.json', 'utf8'));
 const histories = payload.histories || {};
 const data = payload.data || {};
@@ -145,6 +225,19 @@ try {
   const spot = await fetchSpotSofR();
   console.log('spot', spot);
 
+  // Long reference series
+  const sofrHist = await fetchSofRHistory(2019);
+  const avgs = await fetchSofRAveragesHistory(2019);
+  const zqHist = await fetchYahooRateHistory('ZQ=F', true);
+  console.log('len SOFR', sofrHist.length, 'ZQ', zqHist.length, 'avg30', avgs.sofr30.length);
+
+  histories['USA-sofrTenor-spot'] = mergeSeries(histories['USA-sofrTenor-spot'], sofrHist);
+  histories['USA-sofrTenor-sofr30'] = mergeSeries(histories['USA-sofrTenor-sofr30'], avgs.sofr30);
+  histories['USA-sofrTenor-sofr90'] = mergeSeries(histories['USA-sofrTenor-sofr90'], avgs.sofr90);
+  histories['USA-sofrTenor-sofr180'] = mergeSeries(histories['USA-sofrTenor-sofr180'], avgs.sofr180);
+  histories['USA-sofrTenor-zq'] = mergeSeries(histories['USA-sofrTenor-zq'], zqHist);
+
+  // SR1 strip
   const sr1Strip = [];
   for (let m = 0; m <= 15; m++) {
     const d = addMonthsUTC(now, m);
@@ -159,7 +252,6 @@ try {
         rate: q.rate,
         kind: 'SR1'
       });
-      console.log('SR1', m + 'm', q.symbol, q.rate);
     } catch (e) {
       console.warn('SR1 skip', symbol, e.message);
     }
@@ -183,7 +275,6 @@ try {
           rate: q.rate,
           kind: 'SR3'
         });
-        console.log('SR3', q.symbol, monthsFromNow + 'm', q.rate);
       } catch (e) {}
     }
   }
@@ -224,10 +315,7 @@ try {
       });
       continue;
     }
-    if (h.months > 12 && maxM < h.months * 0.7) {
-      console.log('skip', h.tenor, 'max', maxM);
-      continue;
-    }
+    if (h.months > 12 && maxM < h.months * 0.7) continue;
     const interp = interpolateAtMonths(combined, h.months);
     if (!interp) continue;
     points.push({
@@ -241,10 +329,52 @@ try {
     });
   }
   if (points.length < 3) throw new Error('curve too short');
-
   histories['USA-sofrFwd'] = points.map(p => ({ period: p.period, value: p.value }));
 
-  const catalog = [];
+  // Catalog: long-history series first, then futures
+  const catalog = [
+    {
+      id: 'spot',
+      label: 'SOFR Overnight (Spot)',
+      symbol: 'NYFED:SOFR',
+      kind: 'REF',
+      lastRate: sofrHist.at(-1)?.value ?? spot.value,
+      histSource: 'NY Fed'
+    },
+    {
+      id: 'sofr30',
+      label: 'SOFR 30-Day Average',
+      symbol: 'NYFED:SOFR30',
+      kind: 'REF',
+      lastRate: avgs.sofr30.at(-1)?.value,
+      histSource: 'NY Fed'
+    },
+    {
+      id: 'sofr90',
+      label: 'SOFR 90-Day Average',
+      symbol: 'NYFED:SOFR90',
+      kind: 'REF',
+      lastRate: avgs.sofr90.at(-1)?.value,
+      histSource: 'NY Fed'
+    },
+    {
+      id: 'sofr180',
+      label: 'SOFR 180-Day Average',
+      symbol: 'NYFED:SOFR180',
+      kind: 'REF',
+      lastRate: avgs.sofr180.at(-1)?.value,
+      histSource: 'NY Fed'
+    },
+    {
+      id: 'zq',
+      label: 'Fed Funds Futures ZQ (cont.)',
+      symbol: 'ZQ=F',
+      kind: 'REF',
+      lastRate: zqHist.at(-1)?.value,
+      histSource: 'Yahoo ZQ=F'
+    }
+  ];
+
   for (const s of sr1Strip) {
     catalog.push({
       id: `sr1_${s.yearMonth}`,
@@ -253,7 +383,8 @@ try {
       kind: 'SR1',
       yearMonth: s.yearMonth,
       monthsFromNow: s.monthsFromNow,
-      lastRate: s.rate
+      lastRate: s.rate,
+      histSource: 'Yahoo + ZQ-Backfill'
     });
   }
   for (const s of sr3Strip.filter(x => x.monthsFromNow <= 72)) {
@@ -266,27 +397,30 @@ try {
       kind: 'SR3',
       yearMonth: s.yearMonth,
       monthsFromNow: s.monthsFromNow,
-      lastRate: s.rate
+      lastRate: s.rate,
+      histSource: 'Yahoo + ZQ-Backfill'
     });
   }
 
-  // Fetch history for ALL catalog contracts (range=max), merge with previous
   const histKeys = {};
   for (const c of catalog) {
     const key = `USA-sofrTenor-${c.id}`;
-    let neu = [];
+    if (c.kind === 'REF') {
+      histKeys[c.id] = (histories[key] || []).length;
+      continue;
+    }
+    let raw = [];
     try {
-      neu = await fetchYahooHistory(c.symbol);
-      console.log('hist raw', c.id, neu.length);
+      raw = await fetchYahooRateHistory(c.symbol, true);
     } catch (e) {
       console.warn('hist fail', c.symbol, e.message);
     }
-    // always append today's lastRate so series grows daily even if Yahoo is sparse
-    neu = mergeSeries(neu, [{ period: today, value: c.lastRate }]);
-    const merged = mergeSeries(histories[key], neu);
-    histories[key] = merged;
-    histKeys[c.id] = merged.length;
-    console.log('hist merge', c.id, merged.length);
+    raw = mergeSeries(raw, [{ period: today, value: c.lastRate }]);
+    // Always ensure ≥5y via ZQ backfill when short
+    const filled = backfillWithZq(raw, zqHist, c.lastRate);
+    histories[key] = mergeSeries(histories[key], filled);
+    histKeys[c.id] = histories[key].length;
+    console.log('tenor', c.id, 'raw', raw.length, 'final', histKeys[c.id]);
   }
 
   const snaps = Array.isArray(histories['USA-sofrFwdSnapshots'])
@@ -306,7 +440,9 @@ try {
     updatedAt: asOf,
     curve: points.map(p => ({ period: p.period, value: p.value })),
     detail: points,
-    source: 'NY Fed SOFR + CME SR1/SR3 (Yahoo)',
+    source: 'NY Fed SOFR + CME SR1/SR3 (Yahoo) + ZQ backfill',
+    histNote:
+      'SR1/SR3-Einzelkontrakte: Yahoo liefert kaum Historie. Fehlende Jahre werden mit ZQ=F (Fed-Funds-Futures) + konstantem Basis-Spread angenähert. REF-Serien (SOFR, Averages, ZQ) sind echte Markt-/Fed-Historie.',
     maxStripMonths: maxM,
     sr1Count: sr1Strip.length,
     sr3Count: sr3Strip.length,
@@ -315,14 +451,15 @@ try {
   };
   data.USA.sofrTenorCatalog = catalog;
 
+  const lens = Object.values(histKeys);
   console.log(
     'OK curve',
     points.map(p => p.tenor).join(','),
     'catalog',
     catalog.length,
     'hist min/max',
-    Math.min(...Object.values(histKeys)),
-    Math.max(...Object.values(histKeys))
+    Math.min(...lens),
+    Math.max(...lens)
   );
 } catch (e) {
   errors.push(`USA SOFR Fwd: ${e.message}`);
