@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** Remove orphan branches and duplicate declarations that break parse */
+/** Remove duplicate declarations; do NOT strip valid dual-chart render code */
 let html = fs.readFileSync('index.html', 'utf8');
 
 // Collapse multiple let _rateDiffOrder=[]; to one
@@ -19,7 +19,6 @@ if (first >= 0) {
   if (removed) console.log('removed duplicate _rateDiffOrder', removed);
 }
 
-// Same for _yieldDiffOrder
 const yDecl = 'let _yieldDiffOrder=[];';
 first = html.indexOf(yDecl);
 if (first >= 0) {
@@ -35,13 +34,9 @@ if (first >= 0) {
   if (removed) console.log('removed duplicate _yieldDiffOrder', removed);
 }
 
-// Existing orphan cleanup for us2ySofrDual if any
-const orphan =
-  /\n\s*body\.innerHTML=renderUs2ySofrChart[\s\S]*?return;\s*\n\s*\}/;
-if (orphan.test(html)) {
-  html = html.replace(orphan, '\n}');
-  console.log('removed orphan us2y branch');
-}
+// Only remove TRUE orphan: body.innerHTML=renderUs2ySofrChart that appears
+// AFTER a return/closing of the us2y branch, not the legitimate render call.
+// Disabled aggressive orphan strip — it was deleting the enlarge render path.
 
 fs.writeFileSync('index.html', html);
 
