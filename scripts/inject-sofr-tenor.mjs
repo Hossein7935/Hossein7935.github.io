@@ -88,11 +88,15 @@ function paintSofRTenor(){
   if(!id){
     host.innerHTML='';
     if(valEl)valEl.textContent='—';
-    if(meta)meta.textContent='Keine Laufzeit gewählt';
+    if(meta)meta.textContent=catalog.length?('Katalog: '+catalog.length+' Laufzeiten'):'Keine Laufzeit gewählt';
     return;
   }
   const cat=catalog.find(c=>c.id===id)||{label:id,symbol:id};
   let pts=histories['USA-sofrTenor-'+id]||[];
+  // fallback: single point from catalog lastRate
+  if(!pts.length&&cat.lastRate!=null){
+    pts=[{period:new Date().toISOString().slice(0,10),value:Number(cat.lastRate)}];
+  }
   const last=pts.length?pts.at(-1):null;
   if(valEl)valEl.textContent=last?fmt(last.value):(cat.lastRate!=null?fmt(cat.lastRate):'—');
   if(dateEl)dateEl.textContent=(cat.label||id)+(last?(' · Stand '+last.period+' · '+pts.length+' Tage'):'');
@@ -114,17 +118,15 @@ function paintSofRTenor(){
   if(!pts.length){
     host.innerHTML='<div class="sparkempty">Keine Historie für diesen Kontrakt</div>';
   }else if(typeof renderDiffOverlayChart==='function'&&ovPts.length){
-    // reuse dual renderer: blue=tenor, red=overlay (as "diff" axis + right)
-    host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+esc(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderDiffOverlayChart(pts,ovPts,{w:360,h:180})+'</div>';
+    host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderDiffOverlayChart(pts,ovPts,{w:360,h:180})+'</div>';
   }else if(typeof renderLineChart==='function'){
-    host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+esc(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderLineChart(pts,{w:360,h:160})+'</div>';
+    host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderLineChart(pts,{w:360,h:160})+'</div>';
   }
   if(meta)meta.textContent=(cat.symbol||'')+' · '+(pts.length)+' Punkte'+(ovLabel?(' · rot: '+ovLabel):'')+' · Tippen · 6M/1J/3J';
 }
 `;
 
 if (!html.includes('function paintSofRTenor')) {
-  // insert before paintSofRFwd if present, else before bindUsaPages
   if (html.includes('function paintSofRFwd')) {
     html = html.replace('function paintSofRFwd', block + '\nfunction paintSofRFwd');
     console.log('tenor before paintSofRFwd');
@@ -133,55 +135,43 @@ if (!html.includes('function paintSofRTenor')) {
   }
 }
 
-// Call from paintSofRFwd end or setUsaPage page 3
 if (!html.includes("typeof paintSofRTenor==='function'&&paintSofRTenor()")) {
   html = html.replace(
     /typeof paintSofRFwd==='function'&&paintSofRFwd\(\)/g,
     "typeof paintSofRFwd==='function'&&paintSofRFwd();typeof paintSofRTenor==='function'&&paintSofRTenor()"
   );
-  // also after paintSofRFwd body ends if we can find a unique return path
-  if (html.includes('function paintSofRFwd') && !html.includes('paintSofRTenor();\n}')) {
-    // append call inside setUsaPage page===3 already covered by replace above
-  }
 }
 
-// paintChartDlg branch for sofrTenorHist
-if (!html.includes("key==='sofrTenorHist'")) {
-  const start = html.indexOf('function paintChartDlg');
-  const end = html.indexOf('function bindBigChartHover');
-  if (start >= 0 && end > start) {
-    let region = html.slice(start, end);
-    const inject =
-      "\n  if(key==='sofrTenorHist'){\n" +
-      "    const tm=window.__sofrTenorMeta||{};\n" +
-      "    let pts=histories['USA-sofrTenor-'+(tm.id||'') ]||[];\n" +
-      "    if(typeof filterByRange==='function'){const p2=filterByRange(pts,range); if(p2.length) pts=p2;}\n" +
-      "    let ov=[];\n" +
-      "    if(tm.ovKey){ov=histories['USA-'+tm.ovKey]||[]; if(typeof filterByRange==='function'){const o2=filterByRange(ov,range); if(o2.length) ov=o2;}}\n" +
-      "    if(!pts.length){body.innerHTML='<div class=\\\"sparkempty\\\">Keine Daten</div>';if(meta)meta.textContent='';return;}\n" +
-      "    if(typeof renderDiffOverlayChart==='function'&&ov.length){body.innerHTML=renderDiffOverlayChart(pts,ov,{w:720,h:320,big:true})+'<div class=\\\"chart-tip-inline\\\" id=\\\"chartDlgTip\\\"></div>';}\n" +
-      "    else{body.innerHTML=renderLineChart(pts,{w:720,h:300,big:true})+'<div class=\\\"chart-tip-inline\\\" id=\\\"chartDlgTip\\\"></div>';}\n" +
-      "    if(typeof bindBigChartHover==='function')bindBigChartHover(body);\n" +
-      "    if(meta)meta.textContent=(tm.label||'SOFR Tenor')+' · '+rLabel+' · '+pts.length+' Punkte'+(tm.ovLabel?(' · rot: '+tm.ovLabel):'');\n" +
-      "    return;\n" +
-      "  }\n";
-    // insert after rateOverlayDual or at start of try after range setup
-    if (region.includes("key==='rateOverlayDual'")) {
-      const k = region.indexOf("key==='rateOverlayDual'");
-      // find end of that if block — after "return;\n  }"
-      const ret = region.indexOf('return;', k);
-      const close = region.indexOf('}', ret);
-      region = region.slice(0, close + 1) + inject + region.slice(close + 1);
-    } else {
-      region = region.replace(
-        'const rLabel=',
-        inject + 'const rLabel='
-      );
+// Force page-3 hook in every setUsaPage copy
+if (!html.includes("typeof paintSofRTenor==='function'&&paintSofRTenor()")) {
+  html = html.replace(
+    /if\(page===3\)setTimeout\(\(\)=>\{try\{typeof paintSofRFwd==='function'&&paintSofRFwd\(\)\}catch\(e\)\{\}/g,
+    "if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}"
+  );
+}
+
+// Append paintSofRTenor() to end of paintSofRFwd body
+if (html.includes('function paintSofRFwd')) {
+  const s = html.indexOf('function paintSofRFwd');
+  if (s >= 0) {
+    let i = s;
+    let depth = 0, started = false, end = -1;
+    for (; i < html.length; i++) {
+      if (html[i] === '{') { depth++; started = true; }
+      else if (html[i] === '}') {
+        depth--;
+        if (started && depth === 0) { end = i; break; }
+      }
     }
-    html = html.slice(0, start) + region + html.slice(end);
-    console.log('paintChartDlg sofrTenorHist');
+    if (end > s) {
+      const body = html.slice(s, end);
+      if (!body.includes('paintSofRTenor()')) {
+        html = html.slice(0, end) + "\n  try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}\n" + html.slice(end);
+        console.log('paintSofRFwd calls paintSofRTenor');
+      }
+    }
   }
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.includes('function paintSofRTenor'), html.includes('sofrTenorHist'));
+console.log('done', html.includes('function paintSofRTenor'), html.includes('sofrTenorHist'), html.includes("paintSofRTenor()"));
