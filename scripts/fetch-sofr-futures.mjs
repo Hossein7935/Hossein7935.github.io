@@ -59,10 +59,22 @@ async function fetchYahooPrice(symbol) {
   return { symbol, price: Number(price), rate };
 }
 
-async function fetchYahooHistory(symbol, range = '2y') {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=${range}`;
-  const j = await fetchJson(url, symbol + ' hist');
-  const res = j?.chart?.result?.[0];
+async function fetchYahooHistory(symbol, range = 'max') {
+  const urls = [
+    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=max`,
+    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2y`,
+    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1y`
+  ];
+  let res = null;
+  for (const url of urls) {
+    try {
+      const j = await fetchJson(url, symbol + ' hist');
+      res = j?.chart?.result?.[0];
+      if (res?.timestamp?.length) break;
+    } catch (e) {
+      console.warn(symbol, e.message);
+    }
+  }
   if (!res) return [];
   const ts = res.timestamp || [];
   const closes = res.indicators?.quote?.[0]?.close || [];
@@ -87,7 +99,7 @@ function interpolateAtMonths(strip, months) {
     return { value: s.rate, contracts: [s.symbol], price: s.price, method: 'front' };
   }
   if (months >= strip.at(-1).monthsFromNow) {
-    const s = strip.at(-1);
+    const s = strip.at(-1];
     return { value: s.rate, contracts: [s.symbol], price: s.price, method: 'back' };
   }
   let i = 0;
@@ -117,7 +129,6 @@ const now = new Date();
 try {
   const spot = await fetchSpotSofR();
 
-  // SR1 monthly strip 0..18 months
   const sr1Strip = [];
   for (let m = 0; m <= 18; m++) {
     const d = addMonthsUTC(now, m);
@@ -139,7 +150,6 @@ try {
   }
   if (sr1Strip.length < 4) throw new Error(`SR1 strip too short (${sr1Strip.length})`);
 
-  // SR3 quarterly strip out to ~10y (as far as Yahoo lists)
   const sr3Strip = [];
   for (let y = now.getUTCFullYear(); y <= now.getUTCFullYear() + 10; y++) {
     for (const code of IMM_CODES) {
@@ -159,23 +169,18 @@ try {
           kind: 'SR3'
         });
         console.log('SR3', q.symbol, monthsFromNow + 'm', q.price, '→', q.rate);
-      } catch (e) {
-        // many far contracts missing — stop after several consecutive misses per year
-      }
+      } catch (e) {}
     }
   }
   sr3Strip.sort((a, b) => a.monthsFromNow - b.monthsFromNow);
 
-  // Combined strip for long interpolation: prefer SR1 near, SR3 far
   const combined = [];
   const seenM = new Set();
   for (const s of [...sr1Strip, ...sr3Strip].sort((a, b) => a.monthsFromNow - b.monthsFromNow)) {
-    const k = s.monthsFromNow;
-    if (seenM.has(k)) continue;
-    seenM.add(k);
+    if (seenM.has(s.monthsFromNow)) continue;
+    seenM.add(s.monthsFromNow);
     combined.push(s);
   }
-
   const maxM = combined.length ? combined.at(-1).monthsFromNow : 12;
 
   const horizons = [
@@ -205,7 +210,6 @@ try {
       });
       continue;
     }
-    // only include long horizons if strip reaches at least ~70% of target
     if (h.months > 12 && maxM < h.months * 0.7) {
       console.log('skip horizon', h.tenor, 'maxStrip', maxM);
       continue;
@@ -226,9 +230,28 @@ try {
 
   histories['USA-sofrFwd'] = points.map(p => ({ period: p.period, value: p.value }));
 
-  // Contract catalog + histories (SR1 near + SR3 available)
   const catalog = [];
   const histKeys = {};
+  async function loadHist(s, id) {
+    try {
+      const hist = await fetchYahooHistory(s.symbol, 'max');
+      if (hist.length >= 5) {
+        histories[`USA-sofrTenor-${id}`] = hist;
+        histKeys[id] = hist.length;
+        console.log('hist', id, hist.length, hist.at(-1)?.period);
+      } else {
+        histories[`USA-sofrTenor-${id}`] = [
+          { period: new Date().toISOString().slice(0, 10), value: s.rate }
+        ];
+      }
+    } catch (e) {
+      console.warn('hist fail', s.symbol, e.message);
+      histories[`USA-sofrTenor-${id}`] = [
+        { period: new Date().toISOString().slice(0, 10), value: s.rate }
+      ];
+    }
+  }
+
   for (const s of sr1Strip) {
     const id = `sr1_${s.yearMonth}`;
     catalog.push({
@@ -240,18 +263,8 @@ try {
       monthsFromNow: s.monthsFromNow,
       lastRate: s.rate
     });
-    try {
-      const hist = await fetchYahooHistory(s.symbol, '2y');
-      if (hist.length >= 10) {
-        histories[`USA-sofrTenor-${id}`] = hist;
-        histKeys[id] = hist.length;
-        console.log('hist', id, hist.length, hist.at(-1)?.period);
-      }
-    } catch (e) {
-      console.warn('hist fail', s.symbol, e.message);
-    }
+    await loadHist(s, id);
   }
-  // SR3 sample: every contract up to ~5y for picker
   for (const s of sr3Strip.filter(x => x.monthsFromNow <= 60)) {
     const id = `sr3_${s.yearMonth}`;
     if (catalog.some(c => c.id === id)) continue;
@@ -264,18 +277,9 @@ try {
       monthsFromNow: s.monthsFromNow,
       lastRate: s.rate
     });
-    try {
-      const hist = await fetchYahooHistory(s.symbol, '2y');
-      if (hist.length >= 10) {
-        histories[`USA-sofrTenor-${id}`] = hist;
-        histKeys[id] = hist.length;
-      }
-    } catch (e) {
-      console.warn('hist fail', s.symbol, e.message);
-    }
+    await loadHist(s, id);
   }
 
-  // Snapshot for hist comparison panel (existing feature)
   const snaps = Array.isArray(histories['USA-sofrFwdSnapshots'])
     ? histories['USA-sofrFwdSnapshots']
     : [];
@@ -306,7 +310,9 @@ try {
     'curve points',
     points.map(p => p.tenor + '=' + p.value).join(' '),
     'catalog',
-    catalog.length
+    catalog.length,
+    'histKeys',
+    Object.keys(histKeys).length
   );
 } catch (e) {
   errors.push(`USA SOFR Fwd: ${e.message}`);
