@@ -349,25 +349,17 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(6,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
   document.querySelectorAll('.country').forEach(card=>{
     if(!card.querySelector('.usa-face-a'))return;
-    const a=card.querySelector('.usa-face-a');
-    const b=card.querySelector('.usa-face-b');
-    const c=card.querySelector('.usa-face-c');
-    const d=card.querySelector('.usa-face-d');
-    const e=card.querySelector('.usa-face-e');
-    const f=card.querySelector('.usa-face-f');
-    const g=card.querySelector('.usa-face-g');
-    if(a)a.classList.toggle('hidden',page!==0);
-    if(b)b.classList.toggle('hidden',page!==1);
-    if(c)c.classList.toggle('hidden',page!==2);
-    if(d)d.classList.toggle('hidden',page!==3);
-    if(e)e.classList.toggle('hidden',page!==4);
-    if(f)f.classList.toggle('hidden',page!==5);
-    if(g)g.classList.toggle('hidden',page!==6);
+    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g'];
+    faces.forEach((sel,i)=>{
+      const el=card.querySelector(sel);
+      if(el)el.classList.toggle('hidden',page!==i);
+    });
     const sel=card.querySelector('#usaPageSelect');
     if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));
   });
@@ -404,7 +396,7 @@ if(!window.__usaRenderPatched){
   const _render=render;
   render=function(){
     const r=_render.apply(this,arguments);
-    try{bindUsaPages()}catch(e){try{setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'))}catch(e2){}}
+    try{setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'))}catch(e){}
     return r;
   };
 }
@@ -677,6 +669,7 @@ function paintSofRFwd(){
   }
 }
 bindUsaPages();
+
 
 
 
