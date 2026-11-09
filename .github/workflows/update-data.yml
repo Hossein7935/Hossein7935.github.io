@@ -38,6 +38,8 @@ jobs:
         run: node scripts/restore-index.mjs
       - name: Inject Copper/Gold native chart (USA page 2)
         run: node scripts/inject-cuau.mjs
+      - name: Inject DXY (USA page 1)
+        run: node scripts/inject-dxy.mjs
       - name: Inject USA page 3 (EFFR/SOFR/IORB + diff)
         run: node scripts/inject-faceC.mjs
       - name: Inject rate overlay (EFFR/SOFR/IORB dual)
@@ -82,10 +84,14 @@ jobs:
         run: node scripts/fix-paint-chart-dlg.mjs
       - name: Re-apply rate overlay after other injects
         run: node scripts/inject-rate-overlay.mjs
+      - name: Re-apply DXY panel
+        run: node scripts/inject-dxy.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/inject-page7-yields.mjs
           node --check scripts/inject-rate-overlay.mjs
+          node --check scripts/inject-dxy.mjs
+          node --check scripts/fetch-dxy.mjs
           node --check scripts/fix-paint-chart-dlg.mjs
           node --check scripts/fix-js-syntax.mjs
       - name: Fetch official economic data
@@ -134,6 +140,8 @@ jobs:
         run: node scripts/fetch-iorb-us1y.mjs
       - name: MOVE Index (Yahoo ^MOVE)
         run: node scripts/fetch-move.mjs
+      - name: DXY US Dollar Index (Yahoo)
+        run: node scripts/fetch-dxy.mjs
       - name: US 2Y + SOFR dual (FRED)
         run: node scripts/fetch-us2y-sofr.mjs
       - name: USA page 7 UST + TIPS daily (FRED)
@@ -160,6 +168,7 @@ jobs:
           node scripts/fix-js-syntax.mjs || true
           node scripts/inject-fix-usa-nav.mjs || true
           node scripts/inject-rate-overlay.mjs || true
+          node scripts/inject-dxy.mjs || true
           node scripts/fix-js-syntax.mjs || true
           node scripts/fix-paint-chart-dlg.mjs || true
           git add data.json scripts/ index.html || true
