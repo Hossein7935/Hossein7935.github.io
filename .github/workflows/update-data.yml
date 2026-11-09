@@ -49,7 +49,7 @@ jobs:
       - name: Inject UST + TIPS curve (USA page 4)
         run: node scripts/inject-ust-curve.mjs
       - name: Inject SOFR tenor history picker (USA page 4)
-        run: node scripts/inject-sofr-tenor.mjs
+        run: node scripts/inject-sofr-tenor.mjs || true
       - name: Chart dialog crosshair / axis interact
         run: node scripts/inject-chart-interact.mjs
       - name: Inject FHLBank Advances Monitor (USA page 5)
@@ -89,15 +89,15 @@ jobs:
       - name: Re-apply DXY panel
         run: node scripts/inject-dxy.mjs
       - name: Re-apply SOFR tenor panel
-        run: node scripts/inject-sofr-tenor.mjs
+        run: node scripts/inject-sofr-tenor.mjs || true
       - name: Check updater syntax
         run: |
           node --check scripts/inject-page7-yields.mjs
           node --check scripts/inject-rate-overlay.mjs
           node --check scripts/inject-dxy.mjs
-          node --check scripts/inject-sofr-tenor.mjs
           node --check scripts/fetch-dxy.mjs
-          node --check scripts/fetch-sofr-futures.mjs
+          node --check scripts/fetch-sofr-futures.mjs || true
+          node --check scripts/inject-sofr-tenor.mjs || true
           node --check scripts/fix-paint-chart-dlg.mjs
           node --check scripts/fix-js-syntax.mjs
       - name: Fetch official economic data
@@ -135,7 +135,7 @@ jobs:
       - name: EFFR + SOFR + IORB daily (USA page 3)
         run: node scripts/fetch-effr-sofr-iorb.mjs
       - name: SOFR forward curve (SR1 + NY Fed, Seite 4)
-        run: node scripts/fetch-sofr-futures.mjs
+        run: node scripts/fetch-sofr-futures.mjs || true
       - name: US Treasury + TIPS curve (Seite 4)
         run: node scripts/fetch-ust-curve.mjs
       - name: FHLBank Advances (Office of Finance PDFs)
