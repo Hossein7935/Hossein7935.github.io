@@ -3,6 +3,22 @@ import fs from 'fs';
 /** USA page nav sticky + bindUsaPages + FULL setUsaPage 0..6 (must run last) */
 let html = fs.readFileSync('index.html', 'utf8');
 
+// CRITICAL: dedupe declarations that break the whole site
+function dedupeDecl(html, decl) {
+  const first = html.indexOf(decl);
+  if (first < 0) return html;
+  let pos = first + decl.length;
+  while (true) {
+    const n = html.indexOf(decl, pos);
+    if (n < 0) break;
+    html = html.slice(0, n) + html.slice(n + decl.length);
+    pos = n;
+  }
+  return html;
+}
+html = dedupeDecl(html, 'let _rateDiffOrder=[];');
+html = dedupeDecl(html, 'let _yieldDiffOrder=[];');
+
 if (!html.includes('/* usa-nav-sticky */')) {
   const css = `
 /* usa-nav-sticky */
@@ -102,5 +118,17 @@ if (!html.includes('data-page=\"6\"') && !html.includes('data-page="6"')) {
   );
 }
 
+// Final dedupe after all edits
+html = dedupeDecl(html, 'let _rateDiffOrder=[];');
+html = dedupeDecl(html, 'let _yieldDiffOrder=[];');
+
 fs.writeFileSync('index.html', html);
+
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+try {
+  new Function(scripts.join('\n'));
+  console.log('js ok');
+} catch (e) {
+  console.warn('js warn', e.message);
+}
 console.log('done', html.length, 'page===6', html.includes('page===6'), 'call', html.includes('bindUsaPages();'));
