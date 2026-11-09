@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 
 /**
- * SOFR expectation curve + tenor catalog
+ * SOFR expectation curve + tenor catalog with histories
  * Spot: NY Fed | Forwards: CME SR1/SR3 via Yahoo
- * Robust: curve+catalog always written if strip loads; histories best-effort
+ * Histories: Yahoo range=max, merged with previous runs (grows over time)
  */
 
 const MONTH_CODES = ['F', 'G', 'H', 'J', 'K', 'M', 'N', 'Q', 'U', 'V', 'X', 'Z'];
@@ -19,13 +19,30 @@ function srSymbol(root, d) {
   return `${root}${MONTH_CODES[d.getUTCMonth()]}${String(d.getUTCFullYear()).slice(2)}.CME`;
 }
 
+function mergeSeries(oldPts, newPts) {
+  const map = new Map();
+  for (const p of oldPts || []) {
+    if (p && p.period != null && Number.isFinite(Number(p.value))) {
+      map.set(String(p.period).slice(0, 10), Number(p.value));
+    }
+  }
+  for (const p of newPts || []) {
+    if (p && p.period != null && Number.isFinite(Number(p.value))) {
+      map.set(String(p.period).slice(0, 10), Number(p.value));
+    }
+  }
+  return [...map.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([period, value]) => ({ period, value }));
+}
+
 async function fetchJson(url, label) {
   const r = await fetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 MacroWatch/1.0',
       Accept: 'application/json'
     },
-    signal: AbortSignal.timeout(25000),
+    signal: AbortSignal.timeout(30000),
     cache: 'no-store'
   });
   if (!r.ok) throw new Error(`${label} HTTP ${r.status}`);
@@ -58,10 +75,15 @@ async function fetchYahooPrice(symbol) {
   };
 }
 
+/** Prefer range=max — CME futures often only sparse history on Yahoo */
 async function fetchYahooHistory(symbol) {
-  for (const range of ['2y', '1y', '6mo']) {
+  const urls = [
+    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=max`,
+    `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=max`,
+    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2y`
+  ];
+  for (const url of urls) {
     try {
-      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=${range}`;
       const j = await fetchJson(url, symbol + ' hist');
       const res = j?.chart?.result?.[0];
       if (!res?.timestamp?.length) continue;
@@ -73,7 +95,7 @@ async function fetchYahooHistory(symbol) {
         const period = new Date(res.timestamp[i] * 1000).toISOString().slice(0, 10);
         map.set(period, Math.round((100 - Number(c)) * 10000) / 10000);
       }
-      if (map.size >= 5) {
+      if (map.size >= 1) {
         return [...map.entries()]
           .sort((a, b) => a[0].localeCompare(b[0]))
           .map(([period, value]) => ({ period, value }));
@@ -116,13 +138,13 @@ const errors = Array.isArray(payload.errors)
   ? payload.errors.filter(e => !String(e).startsWith('USA SOFR Fwd'))
   : [];
 const asOf = new Date().toISOString();
+const today = asOf.slice(0, 10);
 const now = new Date();
 
 try {
   const spot = await fetchSpotSofR();
   console.log('spot', spot);
 
-  // SR1 0..15m
   const sr1Strip = [];
   for (let m = 0; m <= 15; m++) {
     const d = addMonthsUTC(now, m);
@@ -144,7 +166,6 @@ try {
   }
   if (sr1Strip.length < 4) throw new Error(`SR1 strip too short (${sr1Strip.length})`);
 
-  // SR3 out to ~6y
   const sr3Strip = [];
   for (let y = now.getUTCFullYear(); y <= now.getUTCFullYear() + 6; y++) {
     for (const code of IMM_CODES) {
@@ -219,12 +240,10 @@ try {
       contracts: interp.contracts
     });
   }
-
   if (points.length < 3) throw new Error('curve too short');
 
   histories['USA-sofrFwd'] = points.map(p => ({ period: p.period, value: p.value }));
 
-  // Catalog for UI (all strip points)
   const catalog = [];
   for (const s of sr1Strip) {
     catalog.push({
@@ -251,38 +270,23 @@ try {
     });
   }
 
-  // Histories: limited set to avoid timeouts (first 6 SR1 + 6 SR3)
-  const histTargets = [
-    ...sr1Strip.slice(0, 6),
-    ...sr3Strip.filter(x => x.monthsFromNow <= 36).slice(0, 6)
-  ];
+  // Fetch history for ALL catalog contracts (range=max), merge with previous
   const histKeys = {};
-  for (const s of histTargets) {
-    const id = `${s.kind.toLowerCase()}_${s.yearMonth}`;
-    try {
-      const hist = await fetchYahooHistory(s.symbol);
-      if (hist.length >= 5) {
-        histories[`USA-sofrTenor-${id}`] = hist;
-        histKeys[id] = hist.length;
-        console.log('hist', id, hist.length);
-      } else {
-        histories[`USA-sofrTenor-${id}`] = [
-          { period: asOf.slice(0, 10), value: s.rate }
-        ];
-      }
-    } catch (e) {
-      histories[`USA-sofrTenor-${id}`] = [
-        { period: asOf.slice(0, 10), value: s.rate }
-      ];
-    }
-  }
-  // Ensure every catalog id has at least one point
   for (const c of catalog) {
-    if (!histories[`USA-sofrTenor-${c.id}`]) {
-      histories[`USA-sofrTenor-${c.id}`] = [
-        { period: asOf.slice(0, 10), value: c.lastRate }
-      ];
+    const key = `USA-sofrTenor-${c.id}`;
+    let neu = [];
+    try {
+      neu = await fetchYahooHistory(c.symbol);
+      console.log('hist raw', c.id, neu.length);
+    } catch (e) {
+      console.warn('hist fail', c.symbol, e.message);
     }
+    // always append today's lastRate so series grows daily even if Yahoo is sparse
+    neu = mergeSeries(neu, [{ period: today, value: c.lastRate }]);
+    const merged = mergeSeries(histories[key], neu);
+    histories[key] = merged;
+    histKeys[c.id] = merged.length;
+    console.log('hist merge', c.id, merged.length);
   }
 
   const snaps = Array.isArray(histories['USA-sofrFwdSnapshots'])
@@ -298,7 +302,7 @@ try {
 
   data.USA.sofrFwd = {
     value: points.at(-1).value,
-    date: asOf.slice(0, 10),
+    date: today,
     updatedAt: asOf,
     curve: points.map(p => ({ period: p.period, value: p.value })),
     detail: points,
@@ -316,18 +320,16 @@ try {
     points.map(p => p.tenor).join(','),
     'catalog',
     catalog.length,
-    'hist',
-    Object.keys(histKeys).length
+    'hist min/max',
+    Math.min(...Object.values(histKeys)),
+    Math.max(...Object.values(histKeys))
   );
 } catch (e) {
   errors.push(`USA SOFR Fwd: ${e.message}`);
   console.error('FAIL', e.message);
-  // restore previous if we had working data
   if (prevFwd && prevFwd.curve && prevFwd.curve.length) {
     data.USA.sofrFwd = prevFwd;
-    if (!histories['USA-sofrFwd'] && prevFwd.curve) {
-      histories['USA-sofrFwd'] = prevFwd.curve;
-    }
+    if (!histories['USA-sofrFwd'] && prevFwd.curve) histories['USA-sofrFwd'] = prevFwd.curve;
     console.log('kept previous sofrFwd');
   }
 }
