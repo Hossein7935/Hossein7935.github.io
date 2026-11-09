@@ -28,7 +28,7 @@
         "source": "TradingView · TVC:CN10Y (China 10 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.359,
+        "value": 0.356,
         "date": "2026-11-09",
         "source": "TradingView · CHN 10Y − 2Y"
       },
@@ -3471,7 +3471,7 @@
     "CHN-t10y2y": [
       {
         "period": "2026-11-09",
-        "value": 0.359
+        "value": 0.356
       }
     ],
     "USA-tips5": [
