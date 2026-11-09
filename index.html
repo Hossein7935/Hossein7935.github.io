@@ -486,6 +486,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(6,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -502,7 +503,7 @@ function setUsaPage(page){
   if(page===0)setTimeout(()=>{try{typeof paintDxy==='function'&&paintDxy()}catch(e){}},50);
   if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);
   if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff();typeof paintRateOverlay==='function'&&paintRateOverlay();typeof paintUs2ySofr==='function'&&paintUs2ySofr()}catch(e){}},50);
-  if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);
+  if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);
   if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);
   if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
   if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
@@ -850,11 +851,15 @@ function paintSofRTenor(){
   if(!id){
     host.innerHTML='';
     if(valEl)valEl.textContent='—';
-    if(meta)meta.textContent='Keine Laufzeit gewählt';
+    if(meta)meta.textContent=catalog.length?('Katalog: '+catalog.length+' Laufzeiten'):'Keine Laufzeit gewählt';
     return;
   }
   const cat=catalog.find(c=>c.id===id)||{label:id,symbol:id};
   let pts=histories['USA-sofrTenor-'+id]||[];
+  // fallback: single point from catalog lastRate
+  if(!pts.length&&cat.lastRate!=null){
+    pts=[{period:new Date().toISOString().slice(0,10),value:Number(cat.lastRate)}];
+  }
   const last=pts.length?pts.at(-1):null;
   if(valEl)valEl.textContent=last?fmt(last.value):(cat.lastRate!=null?fmt(cat.lastRate):'—');
   if(dateEl)dateEl.textContent=(cat.label||id)+(last?(' · Stand '+last.period+' · '+pts.length+' Tage'):'');
@@ -876,10 +881,9 @@ function paintSofRTenor(){
   if(!pts.length){
     host.innerHTML='<div class="sparkempty">Keine Historie für diesen Kontrakt</div>';
   }else if(typeof renderDiffOverlayChart==='function'&&ovPts.length){
-    // reuse dual renderer: blue=tenor, red=overlay (as "diff" axis + right)
-    host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+esc(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderDiffOverlayChart(pts,ovPts,{w:360,h:180})+'</div>';
+    host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderDiffOverlayChart(pts,ovPts,{w:360,h:180})+'</div>';
   }else if(typeof renderLineChart==='function'){
-    host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+esc(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderLineChart(pts,{w:360,h:160})+'</div>';
+    host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderLineChart(pts,{w:360,h:160})+'</div>';
   }
   if(meta)meta.textContent=(cat.symbol||'')+' · '+(pts.length)+' Punkte'+(ovLabel?(' · rot: '+ovLabel):'')+' · Tippen · 6M/1J/3J';
 }
@@ -973,8 +977,12 @@ function paintSofRFwd(){
       }
     }
   }
+
+  try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}
 }
 bindUsaPages();
+
+
 
 
 
@@ -1350,6 +1358,7 @@ function paintYieldPage7(){
   }
   paintYield7Diff();
 }
+
 
 
 
