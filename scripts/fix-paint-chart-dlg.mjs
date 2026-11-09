@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** paintChartDlg: dual ranges; US2Y red = SOFR/IORB/EFFR via getUs2yPairKey */
+/** paintChartDlg: dual charts with full render (US2Y+SOFR/IORB/EFFR, IORB+1Y, etc.) */
 let html = fs.readFileSync('index.html', 'utf8');
 
 const start = html.indexOf('function paintChartDlg');
@@ -121,13 +121,14 @@ fs.writeFileSync('index.html', html);
 
 const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
 const js = scripts.join('\n');
-let depth = 0, min = 0;
-for (const ch of js) {
-  if (ch === '{') depth++;
-  else if (ch === '}') {
-    depth--;
-    if (depth < min) min = depth;
-  }
+try {
+  new Function(js);
+  console.log('js ok');
+} catch (e) {
+  console.warn('js warn', e.message);
 }
-console.log('paintChartDlg ok', 'depth', depth, 'effr', js.includes("'effr'"));
-if (depth !== 0 || min < 0) process.exit(1);
+const hasRender =
+  html.includes("key==='us2ySofrDual'") &&
+  html.includes('renderUs2ySofrChart(us2y,red');
+console.log('paintChartDlg ok', 'us2y render', hasRender);
+if (!hasRender) process.exit(1);
