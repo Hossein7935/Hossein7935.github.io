@@ -48,6 +48,8 @@ jobs:
         run: node scripts/fix-js-structure.mjs
       - name: Inject UST + TIPS curve (USA page 4)
         run: node scripts/inject-ust-curve.mjs
+      - name: Inject SOFR tenor history picker (USA page 4)
+        run: node scripts/inject-sofr-tenor.mjs
       - name: Chart dialog crosshair / axis interact
         run: node scripts/inject-chart-interact.mjs
       - name: Inject FHLBank Advances Monitor (USA page 5)
@@ -86,12 +88,16 @@ jobs:
         run: node scripts/inject-rate-overlay.mjs
       - name: Re-apply DXY panel
         run: node scripts/inject-dxy.mjs
+      - name: Re-apply SOFR tenor panel
+        run: node scripts/inject-sofr-tenor.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/inject-page7-yields.mjs
           node --check scripts/inject-rate-overlay.mjs
           node --check scripts/inject-dxy.mjs
+          node --check scripts/inject-sofr-tenor.mjs
           node --check scripts/fetch-dxy.mjs
+          node --check scripts/fetch-sofr-futures.mjs
           node --check scripts/fix-paint-chart-dlg.mjs
           node --check scripts/fix-js-syntax.mjs
       - name: Fetch official economic data
@@ -169,8 +175,10 @@ jobs:
           node scripts/inject-fix-usa-nav.mjs || true
           node scripts/inject-rate-overlay.mjs || true
           node scripts/inject-dxy.mjs || true
+          node scripts/inject-sofr-tenor.mjs || true
           node scripts/fix-js-syntax.mjs || true
           node scripts/fix-paint-chart-dlg.mjs || true
+          node scripts/inject-sofr-tenor.mjs || true
           git add data.json scripts/ index.html || true
           if git diff --cached --quiet; then
             echo "No data changes to commit"
@@ -179,6 +187,7 @@ jobs:
             git pull --no-rebase -X ours origin main || true
             node scripts/fix-js-syntax.mjs || true
             node scripts/fix-paint-chart-dlg.mjs || true
+            node scripts/inject-sofr-tenor.mjs || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
             git push origin HEAD:main || git push --force-with-lease origin HEAD:main
