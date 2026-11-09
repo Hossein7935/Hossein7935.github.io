@@ -1,32 +1,10 @@
 import fs from 'fs';
 
-/** USA page 3: separate overlay checkboxes for EFFR/SOFR/IORB dual chart */
+/** USA page 3: overlay checkboxes for EFFR/SOFR/IORB dual full-history chart */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// 1) Extend faceC HTML with overlay checkboxes + panel
-const oldFaceC =
-  "'<label class=\"diff-pick\"><input type=\"checkbox\" class=\"rate-diff-cb\" data-key=\"effr\"> für Differenz wählen</label></div>'+";
-const newEffr =
-  "'<label class=\"diff-pick\"><input type=\"checkbox\" class=\"rate-diff-cb\" data-key=\"effr\"> für Differenz wählen</label>"+
-  "<label class=\"diff-pick\"><input type=\"checkbox\" class=\"rate-overlay-cb\" data-key=\"effr\"> für Overlay wählen</label></div>'+";
-
-if (html.includes('rate-overlay-cb')) {
-  console.log('overlay cbs already present');
-} else if (html.includes('rate-diff-cb') && html.includes("data-key=\"effr\"")) {
-  // inject overlay label after each rate-diff label for effr/sofr/iorb
-  for (const k of ['effr', 'sofr', 'iorb']) {
-    const a =
-      `<label class="diff-pick"><input type="checkbox" class="rate-diff-cb" data-key="${k}"> für Differenz wählen</label></div>`;
-    const b =
-      `<label class="diff-pick"><input type="checkbox" class="rate-diff-cb" data-key="${k}"> für Differenz wählen</label>` +
-      `<label class="diff-pick"><input type="checkbox" class="rate-overlay-cb" data-key="${k}"> für Overlay wählen</label></div>`;
-    // template uses escaped quotes in string
-    const aEsc = a
-      .replace(/"/g, '\\"')
-      .replace(/</g, "'+") // won't work
-      ;
-  }
-  // Direct replace on the JS string form used in index
+// Overlay checkboxes after each Differenz-label
+if (!html.includes('rate-overlay-cb')) {
   html = html.replace(
     /class=\"rate-diff-cb\" data-key=\"(effr|sofr|iorb)\"> für Differenz wählen<\/label><\/div>/g,
     'class=\"rate-diff-cb\" data-key=\"$1\"> für Differenz wählen</label><label class=\"diff-pick\"><input type=\"checkbox\" class=\"rate-overlay-cb\" data-key=\"$1\"> für Overlay wählen</label></div>'
@@ -35,53 +13,24 @@ if (html.includes('rate-overlay-cb')) {
     /class="rate-diff-cb" data-key="(effr|sofr|iorb)"> für Differenz wählen<\/label><\/div>/g,
     'class="rate-diff-cb" data-key="$1"> für Differenz wählen</label><label class="diff-pick"><input type="checkbox" class="rate-overlay-cb" data-key="$1"> für Overlay wählen</label></div>'
   );
-  console.log('overlay checkboxes injected', (html.match(/rate-overlay-cb/g) || []).length);
+  console.log('overlay cbs', (html.match(/rate-overlay-cb/g) || []).length);
 }
 
-// 2) Add overlay panel after rateDiffPanel closing in faceC
-if (!html.includes('rateOverlayPanel')) {
-  const panel =
-    "'<div class=\"metric has-chart diff-panel\" id=\"rateOverlayPanel\"><div class=\"name\" id=\"rateOverlayTitle\">Overlay · 2 Serien wählen (blau / rot)</div><div class=\"value\" id=\"rateOverlayValue\">—</div><div class=\"date\" id=\"rateOverlayDate\">Separates Kästchen: erste blau, zweite rot · volle Historie</div><div id=\"rateOverlayChart\"></div><div class=\"diff-hint\" id=\"rateOverlayHint\">Noch keine Overlay-Auswahl</div></div>'";
-  // insert before faceA.after(faceB) after faceC.innerHTML assignment ends with rateDiffPanel
-  const marker =
-    "id=\"rateDiffHint\">Noch keine Auswahl</div></div>'";
-  const marker2 =
-    'id=\"rateDiffHint\">Noch keine Auswahl</div></div>\'';
-  if (html.includes(marker)) {
-    html = html.replace(
-      marker,
-      marker + '+\n      ' + panel
-    );
-    console.log('overlay panel inserted (esc)');
-  } else if (html.includes("rateDiffHint">Noch keine Auswahl</div></div>'")) {
-    html = html.replace(
-      "rateDiffHint\">Noch keine Auswahl</div></div>'",
-      "rateDiffHint\">Noch keine Auswahl</div></div>'+\n      " +
-        panel.replace(/^'/, '').replace(/'$/, "'")
-    );
-    // simpler approach
-  }
-}
-
-// Robust panel insert: after rateDiffPanel div closes in the template string
+// Overlay panel after rateDiff panel in faceC template
 if (!html.includes('rateOverlayPanel')) {
   const needle =
-    "id=\"rateDiffHint\">Noch keine Auswahl</div></div>'";
+    'id=\"rateDiffHint\">Noch keine Auswahl</div></div>\'';
+  const add =
+    "id=\"rateDiffHint\">Noch keine Auswahl</div></div>'+\n      '<div class=\"metric has-chart diff-panel\" id=\"rateOverlayPanel\"><div class=\"name\" id=\"rateOverlayTitle\">Overlay · 2 Serien (blau / rot)</div><div class=\"value\" id=\"rateOverlayValue\">—</div><div class=\"date\" id=\"rateOverlayDate\">Separates Kästchen · erste blau, zweite rot · volle Historie</div><div id=\"rateOverlayChart\"></div><div class=\"diff-hint\" id=\"rateOverlayHint\">Noch keine Overlay-Auswahl</div></div>'";
   if (html.includes(needle)) {
-    html = html.replace(
-      needle,
-      "id=\"rateDiffHint\">Noch keine Auswahl</div></div>'+\n      '<div class=\"metric has-chart diff-panel\" id=\"rateOverlayPanel\"><div class=\"name\" id=\"rateOverlayTitle\">Overlay · 2 Serien (blau / rot)</div><div class=\"value\" id=\"rateOverlayValue\">—</div><div class=\"date\" id=\"rateOverlayDate\">Separates Kästchen · erste blau, zweite rot · volle Historie</div><div id=\"rateOverlayChart\"></div><div class=\"diff-hint\" id=\"rateOverlayHint\">Noch keine Overlay-Auswahl</div></div>'"
-    );
-    console.log('overlay panel inserted');
+    html = html.replace(needle, add);
+    console.log('panel in template');
   } else {
-    // try unescaped variant in case restore differs
-    const n2 =
-      'id="rateDiffHint">Noch keine Auswahl</div></div>\'';
-    console.log('panel needle missing, try alt');
+    console.log('template panel needle missing — runtime ensure will create panel');
   }
 }
 
-// 3) Inject paintRateOverlay + dual renderer
+// Functions
 if (!html.includes('function paintRateOverlay')) {
   const fn = `
 let _rateOverlayOrder=[];
@@ -105,8 +54,7 @@ function renderRateOverlayChart(bluePts,redPts,opts){
     let d='';
     pts.forEach(p=>{
       const xi=dateIdx.get(String(p.period)); if(xi==null)return;
-      const x=xOf(xi), y=yOf(p.value);
-      d+=(d?'L':'M')+x.toFixed(1)+','+y.toFixed(1);
+      d+=(d?'L':'M')+xOf(xi).toFixed(1)+','+yOf(p.value).toFixed(1);
     });
     return d;
   };
@@ -130,18 +78,15 @@ function renderRateOverlayChart(bluePts,redPts,opts){
     hits+'</svg>';
 }
 function paintRateOverlay(){
-  // ensure panel exists (for older sessions)
   let panel=document.getElementById('rateOverlayPanel');
   if(!panel){
     const faceC=document.querySelector('.usa-face-c');
     if(faceC){
-      const d=document.createElement('div');
-      d.innerHTML='<div class="metric has-chart diff-panel" id="rateOverlayPanel" style="grid-column:1/-1"><div class="name" id="rateOverlayTitle">Overlay · 2 Serien (blau / rot)</div><div class="value" id="rateOverlayValue">—</div><div class="date" id="rateOverlayDate">Separates Kästchen · volle Historie</div><div id="rateOverlayChart"></div><div class="diff-hint" id="rateOverlayHint">Noch keine Overlay-Auswahl</div></div>';
-      faceC.appendChild(d.firstChild);
-      panel=document.getElementById('rateOverlayPanel');
+      const wrap=document.createElement('div');
+      wrap.innerHTML='<div class="metric has-chart diff-panel" id="rateOverlayPanel" style="grid-column:1/-1"><div class="name" id="rateOverlayTitle">Overlay · 2 Serien (blau / rot)</div><div class="value" id="rateOverlayValue">—</div><div class="date" id="rateOverlayDate">Separates Kästchen · volle Historie</div><div id="rateOverlayChart"></div><div class="diff-hint" id="rateOverlayHint">Noch keine Overlay-Auswahl</div></div>';
+      faceC.appendChild(wrap.firstChild);
     }
   }
-  // ensure overlay checkboxes on each rate card
   ['effr','sofr','iorb'].forEach(k=>{
     const card=document.querySelector('.usa-face-c [data-rate-key="'+k+'"]');
     if(!card)return;
@@ -177,20 +122,16 @@ function paintRateOverlay(){
     return;
   }
   const [k1,k2]=_rateOverlayOrder;
-  // FULL history — no filter
   const blue=histories['USA-'+k1]||[];
   const red=histories['USA-'+k2]||[];
   const name=labels[k1]+' / '+labels[k2];
   if(title)title.textContent='Overlay · '+labels[k1]+' (blau) · '+labels[k2]+' (rot)';
   const lastB=blue.length?blue.at(-1):null;
   const lastR=red.length?red.at(-1):null;
-  if(valEl){
-    valEl.innerHTML='<span style="color:#4a9eed">'+(lastB?fmt(lastB.value):'—')+'</span> / <span style="color:#e74c3c">'+(lastR?fmt(lastR.value):'—')+'</span>';
-  }
+  if(valEl)valEl.innerHTML='<span style="color:#4a9eed">'+(lastB?fmt(lastB.value):'—')+'</span> / <span style="color:#e74c3c">'+(lastR?fmt(lastR.value):'—')+'</span>';
   if(dateEl){
-    const n=Math.max(blue.length,red.length);
     const start=blue[0]?blue[0].period:(red[0]?red[0].period:'');
-    dateEl.textContent=(start?('ab '+start+' · '):'')+n+' Punkte · volle Historie';
+    dateEl.textContent=(start?('ab '+start+' · '):'')+Math.max(blue.length,red.length)+' Punkte · volle Historie';
   }
   window.__rateOverlayMeta={k1,k2,name};
   if(typeof renderRateOverlayChart==='function'){
@@ -201,38 +142,24 @@ function paintRateOverlay(){
 if(!window.__rateOverlayBound){
   window.__rateOverlayBound=true;
   document.addEventListener('change',e=>{
-    if(e.target&&e.target.classList&&e.target.classList.contains('rate-overlay-cb')){
-      paintRateOverlay();
-    }
+    if(e.target&&e.target.classList&&e.target.classList.contains('rate-overlay-cb'))paintRateOverlay();
   });
 }
 `;
-  // insert before paintRateDiff or after it
   if (html.includes('function paintRateDiff')) {
     html = html.replace('function paintRateDiff', fn + '\nfunction paintRateDiff');
     console.log('paintRateOverlay inserted');
   }
 }
 
-// 4) Call paintRateOverlay with page 3 (index 2)
-if (!html.includes('paintRateOverlay()')) {
+// Hook page 2 paints
+if (!html.includes("typeof paintRateOverlay==='function'&&paintRateOverlay()")) {
   html = html.replace(
     /typeof paintRateDiff==='function'&&paintRateDiff\(\);typeof paintUs2ySofr==='function'&&paintUs2ySofr\(\)/g,
     "typeof paintRateDiff==='function'&&paintRateDiff();typeof paintRateOverlay==='function'&&paintRateOverlay();typeof paintUs2ySofr==='function'&&paintUs2ySofr()"
   );
-  // also if only paintRateDiff
-  html = html.replace(
-    /if\(page===2\)setTimeout\(\(\)=>\{try\{typeof paintRateDiff==='function'&&paintRateDiff\(\)\}catch\(e\)\{\}\},50\);/,
-    "if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff();typeof paintRateOverlay==='function'&&paintRateOverlay();typeof paintUs2ySofr==='function'&&paintUss2ySofr()}catch(e){}},50);"
-  );
-  // fix typo if introduced
-  html = html.replace('paintUs2ySofr', 'paintUs2ySofr');
-  html = html.replace('paintUs2ySofr', (m, offset, s) => m); // noop
-  console.log('paintRateOverlay hooks', html.includes('paintRateOverlay()'));
+  console.log('hooked', html.includes("paintRateOverlay()"))
 }
 
-// Fix any typo paintUs2ySofr
-html = html.replace(/paintUs2ySofr/g, 'paintUs2ySofr');
-
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'overlay-cb', (html.match(/rate-overlay-cb/g)||[]).length, 'panel', html.includes('rateOverlayPanel'), 'fn', html.includes('function paintRateOverlay'));
+console.log('done', html.length, 'fn', html.includes('function paintRateOverlay'), 'cbs', (html.match(/rate-overlay-cb/g)||[]).length);
