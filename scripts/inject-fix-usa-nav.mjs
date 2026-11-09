@@ -1,9 +1,8 @@
 import fs from 'fs';
 
-/** USA page nav sticky + bindUsaPages + FULL setUsaPage 0..6 (must run last) */
+/** USA page nav sticky + bindUsaPages + FULL setUsaPage 0..6 (must run last-ish) */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// CRITICAL: dedupe declarations that break the whole site
 function dedupeDecl(html, decl) {
   const first = html.indexOf(decl);
   if (first < 0) return html;
@@ -45,8 +44,9 @@ const setUsaPageFn = `function setUsaPage(page){
     const sel=card.querySelector('#usaPageSelect');
     if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));
   });
+  if(page===0)setTimeout(()=>{try{typeof paintDxy==='function'&&paintDxy()}catch(e){}},50);
   if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);
-  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff();typeof paintUs2ySofr==='function'&&paintUs2ySofr()}catch(e){}},50);
+  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff();typeof paintRateOverlay==='function'&&paintRateOverlay();typeof paintUs2ySofr==='function'&&paintUs2ySofr()}catch(e){}},50);
   if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);
   if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);
   if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
@@ -118,7 +118,6 @@ if (!html.includes('data-page=\"6\"') && !html.includes('data-page="6"')) {
   );
 }
 
-// Final dedupe after all edits
 html = dedupeDecl(html, 'let _rateDiffOrder=[];');
 html = dedupeDecl(html, 'let _yieldDiffOrder=[];');
 
@@ -131,4 +130,4 @@ try {
 } catch (e) {
   console.warn('js warn', e.message);
 }
-console.log('done', html.length, 'page===6', html.includes('page===6'), 'call', html.includes('bindUsaPages();'));
+console.log('done', html.length, 'page===0', html.includes('page===0'), 'page===6', html.includes('page===6'), 'call', html.includes('bindUsaPages();'));
