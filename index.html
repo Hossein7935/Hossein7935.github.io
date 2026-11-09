@@ -139,20 +139,6 @@ function paintChartDlg(){
       if(meta)meta.textContent='';
       return;
     }
-  if(key==='sofrTenorHist'){
-    const tm=window.__sofrTenorMeta||{};
-    let pts=histories['USA-sofrTenor-'+(tm.id||'') ]||[];
-    if(typeof filterByRange==='function'){const p2=filterByRange(pts,range); if(p2.length) pts=p2;}
-    let ov=[];
-    if(tm.ovKey){ov=histories['USA-'+tm.ovKey]||[]; if(typeof filterByRange==='function'){const o2=filterByRange(ov,range); if(o2.length) ov=o2;}}
-    if(!pts.length){body.innerHTML='<div class=\"sparkempty\">Keine Daten</div>';if(meta)meta.textContent='';return;}
-    if(typeof renderDiffOverlayChart==='function'&&ov.length){body.innerHTML=renderDiffOverlayChart(pts,ov,{w:720,h:320,big:true})+'<div class=\"chart-tip-inline\" id=\"chartDlgTip\"></div>';}
-    else{body.innerHTML=renderLineChart(pts,{w:720,h:300,big:true})+'<div class=\"chart-tip-inline\" id=\"chartDlgTip\"></div>';}
-    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
-    if(meta)meta.textContent=(tm.label||'SOFR Tenor')+' · '+rLabel+' · '+pts.length+' Punkte'+(tm.ovLabel?(' · rot: '+tm.ovLabel):'');
-    return;
-  }
-
     if(typeof renderRateOverlayChart==='function'){
       body.innerHTML=renderRateOverlayChart(blue,red,{w:720,h:320,big:true,blueLabel:labels[k1]||k1,redLabel:labels[k2]||k2})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
     }else{
@@ -201,6 +187,20 @@ function paintChartDlg(){
     if(metaO.label)extra.push('rot: '+metaO.label);
     if(metaO.greenLabel)extra.push('grün: '+metaO.greenLabel);
     if(meta)meta.textContent='Differenz · '+rLabel+' · '+pts.length+' Punkte'+(extra.length?(' · '+extra.join(' · ')):'');
+    return;
+  }
+
+  if(key==='sofrTenorHist'){
+    const tm=window.__sofrTenorMeta||{};
+    let pts=histories['USA-sofrTenor-'+(tm.id||'')]||[];
+    if(typeof filterByRange==='function'){const p2=filterByRange(pts,range); if(p2.length) pts=p2;}
+    let ov=[];
+    if(tm.ovKey){ov=histories['USA-'+tm.ovKey]||[]; if(typeof filterByRange==='function'){const o2=filterByRange(ov,range); if(o2.length) ov=o2;}}
+    if(!pts.length){body.innerHTML='<div class="sparkempty">Keine Daten</div>';if(meta)meta.textContent='';return;}
+    if(typeof renderDiffOverlayChart==='function'&&ov.length){body.innerHTML=renderDiffOverlayChart(pts,ov,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';}
+    else{body.innerHTML=renderLineChart(pts,{w:720,h:300,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';}
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
+    if(meta)meta.textContent=(tm.label||'SOFR Tenor')+' · '+rLabel+' · '+pts.length+' Punkte'+(tm.ovLabel?(' · rot: '+tm.ovLabel):'');
     return;
   }
 
