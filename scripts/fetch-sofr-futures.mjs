@@ -2,22 +2,10 @@ import fs from 'node:fs';
 
 /**
  * Marktimplizierte SOFR-Erwartungskurve
- * ----------------------------------------
- * Spot: NY Fed SOFR (veröffentlichter Overnight-Satz)
- * Forward: CME One-Month SOFR Futures (SR1) via Yahoo Finance
- *
- * CME-Konvention SR1:
- *   Price = 100 − R
- *   R = erwarteter arithmetischer Durchschnitt der täglichen SOFR
- *       im Liefermonat des Kontrakts (nicht ein Einzeltag-Satz).
- *
- * Darstellung:
- *   Heute  → Spot SOFR (overnight, published)
- *   3/6/9/12m → aus SR1-Strip linear interpoliert auf exakt N Monate
- *              (Wert = erwarteter Monatsdurchschnitt SOFR um diesen Horizont)
- *
- * Zusätzlich SR3-Strip zur Dokumentation der Quartalskontrakte.
- * Historische Snapshots für Vergleich heute vs. vor 30/90 Tagen.
+ * Spot: NY Fed SOFR
+ * Forward: CME SR1 (1M) + SR3 (3M) via Yahoo
+ * Horizons: Heute, 3m, 6m, 9m, 12m, 2y, 5y, 10y, 30y (nur wenn Strip reicht)
+ * Plus: individuelle Kontrakt-Historien für Laufzeiten-Picker
  */
 
 const MONTH_CODES = ['F', 'G', 'H', 'J', 'K', 'M', 'N', 'Q', 'U', 'V', 'X', 'Z'];
@@ -41,7 +29,7 @@ async function fetchJson(url, label) {
       'User-Agent': 'MacroWatch/1.0 (+https://hossein7935.github.io/)',
       Accept: 'application/json'
     },
-    signal: AbortSignal.timeout(25000),
+    signal: AbortSignal.timeout(30000),
     cache: 'no-store'
   });
   if (!r.ok) throw new Error(`${label} HTTP ${r.status}`);
@@ -71,9 +59,28 @@ async function fetchYahooPrice(symbol) {
   return { symbol, price: Number(price), rate };
 }
 
-/** Linear interpolation of rate at exact month offset from monthly strip. */
+async function fetchYahooHistory(symbol, range = '2y') {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=${range}`;
+  const j = await fetchJson(url, symbol + ' hist');
+  const res = j?.chart?.result?.[0];
+  if (!res) return [];
+  const ts = res.timestamp || [];
+  const closes = res.indicators?.quote?.[0]?.close || [];
+  const out = [];
+  for (let i = 0; i < ts.length; i++) {
+    const c = closes[i];
+    if (c == null || !Number.isFinite(Number(c))) continue;
+    const period = new Date(ts[i] * 1000).toISOString().slice(0, 10);
+    const rate = Math.round((100 - Number(c)) * 10000) / 10000;
+    out.push({ period, value: rate });
+  }
+  const map = new Map(out.map(p => [p.period, p.value]));
+  return [...map.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([period, value]) => ({ period, value }));
+}
+
 function interpolateAtMonths(strip, months) {
-  // strip: [{monthsFromNow, rate, symbol, price}]
   if (!strip.length) return null;
   if (months <= strip[0].monthsFromNow) {
     const s = strip[0];
@@ -101,17 +108,18 @@ const payload = JSON.parse(fs.readFileSync('data.json', 'utf8'));
 const histories = payload.histories || {};
 const data = payload.data || {};
 data.USA = data.USA || {};
-const errors = Array.isArray(payload.errors) ? payload.errors.filter(e => !String(e).startsWith('USA SOFR Fwd')) : [];
-
+const errors = Array.isArray(payload.errors)
+  ? payload.errors.filter(e => !String(e).startsWith('USA SOFR Fwd'))
+  : [];
 const asOf = new Date().toISOString();
 const now = new Date();
 
 try {
   const spot = await fetchSpotSofR();
 
-  // --- SR1 monthly strip (0..13 months) ---
+  // SR1 monthly strip 0..18 months
   const sr1Strip = [];
-  for (let m = 0; m <= 13; m++) {
+  for (let m = 0; m <= 18; m++) {
     const d = addMonthsUTC(now, m);
     const symbol = srSymbol('SR1', d);
     try {
@@ -121,7 +129,8 @@ try {
         yearMonth: `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`,
         symbol: q.symbol,
         price: q.price,
-        rate: q.rate
+        rate: q.rate,
+        kind: 'SR1'
       });
       console.log('SR1', m + 'm', q.symbol, q.price, '→', q.rate);
     } catch (e) {
@@ -130,35 +139,55 @@ try {
   }
   if (sr1Strip.length < 4) throw new Error(`SR1 strip too short (${sr1Strip.length})`);
 
-  // --- SR3 quarterly strip (documentation) ---
+  // SR3 quarterly strip out to ~10y (as far as Yahoo lists)
   const sr3Strip = [];
-  for (let y = now.getUTCFullYear(); y <= now.getUTCFullYear() + 2; y++) {
+  for (let y = now.getUTCFullYear(); y <= now.getUTCFullYear() + 10; y++) {
     for (const code of IMM_CODES) {
       const mi = MONTH_CODES.indexOf(code);
       if (y === now.getUTCFullYear() && mi < now.getUTCMonth()) continue;
       const symbol = `SR3${code}${String(y).slice(2)}.CME`;
       try {
         const q = await fetchYahooPrice(symbol);
+        const monthsFromNow =
+          (y - now.getUTCFullYear()) * 12 + (mi - now.getUTCMonth());
         sr3Strip.push({
-          symbol: q.symbol,
+          monthsFromNow: Math.max(0, monthsFromNow),
           yearMonth: `${y}-${String(mi + 1).padStart(2, '0')}`,
+          symbol: q.symbol,
           price: q.price,
-          rate: q.rate // compounded avg SOFR over SR3 reference quarter
+          rate: q.rate,
+          kind: 'SR3'
         });
-        console.log('SR3', q.symbol, q.price, '→', q.rate);
+        console.log('SR3', q.symbol, monthsFromNow + 'm', q.price, '→', q.rate);
       } catch (e) {
-        console.warn('SR3 skip', symbol, e.message);
+        // many far contracts missing — stop after several consecutive misses per year
       }
     }
   }
+  sr3Strip.sort((a, b) => a.monthsFromNow - b.monthsFromNow);
 
-  // --- Curve points at exact horizons ---
+  // Combined strip for long interpolation: prefer SR1 near, SR3 far
+  const combined = [];
+  const seenM = new Set();
+  for (const s of [...sr1Strip, ...sr3Strip].sort((a, b) => a.monthsFromNow - b.monthsFromNow)) {
+    const k = s.monthsFromNow;
+    if (seenM.has(k)) continue;
+    seenM.add(k);
+    combined.push(s);
+  }
+
+  const maxM = combined.length ? combined.at(-1).monthsFromNow : 12;
+
   const horizons = [
     { tenor: 'Heute', months: 0, spot: true },
     { tenor: '3m', months: 3 },
     { tenor: '6m', months: 6 },
     { tenor: '9m', months: 9 },
-    { tenor: '12m', months: 12 }
+    { tenor: '12m', months: 12 },
+    { tenor: '2y', months: 24 },
+    { tenor: '5y', months: 60 },
+    { tenor: '10y', months: 120 },
+    { tenor: '30y', months: 360 }
   ];
 
   const points = [];
@@ -176,91 +205,112 @@ try {
       });
       continue;
     }
-    const interp = interpolateAtMonths(sr1Strip, h.months);
+    // only include long horizons if strip reaches at least ~70% of target
+    if (h.months > 12 && maxM < h.months * 0.7) {
+      console.log('skip horizon', h.tenor, 'maxStrip', maxM);
+      continue;
+    }
+    const interp = interpolateAtMonths(combined, h.months);
     if (!interp) continue;
     points.push({
       period: h.tenor,
       tenor: h.tenor,
       months: h.months,
       value: interp.value,
-      kind: 'sr1',
-      note: 'Erwarteter Monatsdurchschnitt SOFR (SR1, 100−Price)',
-      contracts: interp.contracts,
-      price: interp.price,
+      kind: 'fwd',
       method: interp.method,
-      vsSpotBp: Math.round((interp.value - spot.value) * 10000) / 100 // bp
+      contracts: interp.contracts,
+      note: h.months > 12 ? 'SR3-Schwerpunkt' : 'SR1/SR3 Strip'
     });
   }
 
-  if (points.length < 3) throw new Error('curve points incomplete');
+  histories['USA-sofrFwd'] = points.map(p => ({ period: p.period, value: p.value }));
 
-  // Chart series (period labels on X)
-  const chartPts = points.map(p => ({
-    period: p.tenor,
-    value: p.value
-  }));
-  histories['USA-sofrFwd'] = chartPts;
-
-  // Daily time series of 12m leg
-  const leg12 = points.find(p => p.months === 12);
-  if (leg12) {
-    const day = asOf.slice(0, 10);
-    const prev = histories['USA-sofrFwd12'] || [];
-    const map = new Map(prev.map(p => [String(p.period), Number(p.value)]));
-    map.set(day, leg12.value);
-    histories['USA-sofrFwd12'] = [...map.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .slice(-900)
-      .map(([period, value]) => ({ period, value: Math.round(value * 10000) / 10000 }));
+  // Contract catalog + histories (SR1 near + SR3 available)
+  const catalog = [];
+  const histKeys = {};
+  for (const s of sr1Strip) {
+    const id = `sr1_${s.yearMonth}`;
+    catalog.push({
+      id,
+      label: `SR1 ${s.yearMonth} (${s.monthsFromNow}m)`,
+      symbol: s.symbol,
+      kind: 'SR1',
+      yearMonth: s.yearMonth,
+      monthsFromNow: s.monthsFromNow,
+      lastRate: s.rate
+    });
+    try {
+      const hist = await fetchYahooHistory(s.symbol, '2y');
+      if (hist.length >= 10) {
+        histories[`USA-sofrTenor-${id}`] = hist;
+        histKeys[id] = hist.length;
+        console.log('hist', id, hist.length, hist.at(-1)?.period);
+      }
+    } catch (e) {
+      console.warn('hist fail', s.symbol, e.message);
+    }
+  }
+  // SR3 sample: every contract up to ~5y for picker
+  for (const s of sr3Strip.filter(x => x.monthsFromNow <= 60)) {
+    const id = `sr3_${s.yearMonth}`;
+    if (catalog.some(c => c.id === id)) continue;
+    catalog.push({
+      id,
+      label: `SR3 ${s.yearMonth} (${s.monthsFromNow}m)`,
+      symbol: s.symbol,
+      kind: 'SR3',
+      yearMonth: s.yearMonth,
+      monthsFromNow: s.monthsFromNow,
+      lastRate: s.rate
+    });
+    try {
+      const hist = await fetchYahooHistory(s.symbol, '2y');
+      if (hist.length >= 10) {
+        histories[`USA-sofrTenor-${id}`] = hist;
+        histKeys[id] = hist.length;
+      }
+    } catch (e) {
+      console.warn('hist fail', s.symbol, e.message);
+    }
   }
 
-  // Historical snapshots (one per calendar day; keep ~180 days)
-  const snap = {
-    asOf,
-    spotDate: spot.period,
-    spot: spot.value,
-    points: points.map(p => ({
-      tenor: p.tenor,
-      months: p.months,
-      value: p.value,
-      contracts: p.contracts,
-      price: p.price ?? null,
-      vsSpotBp: p.vsSpotBp ?? 0,
-      kind: p.kind
-    })),
-    sr1: sr1Strip,
-    sr3: sr3Strip,
-    source: 'NY Fed SOFR + CME SR1/SR3 (Yahoo delayed)'
-  };
-
+  // Snapshot for hist comparison panel (existing feature)
   const snaps = Array.isArray(histories['USA-sofrFwdSnapshots'])
     ? histories['USA-sofrFwdSnapshots']
     : [];
-  // replace same-day snapshot if exists
-  const dayKey = asOf.slice(0, 10);
-  const filtered = snaps.filter(s => String(s.asOf || '').slice(0, 10) !== dayKey);
-  filtered.push(snap);
-  filtered.sort((a, b) => String(a.asOf).localeCompare(String(b.asOf)));
-  histories['USA-sofrFwdSnapshots'] = filtered.slice(-180);
+  snaps.push({
+    asOf,
+    spotDate: spot.period,
+    curve: points.map(p => ({ period: p.period, value: p.value }))
+  });
+  while (snaps.length > 120) snaps.shift();
+  histories['USA-sofrFwdSnapshots'] = snaps;
 
   data.USA.sofrFwd = {
-    value: leg12 ? leg12.value : points.at(-1).value,
-    date: spot.period,
+    value: points.at(-1)?.value,
+    date: asOf.slice(0, 10),
     updatedAt: asOf,
-    source: snap.source,
-    curve: chartPts,
+    curve: points.map(p => ({ period: p.period, value: p.value })),
     detail: points,
-    vsSpotBp: leg12 ? leg12.vsSpotBp : null
+    source: 'NY Fed SOFR + CME SR1/SR3 (Yahoo)',
+    maxStripMonths: maxM,
+    sr1Count: sr1Strip.length,
+    sr3Count: sr3Strip.length,
+    catalog,
+    histKeys
   };
+  data.USA.sofrTenorCatalog = catalog;
 
   console.log(
-    'SOFR Fwd:',
-    points.map(p => `${p.tenor}=${p.value}${p.vsSpotBp != null ? ` (${p.vsSpotBp > 0 ? '+' : ''}${p.vsSpotBp}bp)` : ''}`).join(' · ')
+    'curve points',
+    points.map(p => p.tenor + '=' + p.value).join(' '),
+    'catalog',
+    catalog.length
   );
-  console.log('snapshots', histories['USA-sofrFwdSnapshots'].length, 'SR1', sr1Strip.length, 'SR3', sr3Strip.length);
 } catch (e) {
   errors.push(`USA SOFR Fwd: ${e.message}`);
-  console.error('SOFR Fwd failed:', e.message);
+  console.error(e);
 }
 
 payload.histories = histories;
