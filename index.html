@@ -98,6 +98,29 @@ function paintChartDlg(){
     return;
   }
 
+  if(key==='moveDual'&&typeof renderMoveYieldChart==='function'){
+    let move=histories['USA-move']||[];
+    if(typeof filterByRange==='function'){
+      const m2=filterByRange(move,range); if(m2.length) move=m2;
+    }
+    let yAvg=[];
+    if(typeof getMoveShowYieldAvg==='function'&&getMoveShowYieldAvg()&&typeof buildUsYieldAvgSeries==='function'){
+      yAvg=buildUsYieldAvgSeries();
+      if(typeof filterByRange==='function'){
+        const y2=filterByRange(yAvg,range); if(y2.length) yAvg=y2;
+      }
+    }
+    if(!move.length){
+      body.innerHTML='<div class="sparkempty">Keine Daten</div>';
+      if(meta)meta.textContent='';
+      return;
+    }
+    body.innerHTML=renderMoveYieldChart(move,yAvg,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
+    if(meta)meta.textContent='MOVE blau · '+(yAvg.length?'Ø Rendite rot · ':'')+rLabel+' · '+move.length+' Punkte';
+    return;
+  }
+
   if(key==='sofrFwd'){
     const pts=histories['USA-sofrFwd']||((data.USA&&data.USA.sofrFwd&&data.USA.sofrFwd.points)||[]);
     if(typeof renderSofRFwdChart==='function'&&pts.length){
