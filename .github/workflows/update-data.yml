@@ -92,7 +92,6 @@ jobs:
           node --check scripts/inject-rate-overlay.mjs
           node --check scripts/inject-dxy.mjs
           node --check scripts/fetch-dxy.mjs
-          node --check scripts/fetch-live-macro.mjs
           node --check scripts/fix-paint-chart-dlg.mjs
           node --check scripts/fix-js-syntax.mjs
       - name: Fetch official economic data
@@ -147,8 +146,6 @@ jobs:
         run: node scripts/fetch-us2y-sofr.mjs
       - name: USA page 7 UST + TIPS daily (FRED)
         run: node scripts/fetch-ust-tips-page7.mjs
-      - name: Live macro (Treasury.gov + NY Fed + Yahoo)
-        run: node scripts/fetch-live-macro.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
       - name: Copper/Gold ratio (Yahoo HG=F / GC=F)
