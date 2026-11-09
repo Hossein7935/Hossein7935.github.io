@@ -1,9 +1,9 @@
 import fs from 'fs';
 
-/** Make USA page selector always reachable (sticky top) and harden navigation */
+/** USA page nav: sticky selector + ensure bindUsaPages() is actually called */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// 1) CSS: sticky page select at top of USA card
+// 1) CSS sticky
 if (!html.includes('/* usa-nav-sticky */')) {
   const css = `
 /* usa-nav-sticky */
@@ -17,41 +17,7 @@ if (!html.includes('/* usa-nav-sticky */')) {
   }
 }
 
-// 2) Move page select to right after .ctop in the render template (before metrics)
-// Current: ...</div></div><div class="metrics">...links...usa-flip-toggle
-// Want: after ctop, before metrics
-const oldToggle =
-  "${c.id==='USA'?`<div class=\"usa-flip-toggle\"><div class=\"usa-page-select\" id=\"usaPageSelect\"><button type=\"button\" data-page=\"0\" class=\"active\">Seite 1</button><button type=\"button\" data-page=\"1\">Seite 2</button><button type=\"button\" data-page=\"2\">Seite 3 · Rates</button><button type=\"button\" data-page=\"3\">Seite 4 · Kurven</button><button type=\"button\" data-page=\"4\">Seite 5 · FHLB</button><button type=\"button\" data-page=\"5\">Seite 6 · IORB/1Y</button></div></div>`:''}";
-
-// Find actual toggle snippet in file (escaping may differ)
-if (html.includes('id="usaPageSelect"') || html.includes("id=\"usaPageSelect\"")) {
-  // Remove toggle from end of card template if present after links
-  html = html.replace(
-    /\$\{c\.id==='USA'\?`<div class="usa-flip-toggle">[\s\S]*?<\/div><\/div>`:''\}/,
-    ''
-  );
-  // Insert after ctop closing in template: <div class="ctop">...</div>
-  const ctopEnd = html.indexOf(
-    '<div class="ctop"><div class="flag">${c.flag}</div><div><h2>${c.name}</h2><div class="code">${c.id}</div></div></div>'
-  );
-  if (ctopEnd >= 0) {
-    const insertAt =
-      ctopEnd +
-      '<div class="ctop"><div class="flag">${c.flag}</div><div><h2>${c.name}</h2><div class="code">${c.id}</div></div></div>'
-        .length;
-    const nav =
-      "${c.id==='USA'?`<div class=\"usa-flip-toggle\"><div class=\"usa-page-select\" id=\"usaPageSelect\"><button type=\"button\" data-page=\"0\">Seite 1</button><button type=\"button\" data-page=\"1\">Seite 2</button><button type=\"button\" data-page=\"2\">Seite 3</button><button type=\"button\" data-page=\"3\">Seite 4</button><button type=\"button\" data-page=\"4\">Seite 5</button><button type=\"button\" data-page=\"5\">Seite 6</button></div></div>`:''}";
-    // Avoid double insert
-    if (!html.slice(insertAt, insertAt + 80).includes('usaPageSelect')) {
-      html = html.slice(0, insertAt) + nav + html.slice(insertAt);
-      console.log('nav moved after ctop');
-    }
-  } else {
-    console.warn('ctop template not found for nav insert');
-  }
-}
-
-// 3) Harden bindUsaPages — always rebind, stopPropagation issues
+// 2) Harden bindUsaPages
 const hardened = `
 function bindUsaPages(){
   if(!window.__usaPageClickBound){
@@ -76,15 +42,47 @@ function bindUsaPages(){
 
 if (html.includes('function bindUsaPages')) {
   const s = html.indexOf('function bindUsaPages');
-  const e = html.indexOf('function ', s + 10);
-  // also handle if(!window.__usaRenderPatched) following
   let end = html.indexOf('if(!window.__usaRenderPatched)', s);
-  if (end < 0 || end > s + 800) end = html.indexOf('\nfunction ', s + 10);
+  if (end < 0 || end > s + 900) end = html.indexOf('\nfunction ', s + 10);
   if (end > s) {
     html = html.slice(0, s) + hardened + html.slice(end);
     console.log('bindUsaPages hardened');
   }
 }
 
+// 3) CRITICAL: ensure bindUsaPages() is invoked
+// Prefer right after the render-patch block; also before refresh();
+if (!html.includes('bindUsaPages();')) {
+  if (html.includes('if(!window.__usaRenderPatched)')) {
+    // append call after the render patch closing
+    html = html.replace(
+      /if\(!window\.__usaRenderPatched\)\{[\s\S]*?\n\}/,
+      (m) => m + '\nbindUsaPages();\n'
+    );
+    console.log('bindUsaPages() after render patch');
+  }
+  if (!html.includes('bindUsaPages();')) {
+    // fallback: before final refresh();
+    if (html.includes('\nrefresh();\n')) {
+      html = html.replace('\nrefresh();\n', '\nbindUsaPages();\nrefresh();\n');
+      console.log('bindUsaPages() before refresh');
+    } else if (html.includes('refresh();')) {
+      html = html.replace('refresh();', 'bindUsaPages();refresh();');
+      console.log('bindUsaPages() before refresh (inline)');
+    }
+  }
+} else {
+  console.log('bindUsaPages(); already present');
+}
+
+// 4) Also call after each render (in case cards rebuilt)
+if (html.includes('__usaRenderPatched') && !html.includes('bindUsaPages()\n    return')) {
+  html = html.replace(
+    "try{setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'))}catch(e){}\n    return r;",
+    "try{bindUsaPages()}catch(e){try{setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'))}catch(e2){}}\n    return r;"
+  );
+  console.log('render calls bindUsaPages');
+}
+
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'usaPageSelect', html.includes('usaPageSelect'));
+console.log('done', html.length, 'has call', html.includes('bindUsaPages();'));
