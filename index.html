@@ -462,6 +462,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(6,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -849,6 +850,8 @@ bindUsaPages();
 
 
 
+
+
 let _yieldDiffOrder=[];
 const YIELD7_KEYS=[
   {key:'us3m',label:'US 3M'},
@@ -877,6 +880,7 @@ const USA_OVERLAY_CATALOG=[
   {key:'us5yTips',label:'5Y BEI (Tips)'},
   {key:'us10yTips',label:'10Y BEI (Tips)'},
   {key:'move',label:'MOVE Index'},
+  {key:'dxy',label:'DXY'},
   {key:'wresbal',label:'WRESBAL Reserves'},
   {key:'effrVol',label:'EFFR Volume'},
   {key:'bofaCcc',label:'BofA CCC HY'},
@@ -997,6 +1001,15 @@ function ensureUsaFaceG(){
           '<label style="font-size:13px">Rot-Overlay: <select id="yield7OverlaySelect" style="margin-left:6px;min-width:160px;padding:4px 6px">'+_yield7OverlayOptionsHtml()+'</select></label>'+
           '<label style="font-size:13px">Grün (3.): <select id="yield7GreenSelect" style="margin-left:6px;min-width:160px;padding:4px 6px">'+_yield7OverlayOptionsHtml()+'</select></label>';
       }
+    } else {
+      // refresh options so new catalog entries (e.g. DXY) appear
+      const sel=document.getElementById('yield7OverlaySelect');
+      const selG=document.getElementById('yield7GreenSelect');
+      const cur=sel?sel.value:'';
+      const curG=selG?selG.value:'';
+      const opts=_yield7OverlayOptionsHtml();
+      if(sel&&!sel.querySelector('option[value="dxy"]')){sel.innerHTML=opts;sel.value=cur;}
+      if(selG&&!selG.querySelector('option[value="dxy"]')){selG.innerHTML=opts;selG.value=curG;}
     }
     return g;
   }
@@ -1177,6 +1190,7 @@ function paintYieldPage7(){
   }
   paintYield7Diff();
 }
+
 
 
 
