@@ -40,6 +40,8 @@ jobs:
         run: node scripts/inject-cuau.mjs
       - name: Inject USA page 3 (EFFR/SOFR/IORB + diff)
         run: node scripts/inject-faceC.mjs
+      - name: Inject rate overlay (EFFR/SOFR/IORB dual)
+        run: node scripts/inject-rate-overlay.mjs
       - name: Fix JS structure after injects
         run: node scripts/fix-js-structure.mjs
       - name: Inject UST + TIPS curve (USA page 4)
@@ -78,11 +80,12 @@ jobs:
         run: node scripts/fix-js-syntax.mjs
       - name: Restore paintChartDlg after final dedupe
         run: node scripts/fix-paint-chart-dlg.mjs
+      - name: Re-apply rate overlay after other injects
+        run: node scripts/inject-rate-overlay.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/inject-page7-yields.mjs
-          node --check scripts/fetch-ust-tips-page7.mjs
-          node --check scripts/inject-fix-usa-nav.mjs
+          node --check scripts/inject-rate-overlay.mjs
           node --check scripts/fix-paint-chart-dlg.mjs
           node --check scripts/fix-js-syntax.mjs
       - name: Fetch official economic data
@@ -156,6 +159,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           node scripts/fix-js-syntax.mjs || true
           node scripts/inject-fix-usa-nav.mjs || true
+          node scripts/inject-rate-overlay.mjs || true
           node scripts/fix-js-syntax.mjs || true
           node scripts/fix-paint-chart-dlg.mjs || true
           git add data.json scripts/ index.html || true
