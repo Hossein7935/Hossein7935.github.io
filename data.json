@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-09T22:57:54.726Z",
+  "updatedAt": "2026-11-09T23:02:20.370Z",
   "data": {
     "CHN": {
       "rate": {
@@ -143,7 +143,7 @@
       "ustCurve": {
         "value": 4.86,
         "date": "2026-11-06",
-        "updatedAt": "2026-11-09T22:57:00.359Z",
+        "updatedAt": "2026-11-09T23:02:12.794Z",
         "source": "FRED · DGS* + DFII* (TIPS real yields)",
         "nominal": [
           {
@@ -265,7 +265,7 @@
         "value": 798.428,
         "valueRaw": 798428,
         "date": "2026-09-30",
-        "updatedAt": "2026-11-09T22:57:18.544Z",
+        "updatedAt": "2026-11-09T23:02:13.532Z",
         "source": "FHLBanks Office of Finance · Combined Operating Highlights",
         "sourceUrl": "https://www.fhlb-of.com/",
         "absChangeQoq": -12.287,
@@ -295,7 +295,7 @@
         "prevDate": "2026-11-05",
         "absChange": -6,
         "pctChange": -5.41,
-        "updatedAt": "2026-11-09T22:57:19.642Z",
+        "updatedAt": "2026-11-09T23:02:14.375Z",
         "source": "FRED EFFRVOL · New York Fed Effective Federal Funds Volume",
         "sourceUrl": "https://www.newyorkfed.org/markets/reference-rates/effr",
         "unit": "USD Milliarden",
@@ -312,7 +312,7 @@
         "us1y": 4.33,
         "us1yDate": "2026-11-06",
         "spread": 0.43,
-        "updatedAt": "2026-11-09T22:57:24.146Z",
+        "updatedAt": "2026-11-09T23:02:14.895Z",
         "source": "FRED IOER+IORB (merged) + DGS1",
         "sourceUrl": "https://fred.stlouisfed.org/series/IORB",
         "iorbPoints": 6607,
@@ -325,7 +325,7 @@
         "prevValue": 92.77,
         "absChange": -6.79,
         "pctChange": -7.32,
-        "updatedAt": "2026-11-09T22:57:26.672Z",
+        "updatedAt": "2026-11-09T23:02:15.116Z",
         "source": "Yahoo Finance ^MOVE · ICE BofA MOVE Index",
         "sourceUrl": "https://finance.yahoo.com/quote/%5EMOVE/",
         "unit": "bp (ann.)",
@@ -339,7 +339,7 @@
         "prevValue": 102.3,
         "absChange": -0.605,
         "pctChange": -0.59,
-        "updatedAt": "2026-11-09T22:57:27.002Z",
+        "updatedAt": "2026-11-09T23:02:15.755Z",
         "source": "Yahoo Finance DX-Y.NYB · ICE US Dollar Index (DXY)",
         "sourceUrl": "https://finance.yahoo.com/quote/DX-Y.NYB/",
         "unit": "index",
@@ -353,14 +353,14 @@
         "sofr": 3.89,
         "sofrDate": "2026-11-06",
         "spread": 0.62,
-        "updatedAt": "2026-11-09T22:57:27.372Z",
+        "updatedAt": "2026-11-09T23:02:16.088Z",
         "source": "FRED DGS2 + SOFR",
         "us2yPoints": 2964,
         "sofrPoints": 2148,
         "note": "US 2Y blau · SOFR rot · nicht Teil der Differenz-Funktion"
       },
       "ustTipsPage7": {
-        "updatedAt": "2026-11-09T22:57:29.856Z",
+        "updatedAt": "2026-11-09T23:02:16.304Z",
         "series": {
           "us3m": {
             "value": 4.19,
@@ -572,12 +572,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.816,
+        "value": 4.814,
         "date": "2026-11-09",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.181,
+        "value": 0.183,
         "date": "2026-11-09",
         "source": "TradingView · AUS 10Y − 2Y"
       },
@@ -3376,7 +3376,7 @@
       },
       {
         "period": "2026-11-09",
-        "value": 0.181
+        "value": 0.183
       }
     ],
     "CHN-t10y2y": [
@@ -125695,7 +125695,7 @@
     ],
     "USA-ustCurveSnapshots": [
       {
-        "asOf": "2026-11-09T22:57:00.359Z",
+        "asOf": "2026-11-09T23:02:12.794Z",
         "nominal": [
           {
             "period": "3M",
