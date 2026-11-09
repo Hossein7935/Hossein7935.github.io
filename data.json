@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-09T22:43:21.359Z",
+  "updatedAt": "2026-11-09T22:51:19.217Z",
   "data": {
     "CHN": {
       "rate": {
@@ -140,776 +140,10 @@
         "source": "FRED · IOER+IORB (merged)",
         "note": "IOER bis 2021-07, danach IORB"
       },
-      "sofrFwd": {
-        "value": 4.4967,
-        "date": "2026-11-09",
-        "updatedAt": "2026-11-09T22:42:54.092Z",
-        "curve": [
-          {
-            "period": "Heute",
-            "value": 3.89
-          },
-          {
-            "period": "3m",
-            "value": 4.175
-          },
-          {
-            "period": "6m",
-            "value": 4.32
-          },
-          {
-            "period": "9m",
-            "value": 4.405
-          },
-          {
-            "period": "12m",
-            "value": 4.43
-          },
-          {
-            "period": "2y",
-            "value": 4.3783
-          },
-          {
-            "period": "5y",
-            "value": 4.4967
-          }
-        ],
-        "detail": [
-          {
-            "period": "Heute",
-            "tenor": "Heute",
-            "months": 0,
-            "value": 3.89,
-            "kind": "spot",
-            "note": "Veröffentlichter Overnight-SOFR (NY Fed)",
-            "contracts": [
-              "SOFR"
-            ],
-            "spotDate": "2026-11-06"
-          },
-          {
-            "period": "3m",
-            "tenor": "3m",
-            "months": 3,
-            "value": 4.175,
-            "kind": "fwd",
-            "method": "interp",
-            "contracts": [
-              "SR1F27.CME",
-              "SR1G27.CME"
-            ],
-            "note": "SR1/SR3 Strip"
-          },
-          {
-            "period": "6m",
-            "tenor": "6m",
-            "months": 6,
-            "value": 4.32,
-            "kind": "fwd",
-            "method": "interp",
-            "contracts": [
-              "SR1J27.CME",
-              "SR1K27.CME"
-            ],
-            "note": "SR1/SR3 Strip"
-          },
-          {
-            "period": "9m",
-            "tenor": "9m",
-            "months": 9,
-            "value": 4.405,
-            "kind": "fwd",
-            "method": "interp",
-            "contracts": [
-              "SR1N27.CME",
-              "SR1Q27.CME"
-            ],
-            "note": "SR1/SR3 Strip"
-          },
-          {
-            "period": "12m",
-            "tenor": "12m",
-            "months": 12,
-            "value": 4.43,
-            "kind": "fwd",
-            "method": "interp",
-            "contracts": [
-              "SR1V27.CME",
-              "SR1X27.CME"
-            ],
-            "note": "SR1/SR3 Strip"
-          },
-          {
-            "period": "2y",
-            "tenor": "2y",
-            "months": 24,
-            "value": 4.3783,
-            "kind": "fwd",
-            "method": "interp",
-            "contracts": [
-              "SR3U28.CME",
-              "SR3Z28.CME"
-            ],
-            "note": "SR3-Schwerpunkt"
-          },
-          {
-            "period": "5y",
-            "tenor": "5y",
-            "months": 60,
-            "value": 4.4967,
-            "kind": "fwd",
-            "method": "interp",
-            "contracts": [
-              "SR3U31.CME",
-              "SR3Z31.CME"
-            ],
-            "note": "SR3-Schwerpunkt"
-          }
-        ],
-        "source": "NY Fed SOFR + CME SR1/SR3 (Yahoo)",
-        "maxStripMonths": 79,
-        "sr1Count": 15,
-        "sr3Count": 27,
-        "catalog": [
-          {
-            "id": "sr1_2026-11",
-            "label": "SR1 2026-11 (0m)",
-            "symbol": "SR1X26.CME",
-            "kind": "SR1",
-            "yearMonth": "2026-11",
-            "monthsFromNow": 0,
-            "lastRate": 3.9
-          },
-          {
-            "id": "sr1_2026-12",
-            "label": "SR1 2026-12 (1m)",
-            "symbol": "SR1Z26.CME",
-            "kind": "SR1",
-            "yearMonth": "2026-12",
-            "monthsFromNow": 1,
-            "lastRate": 4.05
-          },
-          {
-            "id": "sr1_2027-01",
-            "label": "SR1 2027-01 (2m)",
-            "symbol": "SR1F27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-01",
-            "monthsFromNow": 2,
-            "lastRate": 4.13
-          },
-          {
-            "id": "sr1_2027-02",
-            "label": "SR1 2027-02 (3m)",
-            "symbol": "SR1G27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-02",
-            "monthsFromNow": 3,
-            "lastRate": 4.175
-          },
-          {
-            "id": "sr1_2027-03",
-            "label": "SR1 2027-03 (4m)",
-            "symbol": "SR1H27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-03",
-            "monthsFromNow": 4,
-            "lastRate": 4.23
-          },
-          {
-            "id": "sr1_2027-04",
-            "label": "SR1 2027-04 (5m)",
-            "symbol": "SR1J27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-04",
-            "monthsFromNow": 5,
-            "lastRate": 4.285
-          },
-          {
-            "id": "sr1_2027-05",
-            "label": "SR1 2027-05 (6m)",
-            "symbol": "SR1K27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-05",
-            "monthsFromNow": 6,
-            "lastRate": 4.32
-          },
-          {
-            "id": "sr1_2027-06",
-            "label": "SR1 2027-06 (7m)",
-            "symbol": "SR1M27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-06",
-            "monthsFromNow": 7,
-            "lastRate": 4.365
-          },
-          {
-            "id": "sr1_2027-07",
-            "label": "SR1 2027-07 (8m)",
-            "symbol": "SR1N27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-07",
-            "monthsFromNow": 8,
-            "lastRate": 4.39
-          },
-          {
-            "id": "sr1_2027-08",
-            "label": "SR1 2027-08 (9m)",
-            "symbol": "SR1Q27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-08",
-            "monthsFromNow": 9,
-            "lastRate": 4.405
-          },
-          {
-            "id": "sr1_2027-09",
-            "label": "SR1 2027-09 (10m)",
-            "symbol": "SR1U27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-09",
-            "monthsFromNow": 10,
-            "lastRate": 4.415
-          },
-          {
-            "id": "sr1_2027-10",
-            "label": "SR1 2027-10 (11m)",
-            "symbol": "SR1V27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-10",
-            "monthsFromNow": 11,
-            "lastRate": 4.43
-          },
-          {
-            "id": "sr1_2027-11",
-            "label": "SR1 2027-11 (12m)",
-            "symbol": "SR1X27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-11",
-            "monthsFromNow": 12,
-            "lastRate": 4.43
-          },
-          {
-            "id": "sr1_2027-12",
-            "label": "SR1 2027-12 (13m)",
-            "symbol": "SR1Z27.CME",
-            "kind": "SR1",
-            "yearMonth": "2027-12",
-            "monthsFromNow": 13,
-            "lastRate": 4.375
-          },
-          {
-            "id": "sr1_2028-01",
-            "label": "SR1 2028-01 (14m)",
-            "symbol": "SR1F28.CME",
-            "kind": "SR1",
-            "yearMonth": "2028-01",
-            "monthsFromNow": 14,
-            "lastRate": 4.365
-          },
-          {
-            "id": "sr3_2026-12",
-            "label": "SR3 2026-12 (1m)",
-            "symbol": "SR3Z26.CME",
-            "kind": "SR3",
-            "yearMonth": "2026-12",
-            "monthsFromNow": 1,
-            "lastRate": 4.17
-          },
-          {
-            "id": "sr3_2027-03",
-            "label": "SR3 2027-03 (4m)",
-            "symbol": "SR3H27.CME",
-            "kind": "SR3",
-            "yearMonth": "2027-03",
-            "monthsFromNow": 4,
-            "lastRate": 4.325
-          },
-          {
-            "id": "sr3_2027-06",
-            "label": "SR3 2027-06 (7m)",
-            "symbol": "SR3M27.CME",
-            "kind": "SR3",
-            "yearMonth": "2027-06",
-            "monthsFromNow": 7,
-            "lastRate": 4.425
-          },
-          {
-            "id": "sr3_2027-09",
-            "label": "SR3 2027-09 (10m)",
-            "symbol": "SR3U27.CME",
-            "kind": "SR3",
-            "yearMonth": "2027-09",
-            "monthsFromNow": 10,
-            "lastRate": 4.45
-          },
-          {
-            "id": "sr3_2027-12",
-            "label": "SR3 2027-12 (13m)",
-            "symbol": "SR3Z27.CME",
-            "kind": "SR3",
-            "yearMonth": "2027-12",
-            "monthsFromNow": 13,
-            "lastRate": 4.435
-          },
-          {
-            "id": "sr3_2028-03",
-            "label": "SR3 2028-03 (16m)",
-            "symbol": "SR3H28.CME",
-            "kind": "SR3",
-            "yearMonth": "2028-03",
-            "monthsFromNow": 16,
-            "lastRate": 4.415
-          },
-          {
-            "id": "sr3_2028-06",
-            "label": "SR3 2028-06 (19m)",
-            "symbol": "SR3M28.CME",
-            "kind": "SR3",
-            "yearMonth": "2028-06",
-            "monthsFromNow": 19,
-            "lastRate": 4.4
-          },
-          {
-            "id": "sr3_2028-09",
-            "label": "SR3 2028-09 (22m)",
-            "symbol": "SR3U28.CME",
-            "kind": "SR3",
-            "yearMonth": "2028-09",
-            "monthsFromNow": 22,
-            "lastRate": 4.385
-          },
-          {
-            "id": "sr3_2028-12",
-            "label": "SR3 2028-12 (25m)",
-            "symbol": "SR3Z28.CME",
-            "kind": "SR3",
-            "yearMonth": "2028-12",
-            "monthsFromNow": 25,
-            "lastRate": 4.375
-          },
-          {
-            "id": "sr3_2029-03",
-            "label": "SR3 2029-03 (28m)",
-            "symbol": "SR3H29.CME",
-            "kind": "SR3",
-            "yearMonth": "2029-03",
-            "monthsFromNow": 28,
-            "lastRate": 4.36
-          },
-          {
-            "id": "sr3_2029-06",
-            "label": "SR3 2029-06 (31m)",
-            "symbol": "SR3M29.CME",
-            "kind": "SR3",
-            "yearMonth": "2029-06",
-            "monthsFromNow": 31,
-            "lastRate": 4.355
-          },
-          {
-            "id": "sr3_2029-09",
-            "label": "SR3 2029-09 (34m)",
-            "symbol": "SR3U29.CME",
-            "kind": "SR3",
-            "yearMonth": "2029-09",
-            "monthsFromNow": 34,
-            "lastRate": 4.35
-          },
-          {
-            "id": "sr3_2029-12",
-            "label": "SR3 2029-12 (37m)",
-            "symbol": "SR3Z29.CME",
-            "kind": "SR3",
-            "yearMonth": "2029-12",
-            "monthsFromNow": 37,
-            "lastRate": 4.35
-          },
-          {
-            "id": "sr3_2030-03",
-            "label": "SR3 2030-03 (40m)",
-            "symbol": "SR3H30.CME",
-            "kind": "SR3",
-            "yearMonth": "2030-03",
-            "monthsFromNow": 40,
-            "lastRate": 4.355
-          },
-          {
-            "id": "sr3_2030-06",
-            "label": "SR3 2030-06 (43m)",
-            "symbol": "SR3M30.CME",
-            "kind": "SR3",
-            "yearMonth": "2030-06",
-            "monthsFromNow": 43,
-            "lastRate": 4.365
-          },
-          {
-            "id": "sr3_2030-09",
-            "label": "SR3 2030-09 (46m)",
-            "symbol": "SR3U30.CME",
-            "kind": "SR3",
-            "yearMonth": "2030-09",
-            "monthsFromNow": 46,
-            "lastRate": 4.38
-          },
-          {
-            "id": "sr3_2030-12",
-            "label": "SR3 2030-12 (49m)",
-            "symbol": "SR3Z30.CME",
-            "kind": "SR3",
-            "yearMonth": "2030-12",
-            "monthsFromNow": 49,
-            "lastRate": 4.395
-          },
-          {
-            "id": "sr3_2031-03",
-            "label": "SR3 2031-03 (52m)",
-            "symbol": "SR3H31.CME",
-            "kind": "SR3",
-            "yearMonth": "2031-03",
-            "monthsFromNow": 52,
-            "lastRate": 4.425
-          },
-          {
-            "id": "sr3_2031-06",
-            "label": "SR3 2031-06 (55m)",
-            "symbol": "SR3M31.CME",
-            "kind": "SR3",
-            "yearMonth": "2031-06",
-            "monthsFromNow": 55,
-            "lastRate": 4.455
-          },
-          {
-            "id": "sr3_2031-09",
-            "label": "SR3 2031-09 (58m)",
-            "symbol": "SR3U31.CME",
-            "kind": "SR3",
-            "yearMonth": "2031-09",
-            "monthsFromNow": 58,
-            "lastRate": 4.49
-          }
-        ],
-        "histKeys": {}
-      },
-      "sofrTenorCatalog": [
-        {
-          "id": "sr1_2026-11",
-          "label": "SR1 2026-11 (0m)",
-          "symbol": "SR1X26.CME",
-          "kind": "SR1",
-          "yearMonth": "2026-11",
-          "monthsFromNow": 0,
-          "lastRate": 3.9
-        },
-        {
-          "id": "sr1_2026-12",
-          "label": "SR1 2026-12 (1m)",
-          "symbol": "SR1Z26.CME",
-          "kind": "SR1",
-          "yearMonth": "2026-12",
-          "monthsFromNow": 1,
-          "lastRate": 4.05
-        },
-        {
-          "id": "sr1_2027-01",
-          "label": "SR1 2027-01 (2m)",
-          "symbol": "SR1F27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-01",
-          "monthsFromNow": 2,
-          "lastRate": 4.13
-        },
-        {
-          "id": "sr1_2027-02",
-          "label": "SR1 2027-02 (3m)",
-          "symbol": "SR1G27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-02",
-          "monthsFromNow": 3,
-          "lastRate": 4.175
-        },
-        {
-          "id": "sr1_2027-03",
-          "label": "SR1 2027-03 (4m)",
-          "symbol": "SR1H27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-03",
-          "monthsFromNow": 4,
-          "lastRate": 4.23
-        },
-        {
-          "id": "sr1_2027-04",
-          "label": "SR1 2027-04 (5m)",
-          "symbol": "SR1J27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-04",
-          "monthsFromNow": 5,
-          "lastRate": 4.285
-        },
-        {
-          "id": "sr1_2027-05",
-          "label": "SR1 2027-05 (6m)",
-          "symbol": "SR1K27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-05",
-          "monthsFromNow": 6,
-          "lastRate": 4.32
-        },
-        {
-          "id": "sr1_2027-06",
-          "label": "SR1 2027-06 (7m)",
-          "symbol": "SR1M27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-06",
-          "monthsFromNow": 7,
-          "lastRate": 4.365
-        },
-        {
-          "id": "sr1_2027-07",
-          "label": "SR1 2027-07 (8m)",
-          "symbol": "SR1N27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-07",
-          "monthsFromNow": 8,
-          "lastRate": 4.39
-        },
-        {
-          "id": "sr1_2027-08",
-          "label": "SR1 2027-08 (9m)",
-          "symbol": "SR1Q27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-08",
-          "monthsFromNow": 9,
-          "lastRate": 4.405
-        },
-        {
-          "id": "sr1_2027-09",
-          "label": "SR1 2027-09 (10m)",
-          "symbol": "SR1U27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-09",
-          "monthsFromNow": 10,
-          "lastRate": 4.415
-        },
-        {
-          "id": "sr1_2027-10",
-          "label": "SR1 2027-10 (11m)",
-          "symbol": "SR1V27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-10",
-          "monthsFromNow": 11,
-          "lastRate": 4.43
-        },
-        {
-          "id": "sr1_2027-11",
-          "label": "SR1 2027-11 (12m)",
-          "symbol": "SR1X27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-11",
-          "monthsFromNow": 12,
-          "lastRate": 4.43
-        },
-        {
-          "id": "sr1_2027-12",
-          "label": "SR1 2027-12 (13m)",
-          "symbol": "SR1Z27.CME",
-          "kind": "SR1",
-          "yearMonth": "2027-12",
-          "monthsFromNow": 13,
-          "lastRate": 4.375
-        },
-        {
-          "id": "sr1_2028-01",
-          "label": "SR1 2028-01 (14m)",
-          "symbol": "SR1F28.CME",
-          "kind": "SR1",
-          "yearMonth": "2028-01",
-          "monthsFromNow": 14,
-          "lastRate": 4.365
-        },
-        {
-          "id": "sr3_2026-12",
-          "label": "SR3 2026-12 (1m)",
-          "symbol": "SR3Z26.CME",
-          "kind": "SR3",
-          "yearMonth": "2026-12",
-          "monthsFromNow": 1,
-          "lastRate": 4.17
-        },
-        {
-          "id": "sr3_2027-03",
-          "label": "SR3 2027-03 (4m)",
-          "symbol": "SR3H27.CME",
-          "kind": "SR3",
-          "yearMonth": "2027-03",
-          "monthsFromNow": 4,
-          "lastRate": 4.325
-        },
-        {
-          "id": "sr3_2027-06",
-          "label": "SR3 2027-06 (7m)",
-          "symbol": "SR3M27.CME",
-          "kind": "SR3",
-          "yearMonth": "2027-06",
-          "monthsFromNow": 7,
-          "lastRate": 4.425
-        },
-        {
-          "id": "sr3_2027-09",
-          "label": "SR3 2027-09 (10m)",
-          "symbol": "SR3U27.CME",
-          "kind": "SR3",
-          "yearMonth": "2027-09",
-          "monthsFromNow": 10,
-          "lastRate": 4.45
-        },
-        {
-          "id": "sr3_2027-12",
-          "label": "SR3 2027-12 (13m)",
-          "symbol": "SR3Z27.CME",
-          "kind": "SR3",
-          "yearMonth": "2027-12",
-          "monthsFromNow": 13,
-          "lastRate": 4.435
-        },
-        {
-          "id": "sr3_2028-03",
-          "label": "SR3 2028-03 (16m)",
-          "symbol": "SR3H28.CME",
-          "kind": "SR3",
-          "yearMonth": "2028-03",
-          "monthsFromNow": 16,
-          "lastRate": 4.415
-        },
-        {
-          "id": "sr3_2028-06",
-          "label": "SR3 2028-06 (19m)",
-          "symbol": "SR3M28.CME",
-          "kind": "SR3",
-          "yearMonth": "2028-06",
-          "monthsFromNow": 19,
-          "lastRate": 4.4
-        },
-        {
-          "id": "sr3_2028-09",
-          "label": "SR3 2028-09 (22m)",
-          "symbol": "SR3U28.CME",
-          "kind": "SR3",
-          "yearMonth": "2028-09",
-          "monthsFromNow": 22,
-          "lastRate": 4.385
-        },
-        {
-          "id": "sr3_2028-12",
-          "label": "SR3 2028-12 (25m)",
-          "symbol": "SR3Z28.CME",
-          "kind": "SR3",
-          "yearMonth": "2028-12",
-          "monthsFromNow": 25,
-          "lastRate": 4.375
-        },
-        {
-          "id": "sr3_2029-03",
-          "label": "SR3 2029-03 (28m)",
-          "symbol": "SR3H29.CME",
-          "kind": "SR3",
-          "yearMonth": "2029-03",
-          "monthsFromNow": 28,
-          "lastRate": 4.36
-        },
-        {
-          "id": "sr3_2029-06",
-          "label": "SR3 2029-06 (31m)",
-          "symbol": "SR3M29.CME",
-          "kind": "SR3",
-          "yearMonth": "2029-06",
-          "monthsFromNow": 31,
-          "lastRate": 4.355
-        },
-        {
-          "id": "sr3_2029-09",
-          "label": "SR3 2029-09 (34m)",
-          "symbol": "SR3U29.CME",
-          "kind": "SR3",
-          "yearMonth": "2029-09",
-          "monthsFromNow": 34,
-          "lastRate": 4.35
-        },
-        {
-          "id": "sr3_2029-12",
-          "label": "SR3 2029-12 (37m)",
-          "symbol": "SR3Z29.CME",
-          "kind": "SR3",
-          "yearMonth": "2029-12",
-          "monthsFromNow": 37,
-          "lastRate": 4.35
-        },
-        {
-          "id": "sr3_2030-03",
-          "label": "SR3 2030-03 (40m)",
-          "symbol": "SR3H30.CME",
-          "kind": "SR3",
-          "yearMonth": "2030-03",
-          "monthsFromNow": 40,
-          "lastRate": 4.355
-        },
-        {
-          "id": "sr3_2030-06",
-          "label": "SR3 2030-06 (43m)",
-          "symbol": "SR3M30.CME",
-          "kind": "SR3",
-          "yearMonth": "2030-06",
-          "monthsFromNow": 43,
-          "lastRate": 4.365
-        },
-        {
-          "id": "sr3_2030-09",
-          "label": "SR3 2030-09 (46m)",
-          "symbol": "SR3U30.CME",
-          "kind": "SR3",
-          "yearMonth": "2030-09",
-          "monthsFromNow": 46,
-          "lastRate": 4.38
-        },
-        {
-          "id": "sr3_2030-12",
-          "label": "SR3 2030-12 (49m)",
-          "symbol": "SR3Z30.CME",
-          "kind": "SR3",
-          "yearMonth": "2030-12",
-          "monthsFromNow": 49,
-          "lastRate": 4.395
-        },
-        {
-          "id": "sr3_2031-03",
-          "label": "SR3 2031-03 (52m)",
-          "symbol": "SR3H31.CME",
-          "kind": "SR3",
-          "yearMonth": "2031-03",
-          "monthsFromNow": 52,
-          "lastRate": 4.425
-        },
-        {
-          "id": "sr3_2031-06",
-          "label": "SR3 2031-06 (55m)",
-          "symbol": "SR3M31.CME",
-          "kind": "SR3",
-          "yearMonth": "2031-06",
-          "monthsFromNow": 55,
-          "lastRate": 4.455
-        },
-        {
-          "id": "sr3_2031-09",
-          "label": "SR3 2031-09 (58m)",
-          "symbol": "SR3U31.CME",
-          "kind": "SR3",
-          "yearMonth": "2031-09",
-          "monthsFromNow": 58,
-          "lastRate": 4.49
-        }
-      ],
       "ustCurve": {
         "value": 4.86,
         "date": "2026-11-06",
-        "updatedAt": "2026-11-09T22:43:02.635Z",
+        "updatedAt": "2026-11-09T22:50:50.168Z",
         "source": "FRED · DGS* + DFII* (TIPS real yields)",
         "nominal": [
           {
@@ -1031,7 +265,7 @@
         "value": 798.428,
         "valueRaw": 798428,
         "date": "2026-09-30",
-        "updatedAt": "2026-11-09T22:43:07.811Z",
+        "updatedAt": "2026-11-09T22:50:57.275Z",
         "source": "FHLBanks Office of Finance · Combined Operating Highlights",
         "sourceUrl": "https://www.fhlb-of.com/",
         "absChangeQoq": -12.287,
@@ -1061,7 +295,7 @@
         "prevDate": "2026-11-05",
         "absChange": -6,
         "pctChange": -5.41,
-        "updatedAt": "2026-11-09T22:43:08.768Z",
+        "updatedAt": "2026-11-09T22:50:58.355Z",
         "source": "FRED EFFRVOL · New York Fed Effective Federal Funds Volume",
         "sourceUrl": "https://www.newyorkfed.org/markets/reference-rates/effr",
         "unit": "USD Milliarden",
@@ -1078,7 +312,7 @@
         "us1y": 4.33,
         "us1yDate": "2026-11-06",
         "spread": 0.43,
-        "updatedAt": "2026-11-09T22:43:10.507Z",
+        "updatedAt": "2026-11-09T22:50:59.332Z",
         "source": "FRED IOER+IORB (merged) + DGS1",
         "sourceUrl": "https://fred.stlouisfed.org/series/IORB",
         "iorbPoints": 6607,
@@ -1091,7 +325,7 @@
         "prevValue": 92.77,
         "absChange": -6.79,
         "pctChange": -7.32,
-        "updatedAt": "2026-11-09T22:43:11.669Z",
+        "updatedAt": "2026-11-09T22:51:01.306Z",
         "source": "Yahoo Finance ^MOVE · ICE BofA MOVE Index",
         "sourceUrl": "https://finance.yahoo.com/quote/%5EMOVE/",
         "unit": "bp (ann.)",
@@ -1100,12 +334,12 @@
         "note": "MOVE = implizite Treasury-Optionsvolatilität. Volle Tageshistorie ab 2002-11-12 (Index-Start ~2002)."
       },
       "dxy": {
-        "value": 101.684,
+        "value": 101.695,
         "date": "2026-11-09",
         "prevValue": 102.3,
-        "absChange": -0.616,
-        "pctChange": -0.6,
-        "updatedAt": "2026-11-09T22:43:12.010Z",
+        "absChange": -0.605,
+        "pctChange": -0.59,
+        "updatedAt": "2026-11-09T22:51:01.584Z",
         "source": "Yahoo Finance DX-Y.NYB · ICE US Dollar Index (DXY)",
         "sourceUrl": "https://finance.yahoo.com/quote/DX-Y.NYB/",
         "unit": "index",
@@ -1119,14 +353,14 @@
         "sofr": 3.89,
         "sofrDate": "2026-11-06",
         "spread": 0.62,
-        "updatedAt": "2026-11-09T22:43:12.447Z",
+        "updatedAt": "2026-11-09T22:51:01.959Z",
         "source": "FRED DGS2 + SOFR",
         "us2yPoints": 2964,
         "sofrPoints": 2148,
         "note": "US 2Y blau · SOFR rot · nicht Teil der Differenz-Funktion"
       },
       "ustTipsPage7": {
-        "updatedAt": "2026-11-09T22:43:12.743Z",
+        "updatedAt": "2026-11-09T22:51:02.387Z",
         "series": {
           "us3m": {
             "value": 4.19,
@@ -1338,7 +572,7 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.82,
+        "value": 4.819,
         "date": "2026-11-09",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
@@ -97601,72 +96835,6 @@
         "value": 3.9
       }
     ],
-    "USA-sofrFwd": [
-      {
-        "period": "Heute",
-        "value": 3.89
-      },
-      {
-        "period": "3m",
-        "value": 4.175
-      },
-      {
-        "period": "6m",
-        "value": 4.32
-      },
-      {
-        "period": "9m",
-        "value": 4.405
-      },
-      {
-        "period": "12m",
-        "value": 4.43
-      },
-      {
-        "period": "2y",
-        "value": 4.3783
-      },
-      {
-        "period": "5y",
-        "value": 4.4967
-      }
-    ],
-    "USA-sofrFwdSnapshots": [
-      {
-        "asOf": "2026-11-09T22:42:54.092Z",
-        "spotDate": "2026-11-06",
-        "curve": [
-          {
-            "period": "Heute",
-            "value": 3.89
-          },
-          {
-            "period": "3m",
-            "value": 4.175
-          },
-          {
-            "period": "6m",
-            "value": 4.32
-          },
-          {
-            "period": "9m",
-            "value": 4.405
-          },
-          {
-            "period": "12m",
-            "value": 4.43
-          },
-          {
-            "period": "2y",
-            "value": 4.3783
-          },
-          {
-            "period": "5y",
-            "value": 4.4967
-          }
-        ]
-      }
-    ],
     "USA-ust3M": [
       {
         "period": "2020-01-02",
@@ -126527,7 +125695,7 @@
     ],
     "USA-ustCurveSnapshots": [
       {
-        "asOf": "2026-11-09T22:43:02.635Z",
+        "asOf": "2026-11-09T22:50:50.168Z",
         "nominal": [
           {
             "period": "3M",
@@ -241047,7 +240215,7 @@
       },
       {
         "period": "2026-11-09",
-        "value": 101.684
+        "value": 101.695
       }
     ],
     "USA-us2y": [
