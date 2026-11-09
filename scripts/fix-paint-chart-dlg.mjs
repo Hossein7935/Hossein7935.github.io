@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** paintChartDlg: dual charts with full render */
+/** paintChartDlg hardened: always paints dual charts, try/catch, visible SVG */
 let html = fs.readFileSync('index.html', 'utf8');
 
 const start = html.indexOf('function paintChartDlg');
@@ -20,8 +20,11 @@ const fn = `function paintChartDlg(){
   const body=document.querySelector('#chartBody');
   const meta=document.querySelector('#chartMeta');
   if(!body)return;
+  body.style.minHeight='280px';
   const range=chartCtx.range||'3y';
   const rLabel={'6m':'6 Monate','1y':'1 Jahr','3y':'3 Jahre'}[range]||range;
+
+  try{
 
   if(key==='us2ySofrDual'&&typeof renderUs2ySofrChart==='function'){
     let us2y=histories['USA-us2y']||[];
@@ -94,18 +97,18 @@ const fn = `function paintChartDlg(){
       if(meta)meta.textContent='';
       return;
     }
-    body.innerHTML=renderMoveYieldChart(move,yAvg,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    body.innerHTML=renderMoveYieldChart(move,yAvg,{w:720,h:320,big:true})+'<div class="chart-tip entip-inline" id="chartDlgTip"></div>'.replace('chart-tip entip','chart-tip');
     if(typeof bindBigChartHover==='function')bindBigChartHover(body);
     if(meta)meta.textContent='MOVE blau · '+(yAvg.length?'Ø Rendite rot · ':'')+rLabel+' · '+move.length+' Punkte';
     return;
   }
 
-  if(key==='rateOverlayDual'&&typeof renderRateOverlayChart==='function'){
+  if(key==='rateOverlayDual'){
     const om=window.__rateOverlayMeta||{};
     const k1=om.k1||'effr', k2=om.k2||'sofr';
     const labels={effr:'EFFR',sofr:'SOFR',iorb:'IORB'};
-    let blue=histories['USA-'+k1]||[];
-    let red=histories['USA-'+k2]||[];
+    let blue=histories['USA-'+k1]||histories['USA-rateOverlayBlue']||[];
+    let red=histories['USA-'+k2]||histories['USA-rateOverlayRed']||[];
     if(typeof filterByRange==='function'){
       const b2=filterByRange(blue,range); if(b2.length) blue=b2;
       const r2=filterByRange(red,range); if(r2.length) red=r2;
@@ -115,27 +118,29 @@ const fn = `function paintChartDlg(){
       if(meta)meta.textContent='';
       return;
     }
-    body.innerHTML=renderRateOverlayChart(blue,red,{w:720,h:320,big:true,blueLabel:labels[k1]||k1,redLabel:labels[k2]||k2})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    if(typeof renderRateOverlayChart==='function'){
+      body.innerHTML=renderRateOverlayChart(blue,red,{w:720,h:320,big:true,blueLabel:labels[k1]||k1,redLabel:labels[k2]||k2})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    }else{
+      // fallback: show blue series as line chart
+      body.innerHTML=renderLineChart(blue,{w:720,h:300,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    }
     if(typeof bindBigChartHover==='function')bindBigChartHover(body);
-    if(meta)meta.textContent=(labels[k1]||k1)+' blau · '+(labels[k2]||k2)+' rot · '+rLabel;
+    if(meta)meta.textContent=(labels[k1]||k1)+' blau · '+(labels[k2]||k2)+' rot · '+rLabel+' · '+blue.length+'/'+red.length+' Punkte';
     return;
   }
 
-  if(key==='yield7Diff'){
-    let pts=histories['USA-yield7Diff']||[];
+  if(key==='diff'||key==='yield7Diff'){
+    const histKey=key==='diff'?'USA-diff':'USA-yield7Diff';
+    let pts=histories[histKey]||[];
     if(typeof filterByRange==='function'){
       const p2=filterByRange(pts,range); if(p2.length) pts=p2;
     }
     let ov=[];
     const metaO=window.__yield7OverlayMeta||{};
-    if(metaO.key&&typeof getYield7OverlayKey==='function'&&getYield7OverlayKey()){
+    if(key==='yield7Diff'&&metaO.key&&typeof getYield7OverlayKey==='function'&&getYield7OverlayKey()){
       ov=histories['USA-'+metaO.key]||[];
       if(typeof filterByRange==='function'){
         const o2=filterByRange(ov,range); if(o2.length) ov=o2;
-      }
-      if(pts.length&&ov.length){
-        const t0=String(pts[0].period), t1=String(pts.at(-1).period);
-        ov=ov.filter(p=>String(p.period)>=t0&&String(p.period)<=t1);
       }
     }
     if(!pts.length){
@@ -143,13 +148,13 @@ const fn = `function paintChartDlg(){
       if(meta)meta.textContent='';
       return;
     }
-    if(typeof renderDiffOverlayChart==='function'){
+    if(key==='yield7Diff'&&typeof renderDiffOverlayChart==='function'){
       body.innerHTML=renderDiffOverlayChart(pts,ov,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
     }else{
-      body.innerHTML=renderLineChart(pts,{w:720,h:280,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+      body.innerHTML=renderLineChart(pts,{w:720,h:300,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
     }
     if(typeof bindBigChartHover==='function')bindBigChartHover(body);
-    if(meta)meta.textContent='Differenz blau · '+(metaO.label?('rot: '+metaO.label+' · '):'')+rLabel+' · '+pts.length+' Punkte';
+    if(meta)meta.textContent='Differenz · '+rLabel+' · '+pts.length+' Punkte'+(metaO.label?(' · rot: '+metaO.label):'');
     return;
   }
 
@@ -188,6 +193,11 @@ const fn = `function paintChartDlg(){
   }else{
     if(meta)meta.textContent=pts.length+' Punkte · '+rLabel+' · '+esc(String(pts[0].period))+' → '+esc(String(pts.at(-1).period));
   }
+
+  }catch(err){
+    body.innerHTML='<div class="sparkempty">Chart-Fehler: '+(err&&err.message?err.message:err)+'</div>';
+    if(meta)meta.textContent='';
+  }
 }
 
 `;
@@ -198,11 +208,12 @@ fs.writeFileSync('index.html', html);
 const s2 = html.indexOf('function paintChartDlg');
 const e2 = html.indexOf('function bindBigChartHover');
 const region = html.slice(s2, e2);
-const hasRender =
-  region.includes("key==='us2ySofrDual'") &&
-  region.includes('renderUs2ySofrChart(us2y,red');
-console.log('paintChartDlg ok', 'us2y', hasRender, 'rateOverlay', region.includes("key==='rateOverlayDual'"));
-if (!hasRender) process.exit(1);
+const ok =
+  region.includes("key==='rateOverlayDual'") &&
+  region.includes('renderRateOverlayChart') &&
+  region.includes('try{');
+console.log('paintChartDlg ok', ok, 'len', region.length);
+if (!ok) process.exit(1);
 
 try {
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
