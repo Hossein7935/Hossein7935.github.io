@@ -194,11 +194,9 @@ if (!html.includes('function paintYieldPage7')) {
 
 fs.writeFileSync('index.html', html);
 
-// validate
 const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
 const js = scripts.join('\n');
 try {
-  // dynamic import not needed; write temp check via Function
   new Function(js);
   console.log('js ok');
 } catch (e) {
