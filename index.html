@@ -373,6 +373,7 @@ function setUsaPage(page){
   if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);
 }
 
+
 function bindUsaPages(){
   if(!window.__usaPageClickBound){
     window.__usaPageClickBound=true;
@@ -397,10 +398,12 @@ if(!window.__usaRenderPatched){
   const _render=render;
   render=function(){
     const r=_render.apply(this,arguments);
-    try{setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'))}catch(e){}
+    try{bindUsaPages()}catch(e){try{setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'))}catch(e2){}}
     return r;
   };
 }
+bindUsaPages();
+
 let _rateDiffOrder=[];
 function paintRateDiff(){
   const labels={effr:'EFFR',sofr:'SOFR',iorb:'IORB'};
