@@ -1,55 +1,50 @@
 import fs from 'fs';
 
-/** USA page 7 (index 6): UST + TIPS charts with checkbox diff */
+/** USA page 7 (index 6): UST + TIPS + full setUsaPage 0..6 */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// Dedupe accidental double let _rateDiffOrder
-html = html.replace(
-  /let _rateDiffOrder=\[\];\s*let _rateDiffOrder=\[\];/g,
-  'let _rateDiffOrder=[];'
-);
-
-html = html.replace(
-  /page=Math\.max\(0,Math\.min\(5,Number\(page\)\|\|0\)\);/g,
-  'page=Math.max(0,Math.min(6,Number(page)||0));'
-);
-html = html.replace(
-  /if\(!Number\.isFinite\(start\)\|\|start<0\|\|start>5\)start=0;/g,
-  'if(!Number.isFinite(start)||start<0||start>6)start=0;'
-);
-html = html.replace(
-  /if\(!Number\.isFinite\(start\)\|\|start<0\|\|start>6\)start=0;/g,
-  'if(!Number.isFinite(start)||start<0||start>6)start=0;'
-);
-
-if (html.includes("const f=card.querySelector('.usa-face-f');") && !html.includes("const g=card.querySelector('.usa-face-g');")) {
-  html = html.replace(
-    "const f=card.querySelector('.usa-face-f');",
-    "const f=card.querySelector('.usa-face-f');\n    const g=card.querySelector('.usa-face-g');"
-  );
-  html = html.replace(
-    "if(f)f.classList.toggle('hidden',page!==5);",
-    "if(f)f.classList.toggle('hidden',page!==5);\n    if(g)g.classList.toggle('hidden',page!==6);"
-  );
+// Full setUsaPage replacement
+const setUsaPageFn = `function setUsaPage(page){
+  page=Math.max(0,Math.min(6,Number(page)||0));
+  try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
+  document.querySelectorAll('.country').forEach(card=>{
+    if(!card.querySelector('.usa-face-a'))return;
+    const a=card.querySelector('.usa-face-a');
+    const b=card.querySelector('.usa-face-b');
+    const c=card.querySelector('.usa-face-c');
+    const d=card.querySelector('.usa-face-d');
+    const e=card.querySelector('.usa-face-e');
+    const f=card.querySelector('.usa-face-f');
+    const g=card.querySelector('.usa-face-g');
+    if(a)a.classList.toggle('hidden',page!==0);
+    if(b)b.classList.toggle('hidden',page!==1);
+    if(c)c.classList.toggle('hidden',page!==2);
+    if(d)d.classList.toggle('hidden',page!==3);
+    if(e)e.classList.toggle('hidden',page!==4);
+    if(f)f.classList.toggle('hidden',page!==5);
+    if(g)g.classList.toggle('hidden',page!==6);
+    const sel=card.querySelector('#usaPageSelect');
+    if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));
+  });
+  if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);
+  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff();typeof paintUs2ySofr==='function'&&paintUs2ySofr()}catch(e){}},50);
+  if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);
+  if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);
+  if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
+  if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
 }
+`;
 
-if (!html.includes('if(page===6)')) {
-  const marker =
-    "if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);";
-  if (html.includes(marker)) {
-    html = html.replace(
-      marker,
-      marker +
-        "\n  if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);"
-    );
-  } else if (html.includes('if(page===5)setTimeout')) {
-    html = html.replace(
-      /(if\(page===5\)setTimeout\([\s\S]*?\},50\);)/,
-      "$1\n  if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);"
-    );
+if (html.includes('function setUsaPage')) {
+  const s = html.indexOf('function setUsaPage');
+  const e = html.indexOf('function bindUsaPages', s);
+  if (e > s) {
+    html = html.slice(0, s) + setUsaPageFn + '\n' + html.slice(e);
+    console.log('setUsaPage replaced');
   }
 }
 
+// Page 7 button
 if (!html.includes('data-page=\"6\"') && !html.includes('data-page="6"')) {
   html = html.replace(
     /(<button type=\"button\" data-page=\"5\"[^>]*>)([^<]*)(<\/button>)/,
@@ -60,6 +55,16 @@ if (!html.includes('data-page=\"6\"') && !html.includes('data-page="6"')) {
     '$1$2$3<button type="button" data-page="6">Seite 7</button>'
   );
 }
+
+// Harden max page in bindUsaPages
+html = html.replace(
+  /if\(!Number\.isFinite\(start\)\|\|start<0\|\|start>5\)start=0;/g,
+  'if(!Number.isFinite(start)||start<0||start>6)start=0;'
+);
+html = html.replace(
+  /if\(!Number\.isFinite\(start\)\|\|start<0\|\|start>6\)start=0;/g,
+  'if(!Number.isFinite(start)||start<0||start>6)start=0;'
+);
 
 const block = `
 let _yieldDiffOrder=[];
@@ -192,49 +197,19 @@ function paintYieldPage7(){
 `;
 
 if (!html.includes('function paintYieldPage7')) {
-  // Insert after rate-diff order declaration to avoid splitting declarations oddly
   const after = html.indexOf('let _rateDiffOrder=[];');
   if (after >= 0) {
     const ins = after + 'let _rateDiffOrder=[];'.length;
     html = html.slice(0, ins) + '\n' + block + html.slice(ins);
-    console.log('page7 after _rateDiffOrder');
+    console.log('page7 functions inserted');
   } else {
     const anchor = html.indexOf('function bindUsaPages');
     if (anchor >= 0) {
       html = html.slice(0, anchor) + block + html.slice(anchor);
-      console.log('page7 before bindUsaPages');
+      console.log('page7 before bind');
     }
   }
 }
 
-// Dedupe again if inject ran twice in history
-html = html.replace(
-  /let _rateDiffOrder=\[\];\s*let _rateDiffOrder=\[\];/g,
-  'let _rateDiffOrder=[];'
-);
-html = html.replace(
-  /let _yieldDiffOrder=\[\];\s*let _yieldDiffOrder=\[\];/g,
-  'let _yieldDiffOrder=[];'
-);
-
 fs.writeFileSync('index.html', html);
-
-const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-const js = scripts.join('\n');
-try {
-  new Function(js);
-  console.log('js ok');
-} catch (e) {
-  console.warn('js warn', e.message);
-  // do not fail build hard — still write file
-}
-console.log(
-  'done',
-  html.length,
-  'page6',
-  html.includes('page===6'),
-  'paint',
-  html.includes('function paintYieldPage7'),
-  'btn6',
-  html.includes('data-page=\"6\"') || html.includes('data-page="6"')
-);
+console.log('done', html.length, 'page===6', html.includes('page===6'), 'paint', html.includes('function paintYieldPage7'), 'face-g', html.includes("usa-face-g"));
