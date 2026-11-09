@@ -3,7 +3,7 @@ import fs from 'fs';
 /** USA page 7: yields + diff + red overlay + green third series */
 let html = fs.readFileSync('index.html', 'utf8');
 
-const setUsaPageFn = `function setUsaPage(page){\n  page=Math.max(0,Math.min(6,Number(page)||0));\n  try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}\n  document.querySelectorAll('.country').forEach(card=>{\n    if(!card.querySelector('.usa-face-a'))return;\n    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g'];\n    faces.forEach((sel,i)=>{\n      const el=card.querySelector(sel);\n      if(el)el.classList.toggle('hidden',page!==i);\n    });\n    const sel=card.querySelector('#usaPageSelect');\n    if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));\n  });\n  if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);\n  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff();typeof paintRateOverlay==='function'&&paintRateOverlay();typeof paintUs2ySofr==='function'&&paintUs2ySofr()}catch(e){}},50);\n  if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);\n  if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);\n  if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);\n  if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);\n}\n`;
+const setUsaPageFn = `function setUsaPage(page){\n  page=Math.max(0,Math.min(6,Number(page)||0));\n  try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}\n  document.querySelectorAll('.country').forEach(card=>{\n    if(!card.querySelector('.usa-face-a'))return;\n    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g'];\n    faces.forEach((sel,i)=>{\n      const el=card.querySelector(sel);\n      if(el)el.classList.toggle('hidden',page!==i);\n    });\n    const sel=card.querySelector('#usaPageSelect');\n    if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));\n  });\n  if(page===0)setTimeout(()=>{try{typeof paintDxy==='function'&&paintDxy()}catch(e){}},50);\n  if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);\n  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff();typeof paintRateOverlay==='function'&&paintRateOverlay();typeof paintUs2ySofr==='function'&&paintUs2ySofr()}catch(e){}},50);\n  if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);\n  if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);\n  if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);\n  if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);\n}\n`;
 
 if (html.includes('function setUsaPage')) {
   const s = html.indexOf('function setUsaPage');
@@ -54,6 +54,7 @@ const USA_OVERLAY_CATALOG=[
   {key:'us5yTips',label:'5Y BEI (Tips)'},
   {key:'us10yTips',label:'10Y BEI (Tips)'},
   {key:'move',label:'MOVE Index'},
+  {key:'dxy',label:'DXY'},
   {key:'wresbal',label:'WRESBAL Reserves'},
   {key:'effrVol',label:'EFFR Volume'},
   {key:'bofaCcc',label:'BofA CCC HY'},
@@ -174,6 +175,15 @@ function ensureUsaFaceG(){
           '<label style="font-size:13px">Rot-Overlay: <select id="yield7OverlaySelect" style="margin-left:6px;min-width:160px;padding:4px 6px">'+_yield7OverlayOptionsHtml()+'</select></label>'+
           '<label style="font-size:13px">Grün (3.): <select id="yield7GreenSelect" style="margin-left:6px;min-width:160px;padding:4px 6px">'+_yield7OverlayOptionsHtml()+'</select></label>';
       }
+    } else {
+      // refresh options so new catalog entries (e.g. DXY) appear
+      const sel=document.getElementById('yield7OverlaySelect');
+      const selG=document.getElementById('yield7GreenSelect');
+      const cur=sel?sel.value:'';
+      const curG=selG?selG.value:'';
+      const opts=_yield7OverlayOptionsHtml();
+      if(sel&&!sel.querySelector('option[value="dxy"]')){sel.innerHTML=opts;sel.value=cur;}
+      if(selG&&!selG.querySelector('option[value="dxy"]')){selG.innerHTML=opts;selG.value=curG;}
     }
     return g;
   }
@@ -389,4 +399,4 @@ if (html.includes('function paintYieldPage7')) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'green', html.includes('yield7GreenSelect'), 'render greenPts', html.includes('greenPts'));
+console.log('done', html.length, 'dxy in catalog', html.includes("{key:'dxy'"), 'green', html.includes('yield7GreenSelect'));
