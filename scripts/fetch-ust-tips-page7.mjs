@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-/** Daily US Treasuries + TIPS real yields for USA page 7 */
+/** Daily US Treasuries + TIPS real yields for USA page 7 — always full FRED series from 2015 */
 const SERIES = [
   { id: 'DGS3MO', key: 'us3m', label: 'US 3M' },
   { id: 'DGS2', key: 'us2y', label: 'US 2Y' },
@@ -12,6 +12,7 @@ const SERIES = [
 ];
 
 async function fredCsv(id) {
+  // no coed — always through latest available FRED observation
   const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=2015-01-01`;
   const r = await fetch(url, {
     headers: { 'User-Agent': 'MacroWatch/1.0', Accept: 'text/csv' },

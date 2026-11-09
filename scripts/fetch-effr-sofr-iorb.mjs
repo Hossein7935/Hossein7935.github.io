@@ -3,6 +3,7 @@ import fs from 'node:fs';
 /**
  * Daily EFFR, SOFR, IORB from FRED for USA page 3 + dual charts.
  * IORB is merged with predecessor IOER (pre 2021-07) for long history.
+ * Always preserves the most recent observation.
  */
 
 const payload = JSON.parse(fs.readFileSync('data.json', 'utf8'));
@@ -14,7 +15,7 @@ async function fredCsv(id, start) {
   const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=${start}`;
   const r = await fetch(url, {
     headers: { 'User-Agent': 'MacroWatch/1.0 (+https://hossein7935.github.io/)' },
-    signal: AbortSignal.timeout(45000),
+    signal: AbortSignal.timeout(60000),
     cache: 'no-store'
   });
   if (!r.ok) throw new Error(`FRED ${id} HTTP ${r.status}`);
@@ -30,17 +31,28 @@ async function fredCsv(id, start) {
   return points;
 }
 
-function sample(points, maxPts = 2800) {
+/** Prefer full recent history; sample only older points if needed */
+function sample(points, maxPts = 4000) {
+  if (!points.length) return points;
   if (points.length <= maxPts) return points;
+  const keepTail = Math.min(2000, maxPts);
+  const tail = points.slice(-keepTail);
+  const head = points.slice(0, -keepTail);
+  const headBudget = maxPts - tail.length;
   const sampled = [];
-  for (let i = 0; i < maxPts; i++) {
-    const idx = Math.round((i * (points.length - 1)) / (maxPts - 1));
-    sampled.push(points[idx]);
+  if (head.length && headBudget > 0) {
+    for (let i = 0; i < headBudget; i++) {
+      const idx =
+        headBudget === 1 ? 0 : Math.round((i * (head.length - 1)) / (headBudget - 1));
+      sampled.push(head[idx]);
+    }
   }
   const out = [];
-  for (const p of sampled) {
+  for (const p of [...sampled, ...tail]) {
     if (!out.length || out.at(-1).period !== p.period) out.push(p);
   }
+  const last = points.at(-1);
+  if (out.length && out.at(-1).period !== last.period) out.push(last);
   return out;
 }
 
@@ -53,7 +65,6 @@ function mergeByDate(a, b) {
     .map(([period, value]) => ({ period, value }));
 }
 
-// EFFR + SOFR
 for (const s of [
   { id: 'EFFR', key: 'effr', start: '2015-01-01' },
   { id: 'SOFR', key: 'sofr', start: '2018-04-02' }
@@ -72,13 +83,12 @@ for (const s of [
   }
 }
 
-// IORB = IOER (legacy) + IORB (current)
 try {
   const [ioer, iorb] = await Promise.all([
     fredCsv('IOER', '2008-10-01'),
     fredCsv('IORB', '2021-07-29')
   ]);
-  const merged = sample(mergeByDate(ioer, iorb), 5000);
+  const merged = sample(mergeByDate(ioer, iorb), 7000);
   if (merged.length < 30) throw new Error(`Only ${merged.length} points`);
   histories['USA-iorb'] = merged;
   const last = merged.at(-1);
@@ -99,8 +109,10 @@ payload.histories = histories;
 payload.data = data;
 payload.updatedAt = new Date().toISOString();
 payload.errors = [
-  ...(payload.errors || []).filter(e => !/EFFR|SOFR|IORB|effr|sofr|iorb/i.test(e) || /SOFR−IORB|sofrIorb|Term SOFR/i.test(e)),
+  ...(payload.errors || []).filter(
+    e => !/EFFR|SOFR|IORB|effr|sofr|iorb/i.test(e) || /SOFR−IORB|sofrIorb|Term SOFR/i.test(e)
+  ),
   ...errors
 ];
-fs.writeFileSync('data.json', JSON.stringify(payload, null, 2) + '\n');
+fs.writeFileSync('data.json', JSON.stringify(payload));
 console.log('done');
