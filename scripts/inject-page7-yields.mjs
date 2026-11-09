@@ -3,18 +3,19 @@ import fs from 'fs';
 /** USA page 7 (index 6): UST + TIPS charts with checkbox diff */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// Extend setUsaPage max page 0..6 and face-g
 html = html.replace(
   /page=Math\.max\(0,Math\.min\(5,Number\(page\)\|\|0\)\);/g,
   'page=Math.max(0,Math.min(6,Number(page)||0));'
 );
-// Also harden bindUsaPages max
 html = html.replace(
   /if\(!Number\.isFinite\(start\)\|\|start<0\|\|start>5\)start=0;/g,
   'if(!Number.isFinite(start)||start<0||start>6)start=0;'
 );
+html = html.replace(
+  /if\(!Number\.isFinite\(start\)\|\|start<0\|\|start>6\)start=0;/g,
+  'if(!Number.isFinite(start)||start<0||start>6)start=0;'
+);
 
-// Patch setUsaPage body to include face-g
 if (html.includes("const f=card.querySelector('.usa-face-f');") && !html.includes("const g=card.querySelector('.usa-face-g');")) {
   html = html.replace(
     "const f=card.querySelector('.usa-face-f');",
@@ -26,17 +27,22 @@ if (html.includes("const f=card.querySelector('.usa-face-f');") && !html.include
   );
 }
 
-// Paint on page 6
 if (!html.includes('if(page===6)')) {
-  html = html.replace(
-    /if\(page===5\)setTimeout\(\(\)=>\{try\{typeof paintIorbUs1y[\s\S]*?\},50\);/,
-    (m) =>
-      m +
-      "\n  if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);"
-  );
+  const marker = "if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);";
+  if (html.includes(marker)) {
+    html = html.replace(
+      marker,
+      marker +
+        "\n  if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);"
+    );
+  } else if (html.includes('if(page===5)setTimeout')) {
+    html = html.replace(
+      /(if\(page===5\)setTimeout\([\s\S]*?\},50\);)/,
+      "$1\n  if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);"
+    );
+  }
 }
 
-// Ensure page select has button 6
 if (!html.includes('data-page=\"6\"') && !html.includes('data-page="6"')) {
   html = html.replace(
     /(<button type=\"button\" data-page=\"5\"[^>]*>)([^<]*)(<\/button>)/,
@@ -48,7 +54,6 @@ if (!html.includes('data-page=\"6\"') && !html.includes('data-page="6"')) {
   );
 }
 
-// Inject paint + face creation functions before bindUsaPages
 const block = `
 let _yieldDiffOrder=[];
 const YIELD7_KEYS=[
@@ -68,23 +73,23 @@ function ensureUsaFaceG(){
   g=document.createElement('div');
   g.className='metrics usa-face usa-face-g hidden';
   g.id='usaFaceG';
-  const panels=YIELD7_KEYS.map(s=>
-    '<div class="metric has-chart" id="y7-'+s.key+'">'+'
-      '<div class="name">'+s.label+'</div>'+
-      '<div class="value" id="y7-'+s.key+'-val">—</div>'+
-      '<div class="date" id="y7-'+s.key+'-date">FRED</div>'+
-      '<div id="y7-'+s.key+'-chart"></div>'+
-      '<label class="diff-pick"><input type="checkbox" class="yield7-diff-cb" data-key="'+s.key+'"> für Differenz wählen</label>'+
-    '</div>'
-  ).join('');
-  g.innerHTML=panels+
-    '<div class="metric has-chart diff-panel" id="yield7DiffPanel" style="grid-column:1/-1">'+
-      '<div class="name" id="yield7DiffTitle">Differenz · 2 Serien wählen</div>'+
-      '<div class="value" id="yield7DiffValue">—</div>'+
-      '<div class="date" id="yield7DiffDate">Kästchen: erste − zweite · gleiche Historie</div>'+
-      '<div id="yield7DiffChart"></div>'+
-      '<div class="diff-hint" id="yield7DiffHint">Noch keine Auswahl</div>'+
-    '</div>';
+  const panels=YIELD7_KEYS.map(s=>{
+    return '<div class="metric has-chart" id="y7-'+s.key+'">'
+      +'<div class="name">'+s.label+'</div>'
+      +'<div class="value" id="y7-'+s.key+'-val">—</div>'
+      +'<div class="date" id="y7-'+s.key+'-date">FRED</div>'
+      +'<div id="y7-'+s.key+'-chart"></div>'
+      +'<label class="diff-pick"><input type="checkbox" class="yield7-diff-cb" data-key="'+s.key+'"> für Differenz wählen</label>'
+      +'</div>';
+  }).join('');
+  g.innerHTML=panels
+    +'<div class="metric has-chart diff-panel" id="yield7DiffPanel" style="grid-column:1/-1">'
+    +'<div class="name" id="yield7DiffTitle">Differenz · 2 Serien wählen</div>'
+    +'<div class="value" id="yield7DiffValue">—</div>'
+    +'<div class="date" id="yield7DiffDate">Kästchen: erste − zweite · gleiche Historie</div>'
+    +'<div id="yield7DiffChart"></div>'
+    +'<div class="diff-hint" id="yield7DiffHint">Noch keine Auswahl</div>'
+    +'</div>';
   const f=card.querySelector('.usa-face-f');
   if(f&&f.parentNode)f.after(g);
   else{
@@ -148,7 +153,6 @@ function paintYield7Diff(){
   const last=pts.at(-1);
   if(valEl)valEl.textContent=fmt(last.value);
   if(dateEl)dateEl.textContent='Stand '+last.period+' · '+pts.length+' Punkte · erste − zweite';
-  // store full series for enlarge + range
   histories['USA-yield7Diff']=pts;
   window.__yield7DiffMeta={k1,k2,name};
   if(typeof renderLineChart==='function'){
@@ -185,14 +189,20 @@ if (!html.includes('function paintYieldPage7')) {
   if (anchor >= 0) {
     html = html.slice(0, anchor) + block + html.slice(anchor);
     console.log('page7 functions inserted');
-  } else {
-    const r = html.lastIndexOf('refresh();');
-    if (r >= 0) html = html.slice(0, r) + block + html.slice(r);
   }
 }
 
-// After USA faces created in render, ensure face-g can be built on demand via paint
-// Hook: when bindUsaPages/setUsaPage runs page 6, paint is called.
-
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'paintYieldPage7', html.includes('function paintYieldPage7'), 'face-g', html.includes('usa-face-g'), 'max6', html.includes('Math.min(6'));
+
+// validate
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+const js = scripts.join('\n');
+try {
+  // dynamic import not needed; write temp check via Function
+  new Function(js);
+  console.log('js ok');
+} catch (e) {
+  console.error('js error', e.message);
+  process.exit(1);
+}
+console.log('done', html.length, 'page6', html.includes('page===6'), 'btn6', html.includes('data-page=\"6\"')||html.includes('data-page="6"'));
