@@ -70,10 +70,13 @@ jobs:
         run: node scripts/fix-js-syntax.mjs
       - name: Restore paintChartDlg (enlarged charts)
         run: node scripts/fix-paint-chart-dlg.mjs
+      - name: Fix USA page navigation (sticky)
+        run: node scripts/inject-fix-usa-nav.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/fix-paint-chart-dlg.mjs
           node --check scripts/inject-us2y-pair-toggle.mjs
+          node --check scripts/inject-fix-usa-nav.mjs
           node --check scripts/fix-js-syntax.mjs
           node --check scripts/restore-index.mjs
       - name: Fetch official economic data
@@ -146,7 +149,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
-            git commit -m "Update MacroWatch + US2Y SOFR/IORB toggle" || true
+            git commit -m "Update MacroWatch + USA nav fix" || true
             git pull --no-rebase -X ours origin main || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
