@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-09T00:11:39.241Z",
+  "updatedAt": "2026-11-09T01:09:13.119Z",
   "data": {
     "CHN": {
       "rate": {
@@ -18,17 +18,17 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.217,
+        "value": 1.266,
         "date": "2026-11-09",
         "source": "TradingView · TVC:CN02Y (China 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 1.574,
+        "value": 1.579,
         "date": "2026-11-09",
         "source": "TradingView · TVC:CN10Y (China 10 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.357,
+        "value": 0.313,
         "date": "2026-11-09",
         "source": "TradingView · CHN 10Y − 2Y"
       },
@@ -50,12 +50,12 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.524,
+        "value": 4.534,
         "date": "2026-11-09",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
-        "value": 4.868,
+        "value": 4.876,
         "date": "2026-11-09",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
@@ -143,7 +143,7 @@
       "sofrFwd": {
         "value": 4.38,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-09T00:11:30.761Z",
+        "updatedAt": "2026-11-09T01:08:55.809Z",
         "source": "NY Fed SOFR + CME SR1/SR3 (Yahoo delayed)",
         "curve": [
           {
@@ -152,15 +152,15 @@
           },
           {
             "period": "3m",
-            "value": 4.15
+            "value": 4.155
           },
           {
             "period": "6m",
-            "value": 4.27
+            "value": 4.28
           },
           {
             "period": "9m",
-            "value": 4.345
+            "value": 4.365
           },
           {
             "period": "12m",
@@ -184,46 +184,46 @@
             "period": "3m",
             "tenor": "3m",
             "months": 3,
-            "value": 4.15,
+            "value": 4.155,
             "kind": "sr1",
             "note": "Erwarteter Monatsdurchschnitt SOFR (SR1, 100−Price)",
             "contracts": [
               "SR1F27.CME",
               "SR1G27.CME"
             ],
-            "price": 95.85,
+            "price": 95.845,
             "method": "interp",
-            "vsSpotBp": 23
+            "vsSpotBp": 23.5
           },
           {
             "period": "6m",
             "tenor": "6m",
             "months": 6,
-            "value": 4.27,
+            "value": 4.28,
             "kind": "sr1",
             "note": "Erwarteter Monatsdurchschnitt SOFR (SR1, 100−Price)",
             "contracts": [
               "SR1J27.CME",
               "SR1K27.CME"
             ],
-            "price": 95.73,
+            "price": 95.72,
             "method": "interp",
-            "vsSpotBp": 35
+            "vsSpotBp": 36
           },
           {
             "period": "9m",
             "tenor": "9m",
             "months": 9,
-            "value": 4.345,
+            "value": 4.365,
             "kind": "sr1",
             "note": "Erwarteter Monatsdurchschnitt SOFR (SR1, 100−Price)",
             "contracts": [
               "SR1N27.CME",
               "SR1Q27.CME"
             ],
-            "price": 95.655,
+            "price": 95.635,
             "method": "interp",
-            "vsSpotBp": 42.5
+            "vsSpotBp": 44.5
           },
           {
             "period": "12m",
@@ -246,7 +246,7 @@
       "ustCurve": {
         "value": 4.84,
         "date": "2026-11-05",
-        "updatedAt": "2026-11-09T00:11:32.622Z",
+        "updatedAt": "2026-11-09T01:08:59.029Z",
         "source": "FRED · DGS* + DFII* (TIPS real yields)",
         "nominal": [
           {
@@ -368,7 +368,7 @@
         "value": 798.428,
         "valueRaw": 798428,
         "date": "2026-09-30",
-        "updatedAt": "2026-11-09T00:11:33.673Z",
+        "updatedAt": "2026-11-09T01:09:02.329Z",
         "source": "FHLBanks Office of Finance · Combined Operating Highlights",
         "sourceUrl": "https://www.fhlb-of.com/",
         "absChangeQoq": -12.287,
@@ -398,7 +398,7 @@
         "prevDate": "2026-11-04",
         "absChange": -4,
         "pctChange": -3.48,
-        "updatedAt": "2026-11-09T00:11:34.535Z",
+        "updatedAt": "2026-11-09T01:09:03.368Z",
         "source": "FRED EFFRVOL · New York Fed Effective Federal Funds Volume",
         "sourceUrl": "https://www.newyorkfed.org/markets/reference-rates/effr",
         "unit": "USD Milliarden",
@@ -415,7 +415,7 @@
         "us1y": 4.28,
         "us1yDate": "2026-11-05",
         "spread": 0.38,
-        "updatedAt": "2026-11-09T00:11:35.158Z",
+        "updatedAt": "2026-11-09T01:09:05.326Z",
         "source": "FRED IOER+IORB (merged) + DGS1",
         "sourceUrl": "https://fred.stlouisfed.org/series/IORB",
         "iorbPoints": 6606,
@@ -428,7 +428,7 @@
         "prevValue": 97.92,
         "absChange": -5.15,
         "pctChange": -5.26,
-        "updatedAt": "2026-11-09T00:11:35.464Z",
+        "updatedAt": "2026-11-09T01:09:06.461Z",
         "source": "Yahoo Finance ^MOVE · ICE BofA MOVE Index",
         "sourceUrl": "https://finance.yahoo.com/quote/%5EMOVE/",
         "unit": "bp (ann.)",
@@ -441,7 +441,7 @@
         "sofr": 3.92,
         "sofrDate": "2026-11-05",
         "spread": 0.54,
-        "updatedAt": "2026-11-09T00:11:35.721Z",
+        "updatedAt": "2026-11-09T01:09:06.869Z",
         "source": "FRED DGS2 + SOFR",
         "us2yPoints": 2963,
         "sofrPoints": 2147,
@@ -458,7 +458,7 @@
         "source": "Fed Z.1 · SAAR · Nonfinancial Business"
       },
       "cuAu": {
-        "value": 1.538745190756881,
+        "value": 1.5327739379244478,
         "date": "2026-11-09",
         "source": "Yahoo HG=F / GC=F · Ratio×1000"
       },
@@ -485,7 +485,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 2.688,
+        "value": 2.694,
         "date": "2026-11-09",
         "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
@@ -495,12 +495,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 1.75,
+        "value": 1.769,
         "date": "2026-11-09",
         "source": "TradingView · TVC:JP02Y (Japan 2 Year LSEG Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.938,
+        "value": 0.925,
         "date": "2026-11-09",
         "source": "TradingView · JPN 10Y − 2Y"
       },
@@ -513,7 +513,7 @@
     "FRA": {
       "rate": {
         "value": 2.5,
-        "date": "2026-11-08",
+        "date": "2026-11-09",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
@@ -550,7 +550,7 @@
     "DEU": {
       "rate": {
         "value": 2.5,
-        "date": "2026-11-08",
+        "date": "2026-11-09",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
@@ -596,7 +596,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 5.02,
+        "value": 5.029,
         "date": "2026-11-09",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
@@ -611,7 +611,7 @@
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.18,
+        "value": 0.189,
         "date": "2026-11-09",
         "source": "TradingView · AUS 10Y − 2Y"
       },
@@ -2892,7 +2892,7 @@
       },
       {
         "period": "2026-11-09",
-        "value": 0.938
+        "value": 0.925
       }
     ],
     "AUS-t10y2y": [
@@ -3410,13 +3410,13 @@
       },
       {
         "period": "2026-11-09",
-        "value": 0.18
+        "value": 0.189
       }
     ],
     "CHN-t10y2y": [
       {
         "period": "2026-11-09",
-        "value": 0.357
+        "value": 0.313
       }
     ],
     "USA-tips5": [
@@ -85008,15 +85008,15 @@
       },
       {
         "period": "3m",
-        "value": 4.15
+        "value": 4.155
       },
       {
         "period": "6m",
-        "value": 4.27
+        "value": 4.28
       },
       {
         "period": "9m",
-        "value": 4.345
+        "value": 4.365
       },
       {
         "period": "12m",
@@ -85031,7 +85031,7 @@
     ],
     "USA-sofrFwdSnapshots": [
       {
-        "asOf": "2026-11-09T00:11:30.761Z",
+        "asOf": "2026-11-09T01:08:55.809Z",
         "spotDate": "2026-11-05",
         "spot": 3.92,
         "points": [
@@ -85049,37 +85049,37 @@
           {
             "tenor": "3m",
             "months": 3,
-            "value": 4.15,
+            "value": 4.155,
             "contracts": [
               "SR1F27.CME",
               "SR1G27.CME"
             ],
-            "price": 95.85,
-            "vsSpotBp": 23,
+            "price": 95.845,
+            "vsSpotBp": 23.5,
             "kind": "sr1"
           },
           {
             "tenor": "6m",
             "months": 6,
-            "value": 4.27,
+            "value": 4.28,
             "contracts": [
               "SR1J27.CME",
               "SR1K27.CME"
             ],
-            "price": 95.73,
-            "vsSpotBp": 35,
+            "price": 95.72,
+            "vsSpotBp": 36,
             "kind": "sr1"
           },
           {
             "tenor": "9m",
             "months": 9,
-            "value": 4.345,
+            "value": 4.365,
             "contracts": [
               "SR1N27.CME",
               "SR1Q27.CME"
             ],
-            "price": 95.655,
-            "vsSpotBp": 42.5,
+            "price": 95.635,
+            "vsSpotBp": 44.5,
             "kind": "sr1"
           },
           {
@@ -85114,64 +85114,64 @@
             "monthsFromNow": 2,
             "yearMonth": "2027-01",
             "symbol": "SR1F27.CME",
-            "price": 95.89,
-            "rate": 4.11
+            "price": 95.885,
+            "rate": 4.115
           },
           {
             "monthsFromNow": 3,
             "yearMonth": "2027-02",
             "symbol": "SR1G27.CME",
-            "price": 95.85,
-            "rate": 4.15
+            "price": 95.845,
+            "rate": 4.155
           },
           {
             "monthsFromNow": 4,
             "yearMonth": "2027-03",
             "symbol": "SR1H27.CME",
-            "price": 95.81,
-            "rate": 4.19
+            "price": 95.8,
+            "rate": 4.2
           },
           {
             "monthsFromNow": 5,
             "yearMonth": "2027-04",
             "symbol": "SR1J27.CME",
-            "price": 95.76,
-            "rate": 4.24
+            "price": 95.75,
+            "rate": 4.25
           },
           {
             "monthsFromNow": 6,
             "yearMonth": "2027-05",
             "symbol": "SR1K27.CME",
-            "price": 95.73,
-            "rate": 4.27
+            "price": 95.72,
+            "rate": 4.28
           },
           {
             "monthsFromNow": 7,
             "yearMonth": "2027-06",
             "symbol": "SR1M27.CME",
-            "price": 95.69,
-            "rate": 4.31
+            "price": 95.685,
+            "rate": 4.315
           },
           {
             "monthsFromNow": 8,
             "yearMonth": "2027-07",
             "symbol": "SR1N27.CME",
-            "price": 95.665,
-            "rate": 4.335
+            "price": 95.65,
+            "rate": 4.35
           },
           {
             "monthsFromNow": 9,
             "yearMonth": "2027-08",
             "symbol": "SR1Q27.CME",
-            "price": 95.655,
-            "rate": 4.345
+            "price": 95.635,
+            "rate": 4.365
           },
           {
             "monthsFromNow": 10,
             "yearMonth": "2027-09",
             "symbol": "SR1U27.CME",
-            "price": 95.63,
-            "rate": 4.37
+            "price": 95.62,
+            "rate": 4.38
           },
           {
             "monthsFromNow": 11,
@@ -85199,56 +85199,56 @@
           {
             "symbol": "SR3Z26.CME",
             "yearMonth": "2026-12",
-            "price": 95.85,
-            "rate": 4.15
+            "price": 95.845,
+            "rate": 4.155
           },
           {
             "symbol": "SR3H27.CME",
             "yearMonth": "2027-03",
-            "price": 95.72,
-            "rate": 4.28
+            "price": 95.71,
+            "rate": 4.29
           },
           {
             "symbol": "SR3M27.CME",
             "yearMonth": "2027-06",
-            "price": 95.635,
-            "rate": 4.365
+            "price": 95.615,
+            "rate": 4.385
           },
           {
             "symbol": "SR3U27.CME",
             "yearMonth": "2027-09",
-            "price": 95.61,
-            "rate": 4.39
+            "price": 95.59,
+            "rate": 4.41
           },
           {
             "symbol": "SR3Z27.CME",
             "yearMonth": "2027-12",
-            "price": 95.62,
-            "rate": 4.38
+            "price": 95.6,
+            "rate": 4.4
           },
           {
             "symbol": "SR3H28.CME",
             "yearMonth": "2028-03",
-            "price": 95.63,
-            "rate": 4.37
+            "price": 95.61,
+            "rate": 4.39
           },
           {
             "symbol": "SR3M28.CME",
             "yearMonth": "2028-06",
-            "price": 95.64,
-            "rate": 4.36
+            "price": 95.62,
+            "rate": 4.38
           },
           {
             "symbol": "SR3U28.CME",
             "yearMonth": "2028-09",
-            "price": 95.645,
-            "rate": 4.355
+            "price": 95.625,
+            "rate": 4.375
           },
           {
             "symbol": "SR3Z28.CME",
             "yearMonth": "2028-12",
-            "price": 95.655,
-            "rate": 4.345
+            "price": 95.635,
+            "rate": 4.365
           }
         ],
         "source": "NY Fed SOFR + CME SR1/SR3 (Yahoo delayed)"
@@ -114114,7 +114114,7 @@
     ],
     "USA-ustCurveSnapshots": [
       {
-        "asOf": "2026-11-09T00:11:32.622Z",
+        "asOf": "2026-11-09T01:08:59.029Z",
         "nominal": [
           {
             "period": "3M",
@@ -185304,7 +185304,7 @@
       },
       {
         "period": "2026-11-09",
-        "value": 1.538745190756881
+        "value": 1.5327739379244478
       }
     ],
     "USA-rate": [
