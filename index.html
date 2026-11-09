@@ -121,6 +121,38 @@ function paintChartDlg(){
     return;
   }
 
+  if(key==='yield7Diff'){
+    let pts=histories['USA-yield7Diff']||[];
+    if(typeof filterByRange==='function'){
+      const p2=filterByRange(pts,range); if(p2.length) pts=p2;
+    }
+    let ov=[];
+    const metaO=window.__yield7OverlayMeta||{};
+    if(metaO.key&&typeof getYield7OverlayKey==='function'&&getYield7OverlayKey()){
+      ov=histories['USA-'+metaO.key]||[];
+      if(typeof filterByRange==='function'){
+        const o2=filterByRange(ov,range); if(o2.length) ov=o2;
+      }
+      if(pts.length&&ov.length){
+        const t0=String(pts[0].period), t1=String(pts.at(-1).period);
+        ov=ov.filter(p=>String(p.period)>=t0&&String(p.period)<=t1);
+      }
+    }
+    if(!pts.length){
+      body.innerHTML='<div class="sparkempty">Keine Daten</div>';
+      if(meta)meta.textContent='';
+      return;
+    }
+    if(typeof renderDiffOverlayChart==='function'){
+      body.innerHTML=renderDiffOverlayChart(pts,ov,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    }else{
+      body.innerHTML=renderLineChart(pts,{w:720,h:280,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    }
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
+    if(meta)meta.textContent='Differenz blau · '+(metaO.label?('rot: '+metaO.label+' · '):'')+rLabel+' · '+pts.length+' Punkte';
+    return;
+  }
+
   if(key==='sofrFwd'){
     const pts=histories['USA-sofrFwd']||((data.USA&&data.USA.sofrFwd&&data.USA.sofrFwd.points)||[]);
     if(typeof renderSofRFwdChart==='function'&&pts.length){
