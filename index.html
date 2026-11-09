@@ -348,6 +348,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(6,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -357,17 +358,27 @@ function setUsaPage(page){
     const b=card.querySelector('.usa-face-b');
     const c=card.querySelector('.usa-face-c');
     const d=card.querySelector('.usa-face-d');
+    const e=card.querySelector('.usa-face-e');
+    const f=card.querySelector('.usa-face-f');
+    const g=card.querySelector('.usa-face-g');
     if(a)a.classList.toggle('hidden',page!==0);
     if(b)b.classList.toggle('hidden',page!==1);
     if(c)c.classList.toggle('hidden',page!==2);
     if(d)d.classList.toggle('hidden',page!==3);
+    if(e)e.classList.toggle('hidden',page!==4);
+    if(f)f.classList.toggle('hidden',page!==5);
+    if(g)g.classList.toggle('hidden',page!==6);
     const sel=card.querySelector('#usaPageSelect');
     if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));
   });
   if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);
-  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff()}catch(e){}},50);
-  if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){}},50);
+  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff();typeof paintUs2ySofr==='function'&&paintUs2ySofr()}catch(e){}},50);
+  if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);
+  if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);
+  if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
+  if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
 }
+
 
 function bindUsaPages(){
   if(!window.__usaPageClickBound){
@@ -666,6 +677,7 @@ function paintSofRFwd(){
   }
 }
 bindUsaPages();
+
 
 
 
