@@ -350,6 +350,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(6,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -674,7 +675,8 @@ bindUsaPages();
 
 
 
-let _rateDiffOrder=[];
+
+
 function paintRateDiff(){
   const labels={effr:'EFFR',sofr:'SOFR',iorb:'IORB'};
   const title=document.getElementById('rateDiffTitle');
