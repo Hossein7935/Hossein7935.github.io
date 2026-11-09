@@ -207,7 +207,7 @@ function bindBigChartHover(body){
 
 
 function historyHTML(country,key){let arr=histories[country+'-'+key]||[];if(key==='inflation'){const range=(document.querySelector('#inflRange')||{}).value||'3y';arr=filterByRange(arr,range)}if(!arr.length)return '<div class="sparkempty">Verlauf nicht verfügbar</div>';const pts=arr.map(x=>({period:String(x.period),value:Number(x.value)})).filter(x=>Number.isFinite(x.value));if(!pts.length)return '<div class="sparkempty">Keine gültigen Werte</div>';if(key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='inflation'||key==='gdp'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit'||key==='sofr3m'||key==='t10y2y'||key==='t10y5y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'||key==='us10yTips'||key==='us5yTips'||key==='sofrIorb'||key==='wresbal'||key==='effr'||key==='sofr'||key==='iorb'||key==='cuAu'){const extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',t10y5y:'10Y − 5Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield',us10yTips:'US10Y − TIPS10Y',us5yTips:'US5Y − TIPS5Y',sofrIorb:'SOFR − IORB',wresbal:'Bankreserven (WRESBAL)',effr:'EFFR',sofr:'SOFR',iorb:'IORB',cuAu:'Kupfer / Gold Ratio',diff:'Differenz',sofrFwd:'SOFR Erwartungskurve',ustCurve:'US Zinsstruktur',fhlbAdv:'FHLB Advances',fhlbAdvQoq:'FHLB Advances QoQ %',fhlbAdvYoy:'FHLB Advances YoY %',effrVol:'Fed Funds Volume',effrVolChg:'Fed Funds Vol Δ%',effr:'EFFR',iorb:'IORB',us1y:'US 1Y',iorbUs1yDual:'IORB + US 1Y',move:'MOVE Index',us2y:'US 2Y',us2ySofrDual:'US 2Y + SOFR'};const label=extraLabels[key]||(defs.find(d=>d[0]===key)||[key,key])[1];const chart=renderLineChart(pts,{w:220,h:58});return `<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="${country}|${key}|${esc(label)}" title="Chart vergrößern">${chart}</div>`}let min=Math.min(0,...pts.map(p=>p.value)),max=Math.max(0,...pts.map(p=>p.value));if(max===min)max=min+1;const range=max-min||1;return `<div class="spark">${pts.slice(-5).map(x=>{const v=x.value,hh=Math.max(2,Math.round(((v-min)/range)*22));return `<div class="barwrap" title="${esc(x.period)}: ${fmt(v)}"><div class="bar ${v<0?'neg':''}" style="height:${hh}px"></div><div class="barlabel">${esc(String(x.period).replace(/^\d{4}-Q/,'Q').slice(0,7))}</div></div>`}).join('')}</div><div class="sparkcaption">Letzte ${Math.min(5,pts.length)} Werte</div>`}
-function render(){const grid=document.querySelector('#grid');grid.innerHTML='';for(const c of countries){const card=document.createElement('section');card.className='country';card.innerHTML=`<div class="ctop"><div class="flag">${c.flag}</div><div><h2>${c.name}</h2><div class="code">${c.id}</div></div></div>${c.id==='USA'?`<div class="usa-flip-toggle"><div class="usa-page-select" id="usaPageSelect"><button type="button" data-page="0">Seite 1</button><button type="button" data-page="1">Seite 2</button><button type="button" data-page="2">Seite 3</button><button type="button" data-page="3">Seite 4</button><button type="button" data-page="4">Seite 5</button><button type="button" data-page="5">Seite 6</button></div></div>`:''}<div class="metrics">${defs.map(([key,label])=>{if((key==='reservesGdp'||key==='tips5'||key==='tips10')&&c.id!=='USA')return'';const m=valueFor(c.id,key);const value=m?fmt(m.value):'Nicht verfügbar';const date=m?`${esc(m.source)} · ${esc(m.date)}`:'Quelle hat keinen Wert geliefert';const spark=key==='inflation'||key==='gdp'||key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit';return `<div class="metric${spark?' has-chart':''}"><div class="name">${label}</div><div class="value ${m?'':'na'}">${value}</div><div class="date">${date}</div>${spark?historyHTML(c.id,key):`<button class="btn" data-edit="${c.id}|${key}">Manuell eintragen</button>`}</div>`}).join('')}</div><div class="links"><a href="${c.links.inflation}" target="_blank" rel="noopener">Inflation ↗</a><a href="${c.links.rate}" target="_blank" rel="noopener">Leitzins ↗</a><a href="${c.links.bonds}" target="_blank" rel="noopener">Anleihen ↗</a><a href="${c.links.gdp}" target="_blank" rel="noopener">IMF-BIP ↗</a></div>`;
+function render(){const grid=document.querySelector('#grid');grid.innerHTML='';for(const c of countries){const card=document.createElement('section');card.className='country';card.innerHTML=`<div class="ctop"><div class="flag">${c.flag}</div><div><h2>${c.name}</h2><div class="code">${c.id}</div></div></div>${c.id==='USA'?`<div class="usa-flip-toggle"><div class="usa-page-select" id="usaPageSelect"><button type="button" data-page="0">Seite 1</button><button type="button" data-page="1">Seite 2</button><button type="button" data-page="2">Seite 3</button><button type="button" data-page="3">Seite 4</button><button type="button" data-page="4">Seite 5</button><button type="button" data-page="5">Seite 6</button><button type="button" data-page="6">Seite 7</button><button type="button" data-page="6">Seite 7</button></div></div>`:''}<div class="metrics">${defs.map(([key,label])=>{if((key==='reservesGdp'||key==='tips5'||key==='tips10')&&c.id!=='USA')return'';const m=valueFor(c.id,key);const value=m?fmt(m.value):'Nicht verfügbar';const date=m?`${esc(m.source)} · ${esc(m.date)}`:'Quelle hat keinen Wert geliefert';const spark=key==='inflation'||key==='gdp'||key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit';return `<div class="metric${spark?' has-chart':''}"><div class="name">${label}</div><div class="value ${m?'':'na'}">${value}</div><div class="date">${date}</div>${spark?historyHTML(c.id,key):`<button class="btn" data-edit="${c.id}|${key}">Manuell eintragen</button>`}</div>`}).join('')}</div><div class="links"><a href="${c.links.inflation}" target="_blank" rel="noopener">Inflation ↗</a><a href="${c.links.rate}" target="_blank" rel="noopener">Leitzins ↗</a><a href="${c.links.bonds}" target="_blank" rel="noopener">Anleihen ↗</a><a href="${c.links.gdp}" target="_blank" rel="noopener">IMF-BIP ↗</a></div>`;
 if(c.id==='USA'){
   const faceA=card.querySelector('.metrics');
   if(faceA){
@@ -346,6 +346,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(5,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -355,24 +356,17 @@ function setUsaPage(page){
     const b=card.querySelector('.usa-face-b');
     const c=card.querySelector('.usa-face-c');
     const d=card.querySelector('.usa-face-d');
-    const e=card.querySelector('.usa-face-e');
-    const f=card.querySelector('.usa-face-f');
     if(a)a.classList.toggle('hidden',page!==0);
     if(b)b.classList.toggle('hidden',page!==1);
     if(c)c.classList.toggle('hidden',page!==2);
     if(d)d.classList.toggle('hidden',page!==3);
-    if(e)e.classList.toggle('hidden',page!==4);
-    if(f)f.classList.toggle('hidden',page!==5);
     const sel=card.querySelector('#usaPageSelect');
     if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));
   });
   if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);
-  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff();typeof paintUs2ySofr==='function'&&paintUs2ySofr()}catch(e){}},50);
-  if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
-  if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);
-  if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);
+  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff()}catch(e){}},50);
+  if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){}},50);
 }
-
 
 function bindUsaPages(){
   if(!window.__usaPageClickBound){
@@ -390,7 +384,7 @@ function bindUsaPages(){
   }
   let start=0;
   try{start=Number(localStorage.getItem('macrowatch-usa-page')||'0')}catch(e){start=0}
-  if(!Number.isFinite(start)||start<0||start>5)start=0;
+  if(!Number.isFinite(start)||start<0||start>6)start=0;
   setUsaPage(start);
 }
 if(!window.__usaRenderPatched){
@@ -402,7 +396,147 @@ if(!window.__usaRenderPatched){
     return r;
   };
 }
+let _rateDiffOrder=[];
+function paintRateDiff(){
+  const labels={effr:'EFFR',sofr:'SOFR',iorb:'IORB'};
+  const title=document.getElementById('rateDiffTitle');
+  const valEl=document.getElementById('rateDiffValue');
+  const dateEl=document.getElementById('rateDiffDate');
+  const host=document.getElementById('rateDiffChart');
+  const hint=document.getElementById('rateDiffHint');
+  if(!host)return;
+  const boxes=[...document.querySelectorAll('.rate-diff-cb')];
+  const checked=boxes.filter(b=>b.checked).map(b=>b.dataset.key);
+  _rateDiffOrder=_rateDiffOrder.filter(k=>checked.includes(k));
+  for(const k of checked){if(!_rateDiffOrder.includes(k))_rateDiffOrder.push(k)}
+  while(_rateDiffOrder.length>2){
+    const drop=_rateDiffOrder.shift();
+    const box=boxes.find(b=>b.dataset.key===drop);
+    if(box)box.checked=false;
+  }
+  if(_rateDiffOrder.length<2){
+    if(title)title.textContent='Differenz · 2 Serien wählen';
+    if(valEl)valEl.textContent='—';
+    if(dateEl)dateEl.textContent='Kästchen: erste − zweite';
+    host.innerHTML='';
+    if(hint)hint.textContent=_rateDiffOrder.length===1?('Gewählt: '+labels[_rateDiffOrder[0]]):'Noch keine Auswahl';
+    return;
+  }
+  const [k1,k2]=_rateDiffOrder;
+  const a1=histories['USA-'+k1]||[];
+  const a2=histories['USA-'+k2]||[];
+  const map2=new Map(a2.map(p=>[String(p.period)]));
+  const map2v=new Map(a2.map(p=>[String(p.period),Number(p.value)]));
+  const pts=[];
+  for(const p of a1){
+    const v2=map2v.get(String(p.period));
+    if(v2==null||!Number.isFinite(Number(p.value))||!Number.isFinite(v2))continue;
+    pts.push({period:String(p.period),value:Math.round((Number(p.value)-v2)*10000)/10000});
+  }
+  const name=labels[k1]+' − '+labels[k2];
+  if(title)title.textContent='Differenz · '+name;
+  if(!pts.length){if(valEl)valEl.textContent='—';host.innerHTML='<div class="sparkempty">Keine gemeinsamen Punkte</div>';return;}
+  const last=pts.at(-1);
+  if(valEl)valEl.textContent=fmt(last.value);
+  if(dateEl)dateEl.textContent='Stand '+last.period+' · '+pts.length+' Punkte';
+  host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|diff|'+name+'" title="Chart vergrößern">'+renderLineChart(pts,{w:220,h:58})+'</div>';
+  histories['USA-diff']=pts;
+  if(hint)hint.textContent='Berechnet: '+name;
+}
+document.addEventListener('change',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('rate-diff-cb'))paintRateDiff()});
+
+function paintSofRFwd(){
+  const host=document.getElementById('sofrFwdChart');
+  const valEl=document.getElementById('sofrFwdValue');
+  const dateEl=document.getElementById('sofrFwdDate');
+  const bpEl=document.getElementById('sofrFwdBp');
+  const metaEl=document.getElementById('sofrFwdMeta');
+  const histHost=document.getElementById('sofrFwdHistChart');
+  const histVal=document.getElementById('sofrFwdHistValue');
+  const histMeta=document.getElementById('sofrFwdHistMeta');
+  if(!host)return;
+  const fwd=(data.USA&&data.USA.sofrFwd)||{};
+  let pts=histories['USA-sofrFwd']||fwd.curve||[];
+  if((!pts||!pts.length)&&fwd.detail){
+    pts=fwd.detail.map(p=>({period:p.tenor,value:p.value}));
+  }
+  if(!pts||!pts.length){
+    host.innerHTML='<div class="sparkempty">Keine Forward-Daten</div>';
+    if(metaEl)metaEl.textContent='Warte auf nächsten Datenlauf (GitHub Actions · stündlich).';
+    return;
+  }
+  const last=pts.at(-1);
+  if(valEl)valEl.textContent=fmt(last.value);
+  if(dateEl){
+    const ts=fwd.updatedAt?fwd.updatedAt.replace('T',' ').slice(0,16)+' UTC':(fwd.date||'');
+    dateEl.textContent=(ts?('Stand '+ts+' · '):'')+'12m-Horizont · '+pts.map(p=>p.period).join(' / ');
+  }
+  // main curve chart — larger for readability
+  host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrFwd|SOFR Fwd" title="Chart vergrößern">'+renderLineChart(pts,{w:360,h:160})+'</div>';
+  if(bpEl){
+    const spot=pts.find(p=>p.period==='Heute');
+    if(spot){
+      bpEl.innerHTML=pts.filter(p=>p.period!=='Heute').map(p=>{
+        const bp=Math.round((Number(p.value)-Number(spot.value))*100);
+        const sign=bp>0?'+':'';
+        return '<span><b>'+p.period+'</b> '+fmt(p.value)+'% ('+sign+bp+' bp)</span>';
+      }).join('');
+    } else bpEl.innerHTML='';
+  }
+  if(metaEl){
+    const det=fwd.detail||[];
+    const legs=det.filter(p=>p.contracts).map(p=>p.tenor+': '+(p.contracts||[]).join('+')).join(' · ');
+    metaEl.textContent='Quelle: '+(fwd.source||'NY Fed + CME SR1')+'. '+(legs?('Kontrakte '+legs+'. '):'')+'SR1: R=100−Price = erwarteter Monatsdurchschnitt SOFR. Keine Fed-Prognose.';
+  }
+  if(histHost){
+    const snaps=histories['USA-sofrFwdSnapshots']||[];
+    function closest(daysAgo){
+      if(!snaps.length)return null;
+      const target=Date.now()-daysAgo*864e5;
+      let best=null,bestAbs=Infinity;
+      for(const s of snaps){
+        const t=Date.parse(s.asOf||s.spotDate||'');
+        if(!Number.isFinite(t))continue;
+        const abs=Math.abs(t-target);
+        if(abs<bestAbs){bestAbs=abs;best=s;}
+      }
+      if(!best)return null;
+      if(daysAgo>0 && bestAbs>20*864e5)return null;
+      return best;
+    }
+    const today=snaps.at(-1)||{points:(fwd.detail||pts.map(p=>({tenor:p.period,value:p.value}))),asOf:fwd.updatedAt};
+    const s30=closest(30);
+    const s90=closest(90);
+    const series=[];
+    if(today&&today.points) series.push({label:'Heute',pts:today.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
+    if(s30&&s30!==today) series.push({label:'≈30d',pts:s30.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
+    if(s90&&s90!==today&&s90!==s30) series.push({label:'≈90d',pts:s90.points.map(p=>({period:p.tenor||p.period,value:Number(p.value)}))});
+    if(series.length<=1){
+      histHost.innerHTML='<div class="sparkempty">Vergleich ab 2+ gespeicherten Tagen</div>';
+      if(histVal)histVal.textContent='—';
+      if(histMeta)histMeta.textContent='Snapshots: '+snaps.length+' Tag(e). Vergleich erscheint automatisch nach weiteren Datenläufen.';
+    } else {
+      histHost.innerHTML=series.map(s=>
+        '<div style="margin-top:8px"><div style="font-size:11px;color:var(--muted);margin-bottom:2px">'+s.label+(s.label==='≈30d'&&s30?' · '+String(s30.asOf).slice(0,10):'')+(s.label==='≈90d'&&s90?' · '+String(s90.asOf).slice(0,10):'')+'</div>'+
+        '<div class="yield-chart-wrap">'+renderLineChart(s.pts,{w:360,h:100})+'</div></div>'
+      ).join('');
+      const t12=(today.points.find(p=>(p.tenor||p.period)==='12m')||{}).value;
+      const p12=s30?(s30.points.find(p=>(p.tenor||p.period)==='12m')||{}).value:null;
+      if(histVal&&t12!=null&&p12!=null){
+        const bp=Math.round((t12-p12)*100);
+        histVal.textContent=fmt(t12)+'  ('+(bp>=0?'+':'')+bp+' bp vs. 30d)';
+      } else if(histVal&&t12!=null) histVal.textContent=fmt(t12);
+      if(histMeta){
+        histMeta.textContent='Heute: '+(today.asOf||'').toString().slice(0,16)+' · Snapshots: '+snaps.length+
+          (s30?' · 30d-Ref: '+String(s30.asOf).slice(0,10):'')+
+          (s90?' · 90d-Ref: '+String(s90.asOf).slice(0,10):'')+
+          '. Verschiebung der 12m-Erwartung in bp.';
+      }
+    }
+  }
+}
 bindUsaPages();
+
 
 let _rateDiffOrder=[];
 function paintRateDiff(){
