@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** paintChartDlg: dual charts with full render (US2Y+SOFR/IORB/EFFR, etc.) */
+/** paintChartDlg: dual charts with full render (US2Y, IORB+1Y, MOVE+yield avg, etc.) */
 let html = fs.readFileSync('index.html', 'utf8');
 
 const start = html.indexOf('function paintChartDlg');
@@ -77,6 +77,29 @@ const fn = `function paintChartDlg(){
     return;
   }
 
+  if(key==='moveDual'&&typeof renderMoveYieldChart==='function'){
+    let move=histories['USA-move']||[];
+    if(typeof filterByRange==='function'){
+      const m2=filterByRange(move,range); if(m2.length) move=m2;
+    }
+    let yAvg=[];
+    if(typeof getMoveShowYieldAvg==='function'&&getMoveShowYieldAvg()&&typeof buildUsYieldAvgSeries==='function'){
+      yAvg=buildUsYieldAvgSeries();
+      if(typeof filterByRange==='function'){
+        const y2=filterByRange(yAvg,range); if(y2.length) yAvg=y2;
+      }
+    }
+    if(!move.length){
+      body.innerHTML='<div class="sparkempty">Keine Daten</div>';
+      if(meta)meta.textContent='';
+      return;
+    }
+    body.innerHTML=renderMoveYieldChart(move,yAvg,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
+    if(meta)meta.textContent='MOVE blau · '+(yAvg.length?'Ø Rendite rot · ':'')+rLabel+' · '+move.length+' Punkte';
+    return;
+  }
+
   if(key==='sofrFwd'){
     const pts=histories['USA-sofrFwd']||((data.USA&&data.USA.sofrFwd&&data.USA.sofrFwd.points)||[]);
     if(typeof renderSofRFwdChart==='function'&&pts.length){
@@ -119,19 +142,14 @@ const fn = `function paintChartDlg(){
 html = html.slice(0, start) + fn + html.slice(end);
 fs.writeFileSync('index.html', html);
 
-// Validate render is INSIDE paintChartDlg
 const s2 = html.indexOf('function paintChartDlg');
 const e2 = html.indexOf('function bindBigChartHover');
 const region = html.slice(s2, e2);
 const hasRender =
   region.includes("key==='us2ySofrDual'") &&
-  region.includes('renderUs2ySofrChart(us2y,red') &&
-  region.includes('return;');
-console.log('paintChartDlg ok', 'us2y render in region', hasRender);
-if (!hasRender) {
-  console.error('US2Y enlarge path missing in paintChartDlg');
-  process.exit(1);
-}
+  region.includes('renderUs2ySofrChart(us2y,red');
+console.log('paintChartDlg ok', 'us2y', hasRender, 'moveDual', region.includes("key==='moveDual'"));
+if (!hasRender) process.exit(1);
 
 try {
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
