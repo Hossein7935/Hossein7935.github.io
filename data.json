@@ -97110,14 +97110,14 @@
           {
             "symbol": "SR3Z26.CME",
             "yearMonth": "2026-12",
-            "price": 95.83,
-            "rate": 4.17
+            "price": 95.835,
+            "rate": 4.165
           },
           {
             "symbol": "SR3H27.CME",
             "yearMonth": "2027-03",
-            "price": 95.675,
-            "rate": 4.325
+            "price": 95.68,
+            "rate": 4.32
           },
           {
             "symbol": "SR3M27.CME",
@@ -97134,8 +97134,8 @@
           {
             "symbol": "SR3Z27.CME",
             "yearMonth": "2027-12",
-            "price": 95.565,
-            "rate": 4.435
+            "price": 95.57,
+            "rate": 4.43
           },
           {
             "symbol": "SR3H28.CME",
