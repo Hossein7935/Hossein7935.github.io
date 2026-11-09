@@ -1,11 +1,9 @@
 import fs from 'node:fs';
 
 /**
- * Marktimplizierte SOFR-Erwartungskurve
- * Spot: NY Fed SOFR
- * Forward: CME SR1 (1M) + SR3 (3M) via Yahoo
- * Horizons: Heute, 3m, 6m, 9m, 12m, 2y, 5y, 10y, 30y (nur wenn Strip reicht)
- * Plus: individuelle Kontrakt-Historien für Laufzeiten-Picker
+ * SOFR expectation curve + tenor catalog
+ * Spot: NY Fed | Forwards: CME SR1/SR3 via Yahoo
+ * Robust: curve+catalog always written if strip loads; histories best-effort
  */
 
 const MONTH_CODES = ['F', 'G', 'H', 'J', 'K', 'M', 'N', 'Q', 'U', 'V', 'X', 'Z'];
@@ -18,18 +16,16 @@ function addMonthsUTC(d, n) {
 }
 
 function srSymbol(root, d) {
-  const code = MONTH_CODES[d.getUTCMonth()];
-  const yy = String(d.getUTCFullYear()).slice(2);
-  return `${root}${code}${yy}.CME`;
+  return `${root}${MONTH_CODES[d.getUTCMonth()]}${String(d.getUTCFullYear()).slice(2)}.CME`;
 }
 
 async function fetchJson(url, label) {
   const r = await fetch(url, {
     headers: {
-      'User-Agent': 'MacroWatch/1.0 (+https://hossein7935.github.io/)',
+      'User-Agent': 'Mozilla/5.0 MacroWatch/1.0',
       Accept: 'application/json'
     },
-    signal: AbortSignal.timeout(30000),
+    signal: AbortSignal.timeout(25000),
     cache: 'no-store'
   });
   if (!r.ok) throw new Error(`${label} HTTP ${r.status}`);
@@ -55,63 +51,58 @@ async function fetchYahooPrice(symbol) {
   const meta = j?.chart?.result?.[0]?.meta;
   const price = meta?.regularMarketPrice ?? meta?.previousClose;
   if (!Number.isFinite(Number(price))) throw new Error(`${symbol}: no price`);
-  const rate = Math.round((100 - Number(price)) * 10000) / 10000;
-  return { symbol, price: Number(price), rate };
+  return {
+    symbol,
+    price: Number(price),
+    rate: Math.round((100 - Number(price)) * 10000) / 10000
+  };
 }
 
-async function fetchYahooHistory(symbol, range = 'max') {
-  const urls = [
-    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=max`,
-    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2y`,
-    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1y`
-  ];
-  let res = null;
-  for (const url of urls) {
+async function fetchYahooHistory(symbol) {
+  for (const range of ['2y', '1y', '6mo']) {
     try {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=${range}`;
       const j = await fetchJson(url, symbol + ' hist');
-      res = j?.chart?.result?.[0];
-      if (res?.timestamp?.length) break;
+      const res = j?.chart?.result?.[0];
+      if (!res?.timestamp?.length) continue;
+      const closes = res.indicators?.quote?.[0]?.close || [];
+      const map = new Map();
+      for (let i = 0; i < res.timestamp.length; i++) {
+        const c = closes[i];
+        if (c == null || !Number.isFinite(Number(c))) continue;
+        const period = new Date(res.timestamp[i] * 1000).toISOString().slice(0, 10);
+        map.set(period, Math.round((100 - Number(c)) * 10000) / 10000);
+      }
+      if (map.size >= 5) {
+        return [...map.entries()]
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map(([period, value]) => ({ period, value }));
+      }
     } catch (e) {
-      console.warn(symbol, e.message);
+      console.warn('hist', symbol, e.message);
     }
   }
-  if (!res) return [];
-  const ts = res.timestamp || [];
-  const closes = res.indicators?.quote?.[0]?.close || [];
-  const out = [];
-  for (let i = 0; i < ts.length; i++) {
-    const c = closes[i];
-    if (c == null || !Number.isFinite(Number(c))) continue;
-    const period = new Date(ts[i] * 1000).toISOString().slice(0, 10);
-    const rate = Math.round((100 - Number(c)) * 10000) / 10000;
-    out.push({ period, value: rate });
-  }
-  const map = new Map(out.map(p => [p.period, p.value]));
-  return [...map.entries()]
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([period, value]) => ({ period, value }));
+  return [];
 }
 
 function interpolateAtMonths(strip, months) {
   if (!strip.length) return null;
   if (months <= strip[0].monthsFromNow) {
     const s = strip[0];
-    return { value: s.rate, contracts: [s.symbol], price: s.price, method: 'front' };
+    return { value: s.rate, contracts: [s.symbol], method: 'front' };
   }
   if (months >= strip.at(-1).monthsFromNow) {
-    const s = strip.at(-1];
-    return { value: s.rate, contracts: [s.symbol], price: s.price, method: 'back' };
+    const s = strip.at(-1);
+    return { value: s.rate, contracts: [s.symbol], method: 'back' };
   }
   let i = 0;
   while (i < strip.length - 1 && strip[i + 1].monthsFromNow < months) i++;
   const a = strip[i];
   const b = strip[i + 1];
   const t = (months - a.monthsFromNow) / (b.monthsFromNow - a.monthsFromNow || 1);
-  const value = Math.round((a.rate + t * (b.rate - a.rate)) * 10000) / 10000;
   return {
-    value,
+    value: Math.round((a.rate + t * (b.rate - a.rate)) * 10000) / 10000,
     contracts: a.symbol === b.symbol ? [a.symbol] : [a.symbol, b.symbol],
-    price: Math.round((a.price + t * (b.price - a.price)) * 10000) / 10000,
     method: 'interp'
   };
 }
@@ -120,6 +111,7 @@ const payload = JSON.parse(fs.readFileSync('data.json', 'utf8'));
 const histories = payload.histories || {};
 const data = payload.data || {};
 data.USA = data.USA || {};
+const prevFwd = data.USA.sofrFwd && typeof data.USA.sofrFwd === 'object' ? data.USA.sofrFwd : null;
 const errors = Array.isArray(payload.errors)
   ? payload.errors.filter(e => !String(e).startsWith('USA SOFR Fwd'))
   : [];
@@ -128,9 +120,11 @@ const now = new Date();
 
 try {
   const spot = await fetchSpotSofR();
+  console.log('spot', spot);
 
+  // SR1 0..15m
   const sr1Strip = [];
-  for (let m = 0; m <= 18; m++) {
+  for (let m = 0; m <= 15; m++) {
     const d = addMonthsUTC(now, m);
     const symbol = srSymbol('SR1', d);
     try {
@@ -143,23 +137,23 @@ try {
         rate: q.rate,
         kind: 'SR1'
       });
-      console.log('SR1', m + 'm', q.symbol, q.price, '→', q.rate);
+      console.log('SR1', m + 'm', q.symbol, q.rate);
     } catch (e) {
       console.warn('SR1 skip', symbol, e.message);
     }
   }
   if (sr1Strip.length < 4) throw new Error(`SR1 strip too short (${sr1Strip.length})`);
 
+  // SR3 out to ~6y
   const sr3Strip = [];
-  for (let y = now.getUTCFullYear(); y <= now.getUTCFullYear() + 10; y++) {
+  for (let y = now.getUTCFullYear(); y <= now.getUTCFullYear() + 6; y++) {
     for (const code of IMM_CODES) {
       const mi = MONTH_CODES.indexOf(code);
       if (y === now.getUTCFullYear() && mi < now.getUTCMonth()) continue;
       const symbol = `SR3${code}${String(y).slice(2)}.CME`;
       try {
         const q = await fetchYahooPrice(symbol);
-        const monthsFromNow =
-          (y - now.getUTCFullYear()) * 12 + (mi - now.getUTCMonth());
+        const monthsFromNow = (y - now.getUTCFullYear()) * 12 + (mi - now.getUTCMonth());
         sr3Strip.push({
           monthsFromNow: Math.max(0, monthsFromNow),
           yearMonth: `${y}-${String(mi + 1).padStart(2, '0')}`,
@@ -168,20 +162,20 @@ try {
           rate: q.rate,
           kind: 'SR3'
         });
-        console.log('SR3', q.symbol, monthsFromNow + 'm', q.price, '→', q.rate);
+        console.log('SR3', q.symbol, monthsFromNow + 'm', q.rate);
       } catch (e) {}
     }
   }
   sr3Strip.sort((a, b) => a.monthsFromNow - b.monthsFromNow);
 
   const combined = [];
-  const seenM = new Set();
+  const seen = new Set();
   for (const s of [...sr1Strip, ...sr3Strip].sort((a, b) => a.monthsFromNow - b.monthsFromNow)) {
-    if (seenM.has(s.monthsFromNow)) continue;
-    seenM.add(s.monthsFromNow);
+    if (seen.has(s.monthsFromNow)) continue;
+    seen.add(s.monthsFromNow);
     combined.push(s);
   }
-  const maxM = combined.length ? combined.at(-1).monthsFromNow : 12;
+  const maxM = combined.at(-1)?.monthsFromNow ?? 12;
 
   const horizons = [
     { tenor: 'Heute', months: 0, spot: true },
@@ -204,14 +198,13 @@ try {
         months: 0,
         value: spot.value,
         kind: 'spot',
-        note: 'Veröffentlichter Overnight-SOFR (NY Fed)',
         contracts: ['SOFR'],
         spotDate: spot.period
       });
       continue;
     }
     if (h.months > 12 && maxM < h.months * 0.7) {
-      console.log('skip horizon', h.tenor, 'maxStrip', maxM);
+      console.log('skip', h.tenor, 'max', maxM);
       continue;
     }
     const interp = interpolateAtMonths(combined, h.months);
@@ -223,39 +216,19 @@ try {
       value: interp.value,
       kind: 'fwd',
       method: interp.method,
-      contracts: interp.contracts,
-      note: h.months > 12 ? 'SR3-Schwerpunkt' : 'SR1/SR3 Strip'
+      contracts: interp.contracts
     });
   }
 
+  if (points.length < 3) throw new Error('curve too short');
+
   histories['USA-sofrFwd'] = points.map(p => ({ period: p.period, value: p.value }));
 
+  // Catalog for UI (all strip points)
   const catalog = [];
-  const histKeys = {};
-  async function loadHist(s, id) {
-    try {
-      const hist = await fetchYahooHistory(s.symbol, 'max');
-      if (hist.length >= 5) {
-        histories[`USA-sofrTenor-${id}`] = hist;
-        histKeys[id] = hist.length;
-        console.log('hist', id, hist.length, hist.at(-1)?.period);
-      } else {
-        histories[`USA-sofrTenor-${id}`] = [
-          { period: new Date().toISOString().slice(0, 10), value: s.rate }
-        ];
-      }
-    } catch (e) {
-      console.warn('hist fail', s.symbol, e.message);
-      histories[`USA-sofrTenor-${id}`] = [
-        { period: new Date().toISOString().slice(0, 10), value: s.rate }
-      ];
-    }
-  }
-
   for (const s of sr1Strip) {
-    const id = `sr1_${s.yearMonth}`;
     catalog.push({
-      id,
+      id: `sr1_${s.yearMonth}`,
       label: `SR1 ${s.yearMonth} (${s.monthsFromNow}m)`,
       symbol: s.symbol,
       kind: 'SR1',
@@ -263,9 +236,8 @@ try {
       monthsFromNow: s.monthsFromNow,
       lastRate: s.rate
     });
-    await loadHist(s, id);
   }
-  for (const s of sr3Strip.filter(x => x.monthsFromNow <= 60)) {
+  for (const s of sr3Strip.filter(x => x.monthsFromNow <= 72)) {
     const id = `sr3_${s.yearMonth}`;
     if (catalog.some(c => c.id === id)) continue;
     catalog.push({
@@ -277,7 +249,40 @@ try {
       monthsFromNow: s.monthsFromNow,
       lastRate: s.rate
     });
-    await loadHist(s, id);
+  }
+
+  // Histories: limited set to avoid timeouts (first 6 SR1 + 6 SR3)
+  const histTargets = [
+    ...sr1Strip.slice(0, 6),
+    ...sr3Strip.filter(x => x.monthsFromNow <= 36).slice(0, 6)
+  ];
+  const histKeys = {};
+  for (const s of histTargets) {
+    const id = `${s.kind.toLowerCase()}_${s.yearMonth}`;
+    try {
+      const hist = await fetchYahooHistory(s.symbol);
+      if (hist.length >= 5) {
+        histories[`USA-sofrTenor-${id}`] = hist;
+        histKeys[id] = hist.length;
+        console.log('hist', id, hist.length);
+      } else {
+        histories[`USA-sofrTenor-${id}`] = [
+          { period: asOf.slice(0, 10), value: s.rate }
+        ];
+      }
+    } catch (e) {
+      histories[`USA-sofrTenor-${id}`] = [
+        { period: asOf.slice(0, 10), value: s.rate }
+      ];
+    }
+  }
+  // Ensure every catalog id has at least one point
+  for (const c of catalog) {
+    if (!histories[`USA-sofrTenor-${c.id}`]) {
+      histories[`USA-sofrTenor-${c.id}`] = [
+        { period: asOf.slice(0, 10), value: c.lastRate }
+      ];
+    }
   }
 
   const snaps = Array.isArray(histories['USA-sofrFwdSnapshots'])
@@ -292,7 +297,7 @@ try {
   histories['USA-sofrFwdSnapshots'] = snaps;
 
   data.USA.sofrFwd = {
-    value: points.at(-1)?.value,
+    value: points.at(-1).value,
     date: asOf.slice(0, 10),
     updatedAt: asOf,
     curve: points.map(p => ({ period: p.period, value: p.value })),
@@ -307,16 +312,24 @@ try {
   data.USA.sofrTenorCatalog = catalog;
 
   console.log(
-    'curve points',
-    points.map(p => p.tenor + '=' + p.value).join(' '),
+    'OK curve',
+    points.map(p => p.tenor).join(','),
     'catalog',
     catalog.length,
-    'histKeys',
+    'hist',
     Object.keys(histKeys).length
   );
 } catch (e) {
   errors.push(`USA SOFR Fwd: ${e.message}`);
-  console.error(e);
+  console.error('FAIL', e.message);
+  // restore previous if we had working data
+  if (prevFwd && prevFwd.curve && prevFwd.curve.length) {
+    data.USA.sofrFwd = prevFwd;
+    if (!histories['USA-sofrFwd'] && prevFwd.curve) {
+      histories['USA-sofrFwd'] = prevFwd.curve;
+    }
+    console.log('kept previous sofrFwd');
+  }
 }
 
 payload.histories = histories;
