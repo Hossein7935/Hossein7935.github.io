@@ -100,6 +100,27 @@ const fn = `function paintChartDlg(){
     return;
   }
 
+  if(key==='rateOverlayDual'&&typeof renderRateOverlayChart==='function'){
+    const om=window.__rateOverlayMeta||{};
+    const k1=om.k1||'effr', k2=om.k2||'sofr';
+    const labels={effr:'EFFR',sofr:'SOFR',iorb:'IORB'};
+    let blue=histories['USA-'+k1]||[];
+    let red=histories['USA-'+k2]||[];
+    if(typeof filterByRange==='function'){
+      const b2=filterByRange(blue,range); if(b2.length) blue=b2;
+      const r2=filterByRange(red,range); if(r2.length) red=r2;
+    }
+    if(!blue.length&&!red.length){
+      body.innerHTML='<div class="sparkempty">Keine Daten</div>';
+      if(meta)meta.textContent='';
+      return;
+    }
+    body.innerHTML=renderRateOverlayChart(blue,red,{w:720,h:320,big:true,blueLabel:labels[k1]||k1,redLabel:labels[k2]||k2})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
+    if(meta)meta.textContent=(labels[k1]||k1)+' blau · '+(labels[k2]||k2)+' rot · '+rLabel;
+    return;
+  }
+
   if(key==='yield7Diff'){
     let pts=histories['USA-yield7Diff']||[];
     if(typeof filterByRange==='function'){
@@ -180,7 +201,7 @@ const region = html.slice(s2, e2);
 const hasRender =
   region.includes("key==='us2ySofrDual'") &&
   region.includes('renderUs2ySofrChart(us2y,red');
-console.log('paintChartDlg ok', 'us2y', hasRender, 'yield7Diff', region.includes("key==='yield7Diff'"));
+console.log('paintChartDlg ok', 'us2y', hasRender, 'rateOverlay', region.includes("key==='rateOverlayDual'"));
 if (!hasRender) process.exit(1);
 
 try {
