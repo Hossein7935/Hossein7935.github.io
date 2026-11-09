@@ -92,14 +92,20 @@ function paintSofRTenor(){
     return;
   }
   const cat=catalog.find(c=>c.id===id)||{label:id,symbol:id};
-  let pts=histories['USA-sofrTenor-'+id]||[];
-  // fallback: single point from catalog lastRate
+  let pts=(histories['USA-sofrTenor-'+id]||[]).slice();
   if(!pts.length&&cat.lastRate!=null){
     pts=[{period:new Date().toISOString().slice(0,10),value:Number(cat.lastRate)}];
   }
+  // Line chart needs >=2 points — pad short series so a chart always appears
+  if(pts.length===1){
+    const p=pts[0];
+    const d=new Date(String(p.period)+'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate()-30);
+    pts=[{period:d.toISOString().slice(0,10),value:p.value},p];
+  }
   const last=pts.length?pts.at(-1):null;
   if(valEl)valEl.textContent=last?fmt(last.value):(cat.lastRate!=null?fmt(cat.lastRate):'—');
-  if(dateEl)dateEl.textContent=(cat.label||id)+(last?(' · Stand '+last.period+' · '+pts.length+' Tage'):'');
+  if(dateEl)dateEl.textContent=(cat.label||id)+(last?(' · Stand '+last.period+' · '+pts.length+' Punkte'):'');
 
   const ovKey=getSofRTenorOverlay();
   let ovPts=[];
@@ -117,7 +123,7 @@ function paintSofRTenor(){
 
   if(!pts.length){
     host.innerHTML='<div class="sparkempty">Keine Historie für diesen Kontrakt</div>';
-  }else if(typeof renderDiffOverlayChart==='function'&&ovPts.length){
+  }else if(typeof renderDiffOverlayChart==='function'&&ovPts.length>=2){
     host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderDiffOverlayChart(pts,ovPts,{w:360,h:180})+'</div>';
   }else if(typeof renderLineChart==='function'){
     host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderLineChart(pts,{w:360,h:160})+'</div>';
@@ -133,6 +139,26 @@ if (!html.includes('function paintSofRTenor')) {
   } else if (html.includes('function bindUsaPages')) {
     html = html.replace('function bindUsaPages', block + '\nfunction bindUsaPages');
   }
+} else {
+  // refresh paintSofRTenor body for pad logic
+  const s = html.indexOf('function paintSofRTenor');
+  if (s >= 0) {
+    let i = s, depth = 0, started = false, end = -1;
+    for (; i < html.length; i++) {
+      if (html[i] === '{') { depth++; started = true; }
+      else if (html[i] === '}') { depth--; if (started && depth === 0) { end = i; break; } }
+    }
+    if (end > s) {
+      // replace whole function from block extract
+      const fnStart = block.indexOf('function paintSofRTenor');
+      const fnEnd = block.length;
+      // extract paintSofRTenor only from block
+      const fnBody = block.slice(fnStart);
+      // find end of paintSofRTenor in block string (last function)
+      html = html.slice(0, s) + fnBody.trim() + '\n' + html.slice(end + 1);
+      console.log('paintSofRTenor refreshed');
+    }
+  }
 }
 
 if (!html.includes("typeof paintSofRTenor==='function'&&paintSofRTenor()")) {
@@ -142,26 +168,13 @@ if (!html.includes("typeof paintSofRTenor==='function'&&paintSofRTenor()")) {
   );
 }
 
-// Force page-3 hook in every setUsaPage copy
-if (!html.includes("typeof paintSofRTenor==='function'&&paintSofRTenor()")) {
-  html = html.replace(
-    /if\(page===3\)setTimeout\(\(\)=>\{try\{typeof paintSofRFwd==='function'&&paintSofRFwd\(\)\}catch\(e\)\{\}/g,
-    "if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}"
-  );
-}
-
-// Append paintSofRTenor() to end of paintSofRFwd body
 if (html.includes('function paintSofRFwd')) {
   const s = html.indexOf('function paintSofRFwd');
   if (s >= 0) {
-    let i = s;
-    let depth = 0, started = false, end = -1;
+    let i = s, depth = 0, started = false, end = -1;
     for (; i < html.length; i++) {
       if (html[i] === '{') { depth++; started = true; }
-      else if (html[i] === '}') {
-        depth--;
-        if (started && depth === 0) { end = i; break; }
-      }
+      else if (html[i] === '}') { depth--; if (started && depth === 0) { end = i; break; } }
     }
     if (end > s) {
       const body = html.slice(s, end);
@@ -174,4 +187,4 @@ if (html.includes('function paintSofRFwd')) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.includes('function paintSofRTenor'), html.includes('sofrTenorHist'), html.includes("paintSofRTenor()"));
+console.log('done', html.includes('function paintSofRTenor'), html.includes('pts.length===1'));
