@@ -1,9 +1,8 @@
 import fs from 'node:fs';
 
 /**
- * ICE BofA MOVE Index — bond market implied volatility ("VIX of Treasuries")
- * Source: Yahoo Finance ^MOVE (daily closes back to 2002)
- * Unit: annualized basis points of yield volatility
+ * ICE BofA MOVE Index — full daily history from Yahoo ^MOVE
+ * (index begins ~2002; Yahoo is the free long history source)
  */
 const YAHOO =
   'https://query1.finance.yahoo.com/v8/finance/chart/%5EMOVE?period1=0&period2=9999999999&interval=1d&events=history';
@@ -23,7 +22,7 @@ try {
       'User-Agent': 'Mozilla/5.0 MacroWatch/1.0',
       Accept: 'application/json'
     },
-    signal: AbortSignal.timeout(60000),
+    signal: AbortSignal.timeout(90000),
     cache: 'no-store'
   });
   if (!r.ok) throw new Error(`Yahoo HTTP ${r.status}`);
@@ -40,20 +39,20 @@ try {
     const period = d.toISOString().slice(0, 10);
     series.push({ period, value: Math.round(Number(c) * 100) / 100 });
   }
-  // dedupe by date
   const map = new Map(series.map(p => [p.period, p.value]));
   const out = [...map.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([period, value]) => ({ period, value }));
   if (out.length < 100) throw new Error('MOVE series too short');
 
+  // Do NOT downsample — keep full history for page 6
   histories['USA-move'] = out;
   const last = out.at(-1);
   const prev = out.length > 1 ? out.at(-2) : null;
   const absChg = prev ? Math.round((last.value - prev.value) * 100) / 100 : null;
   const pctChg =
     prev && prev.value
-      ? Math.round(((last.value / prev.value) - 1) * 10000) / 100
+      ? Math.round((last.value / prev.value - 1) * 10000) / 100
       : null;
 
   data.USA.move = {
@@ -67,14 +66,16 @@ try {
     sourceUrl: 'https://finance.yahoo.com/quote/%5EMOVE/',
     unit: 'bp (ann.)',
     points: out.length,
+    firstDate: out[0].period,
     note:
-      'MOVE = implizite Treasury-Optionsvolatilität (2Y/5Y/10Y/30Y), in annualisierten Basispunkten. Kein Prognoseinstrument.'
+      'MOVE = implizite Treasury-Optionsvolatilität. Volle Tageshistorie ab ' +
+      out[0].period +
+      ' (Index-Start ~2002).'
   };
-
-  console.log('MOVE', last.period, last.value, 'n=', out.length, 'chg', absChg);
+  console.log('MOVE', out.length, out[0].period, '→', last.period, last.value);
 } catch (e) {
   errors.push(`USA MOVE: ${e.message}`);
-  console.error('MOVE failed', e.message);
+  console.error(e.message);
 }
 
 payload.histories = histories;
