@@ -1,9 +1,8 @@
 import fs from 'fs';
 
-/** USA page nav: sticky selector + ensure bindUsaPages() is actually called */
+/** USA page nav: sticky selector + bindUsaPages() call; pages 0..6 */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// 1) CSS sticky
 if (!html.includes('/* usa-nav-sticky */')) {
   const css = `
 /* usa-nav-sticky */
@@ -17,7 +16,6 @@ if (!html.includes('/* usa-nav-sticky */')) {
   }
 }
 
-// 2) Harden bindUsaPages
 const hardened = `
 function bindUsaPages(){
   if(!window.__usaPageClickBound){
@@ -35,7 +33,7 @@ function bindUsaPages(){
   }
   let start=0;
   try{start=Number(localStorage.getItem('macrowatch-usa-page')||'0')}catch(e){start=0}
-  if(!Number.isFinite(start)||start<0||start>5)start=0;
+  if(!Number.isFinite(start)||start<0||start>6)start=0;
   setUsaPage(start);
 }
 `;
@@ -50,39 +48,38 @@ if (html.includes('function bindUsaPages')) {
   }
 }
 
-// 3) CRITICAL: ensure bindUsaPages() is invoked
-// Prefer right after the render-patch block; also before refresh();
 if (!html.includes('bindUsaPages();')) {
   if (html.includes('if(!window.__usaRenderPatched)')) {
-    // append call after the render patch closing
     html = html.replace(
       /if\(!window\.__usaRenderPatched\)\{[\s\S]*?\n\}/,
       (m) => m + '\nbindUsaPages();\n'
     );
     console.log('bindUsaPages() after render patch');
   }
-  if (!html.includes('bindUsaPages();')) {
-    // fallback: before final refresh();
-    if (html.includes('\nrefresh();\n')) {
-      html = html.replace('\nrefresh();\n', '\nbindUsaPages();\nrefresh();\n');
-      console.log('bindUsaPages() before refresh');
-    } else if (html.includes('refresh();')) {
-      html = html.replace('refresh();', 'bindUsaPages();refresh();');
-      console.log('bindUsaPages() before refresh (inline)');
-    }
+  if (!html.includes('bindUsaPages();') && html.includes('refresh();')) {
+    html = html.replace('refresh();', 'bindUsaPages();refresh();');
   }
-} else {
-  console.log('bindUsaPages(); already present');
 }
 
-// 4) Also call after each render (in case cards rebuilt)
-if (html.includes('__usaRenderPatched') && !html.includes('bindUsaPages()\n    return')) {
+if (html.includes('__usaRenderPatched')) {
   html = html.replace(
     "try{setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'))}catch(e){}\n    return r;",
     "try{bindUsaPages()}catch(e){try{setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'))}catch(e2){}}\n    return r;"
   );
-  console.log('render calls bindUsaPages');
+}
+
+// Ensure Seite 7 button exists in template
+if (!html.includes('data-page=\"6\"') && !html.includes('data-page="6"')) {
+  html = html.replace(
+    /(data-page=\"5\"[^>]*>)([^<]*)(<\/button>)/,
+    '$1$2$3<button type=\"button\" data-page=\"6\">Seite 7</button>'
+  );
+  html = html.replace(
+    /(data-page="5"[^>]*>)([^<]*)(<\/button>)/,
+    '$1$2$3<button type="button" data-page="6">Seite 7</button>'
+  );
+  console.log('added page 7 button');
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'has call', html.includes('bindUsaPages();'));
+console.log('done', html.length, 'has call', html.includes('bindUsaPages();'), 'page6 btn', html.includes('data-page=\"6\"')||html.includes('data-page="6"'));
