@@ -76,6 +76,8 @@ jobs:
         run: node scripts/inject-fix-usa-nav.mjs
       - name: Final JS dedupe (after all injects)
         run: node scripts/fix-js-syntax.mjs
+      - name: Restore paintChartDlg after final dedupe
+        run: node scripts/fix-paint-chart-dlg.mjs
       - name: Check updater syntax
         run: |
           node --check scripts/inject-page7-yields.mjs
@@ -152,10 +154,10 @@ jobs:
           set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Re-apply JS fix in case merge brings back duplicates
           node scripts/fix-js-syntax.mjs || true
           node scripts/inject-fix-usa-nav.mjs || true
           node scripts/fix-js-syntax.mjs || true
+          node scripts/fix-paint-chart-dlg.mjs || true
           git add data.json scripts/ index.html || true
           if git diff --cached --quiet; then
             echo "No data changes to commit"
@@ -163,6 +165,7 @@ jobs:
             git commit -m "Update MacroWatch data + fixed index JS" || true
             git pull --no-rebase -X ours origin main || true
             node scripts/fix-js-syntax.mjs || true
+            node scripts/fix-paint-chart-dlg.mjs || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
             git push origin HEAD:main || git push --force-with-lease origin HEAD:main
