@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-09T23:12:42.888Z",
+  "updatedAt": "2026-11-09T23:29:40.389Z",
   "data": {
     "CHN": {
       "rate": {
@@ -141,9 +141,9 @@
         "note": "IOER bis 2021-07, danach IORB"
       },
       "sofrFwd": {
-        "value": 4.4967,
+        "value": 4.495,
         "date": "2026-11-09",
-        "updatedAt": "2026-11-09T23:12:07.627Z",
+        "updatedAt": "2026-11-09T23:29:18.194Z",
         "curve": [
           {
             "period": "Heute",
@@ -167,11 +167,11 @@
           },
           {
             "period": "2y",
-            "value": 4.375
+            "value": 4.3733
           },
           {
             "period": "5y",
-            "value": 4.4967
+            "value": 4.495
           }
         ],
         "detail": [
@@ -238,7 +238,7 @@
             "period": "2y",
             "tenor": "2y",
             "months": 24,
-            "value": 4.375,
+            "value": 4.3733,
             "kind": "fwd",
             "method": "interp",
             "contracts": [
@@ -250,7 +250,7 @@
             "period": "5y",
             "tenor": "5y",
             "months": 60,
-            "value": 4.4967,
+            "value": 4.495,
             "kind": "fwd",
             "method": "interp",
             "contracts": [
@@ -271,7 +271,7 @@
             "kind": "SR1",
             "yearMonth": "2026-11",
             "monthsFromNow": 0,
-            "lastRate": 3.9
+            "lastRate": 3.8975
           },
           {
             "id": "sr1_2026-12",
@@ -280,7 +280,7 @@
             "kind": "SR1",
             "yearMonth": "2026-12",
             "monthsFromNow": 1,
-            "lastRate": 4.045
+            "lastRate": 4.05
           },
           {
             "id": "sr1_2027-01",
@@ -406,7 +406,7 @@
             "kind": "SR3",
             "yearMonth": "2026-12",
             "monthsFromNow": 1,
-            "lastRate": 4.17
+            "lastRate": 4.175
           },
           {
             "id": "sr3_2027-03",
@@ -424,7 +424,7 @@
             "kind": "SR3",
             "yearMonth": "2027-06",
             "monthsFromNow": 7,
-            "lastRate": 4.425
+            "lastRate": 4.42
           },
           {
             "id": "sr3_2027-09",
@@ -469,7 +469,7 @@
             "kind": "SR3",
             "yearMonth": "2028-09",
             "monthsFromNow": 22,
-            "lastRate": 4.385
+            "lastRate": 4.38
           },
           {
             "id": "sr3_2028-12",
@@ -487,7 +487,7 @@
             "kind": "SR3",
             "yearMonth": "2029-03",
             "monthsFromNow": 28,
-            "lastRate": 4.36
+            "lastRate": 4.355
           },
           {
             "id": "sr3_2029-06",
@@ -514,7 +514,7 @@
             "kind": "SR3",
             "yearMonth": "2029-12",
             "monthsFromNow": 37,
-            "lastRate": 4.35
+            "lastRate": 4.345
           },
           {
             "id": "sr3_2030-03",
@@ -523,7 +523,7 @@
             "kind": "SR3",
             "yearMonth": "2030-03",
             "monthsFromNow": 40,
-            "lastRate": 4.355
+            "lastRate": 4.35
           },
           {
             "id": "sr3_2030-06",
@@ -532,7 +532,7 @@
             "kind": "SR3",
             "yearMonth": "2030-06",
             "monthsFromNow": 43,
-            "lastRate": 4.365
+            "lastRate": 4.36
           },
           {
             "id": "sr3_2030-09",
@@ -541,7 +541,7 @@
             "kind": "SR3",
             "yearMonth": "2030-09",
             "monthsFromNow": 46,
-            "lastRate": 4.38
+            "lastRate": 4.375
           },
           {
             "id": "sr3_2030-12",
@@ -550,7 +550,7 @@
             "kind": "SR3",
             "yearMonth": "2030-12",
             "monthsFromNow": 49,
-            "lastRate": 4.4
+            "lastRate": 4.395
           },
           {
             "id": "sr3_2031-03",
@@ -559,7 +559,7 @@
             "kind": "SR3",
             "yearMonth": "2031-03",
             "monthsFromNow": 52,
-            "lastRate": 4.43
+            "lastRate": 4.425
           },
           {
             "id": "sr3_2031-06",
@@ -568,7 +568,7 @@
             "kind": "SR3",
             "yearMonth": "2031-06",
             "monthsFromNow": 55,
-            "lastRate": 4.46
+            "lastRate": 4.455
           },
           {
             "id": "sr3_2031-09",
@@ -577,7 +577,7 @@
             "kind": "SR3",
             "yearMonth": "2031-09",
             "monthsFromNow": 58,
-            "lastRate": 4.49
+            "lastRate": 4.485
           },
           {
             "id": "sr3_2031-12",
@@ -616,7 +616,47 @@
             "lastRate": 4.595
           }
         ],
-        "histKeys": {}
+        "histKeys": {
+          "sr1_2026-11": 1,
+          "sr1_2026-12": 1,
+          "sr1_2027-01": 1,
+          "sr1_2027-02": 1,
+          "sr1_2027-03": 1,
+          "sr1_2027-04": 1,
+          "sr1_2027-05": 1,
+          "sr1_2027-06": 1,
+          "sr1_2027-07": 1,
+          "sr1_2027-08": 1,
+          "sr1_2027-09": 1,
+          "sr1_2027-10": 1,
+          "sr1_2027-11": 1,
+          "sr1_2027-12": 2,
+          "sr1_2028-01": 2,
+          "sr3_2026-12": 17,
+          "sr3_2027-03": 17,
+          "sr3_2027-06": 17,
+          "sr3_2027-09": 17,
+          "sr3_2027-12": 17,
+          "sr3_2028-03": 17,
+          "sr3_2028-06": 17,
+          "sr3_2028-09": 17,
+          "sr3_2028-12": 17,
+          "sr3_2029-03": 17,
+          "sr3_2029-06": 17,
+          "sr3_2029-09": 12,
+          "sr3_2029-12": 1,
+          "sr3_2030-03": 1,
+          "sr3_2030-06": 1,
+          "sr3_2030-09": 1,
+          "sr3_2030-12": 1,
+          "sr3_2031-03": 1,
+          "sr3_2031-06": 1,
+          "sr3_2031-09": 1,
+          "sr3_2031-12": 1,
+          "sr3_2032-03": 1,
+          "sr3_2032-06": 1,
+          "sr3_2032-09": 2
+        }
       },
       "sofrTenorCatalog": [
         {
@@ -626,7 +666,7 @@
           "kind": "SR1",
           "yearMonth": "2026-11",
           "monthsFromNow": 0,
-          "lastRate": 3.9
+          "lastRate": 3.8975
         },
         {
           "id": "sr1_2026-12",
@@ -635,7 +675,7 @@
           "kind": "SR1",
           "yearMonth": "2026-12",
           "monthsFromNow": 1,
-          "lastRate": 4.045
+          "lastRate": 4.05
         },
         {
           "id": "sr1_2027-01",
@@ -761,7 +801,7 @@
           "kind": "SR3",
           "yearMonth": "2026-12",
           "monthsFromNow": 1,
-          "lastRate": 4.17
+          "lastRate": 4.175
         },
         {
           "id": "sr3_2027-03",
@@ -779,7 +819,7 @@
           "kind": "SR3",
           "yearMonth": "2027-06",
           "monthsFromNow": 7,
-          "lastRate": 4.425
+          "lastRate": 4.42
         },
         {
           "id": "sr3_2027-09",
@@ -824,7 +864,7 @@
           "kind": "SR3",
           "yearMonth": "2028-09",
           "monthsFromNow": 22,
-          "lastRate": 4.385
+          "lastRate": 4.38
         },
         {
           "id": "sr3_2028-12",
@@ -842,7 +882,7 @@
           "kind": "SR3",
           "yearMonth": "2029-03",
           "monthsFromNow": 28,
-          "lastRate": 4.36
+          "lastRate": 4.355
         },
         {
           "id": "sr3_2029-06",
@@ -869,7 +909,7 @@
           "kind": "SR3",
           "yearMonth": "2029-12",
           "monthsFromNow": 37,
-          "lastRate": 4.35
+          "lastRate": 4.345
         },
         {
           "id": "sr3_2030-03",
@@ -878,7 +918,7 @@
           "kind": "SR3",
           "yearMonth": "2030-03",
           "monthsFromNow": 40,
-          "lastRate": 4.355
+          "lastRate": 4.35
         },
         {
           "id": "sr3_2030-06",
@@ -887,7 +927,7 @@
           "kind": "SR3",
           "yearMonth": "2030-06",
           "monthsFromNow": 43,
-          "lastRate": 4.365
+          "lastRate": 4.36
         },
         {
           "id": "sr3_2030-09",
@@ -896,7 +936,7 @@
           "kind": "SR3",
           "yearMonth": "2030-09",
           "monthsFromNow": 46,
-          "lastRate": 4.38
+          "lastRate": 4.375
         },
         {
           "id": "sr3_2030-12",
@@ -905,7 +945,7 @@
           "kind": "SR3",
           "yearMonth": "2030-12",
           "monthsFromNow": 49,
-          "lastRate": 4.4
+          "lastRate": 4.395
         },
         {
           "id": "sr3_2031-03",
@@ -914,7 +954,7 @@
           "kind": "SR3",
           "yearMonth": "2031-03",
           "monthsFromNow": 52,
-          "lastRate": 4.43
+          "lastRate": 4.425
         },
         {
           "id": "sr3_2031-06",
@@ -923,7 +963,7 @@
           "kind": "SR3",
           "yearMonth": "2031-06",
           "monthsFromNow": 55,
-          "lastRate": 4.46
+          "lastRate": 4.455
         },
         {
           "id": "sr3_2031-09",
@@ -932,7 +972,7 @@
           "kind": "SR3",
           "yearMonth": "2031-09",
           "monthsFromNow": 58,
-          "lastRate": 4.49
+          "lastRate": 4.485
         },
         {
           "id": "sr3_2031-12",
@@ -974,7 +1014,7 @@
       "ustCurve": {
         "value": 4.86,
         "date": "2026-11-06",
-        "updatedAt": "2026-11-09T23:12:19.092Z",
+        "updatedAt": "2026-11-09T23:29:24.536Z",
         "source": "FRED · DGS* + DFII* (TIPS real yields)",
         "nominal": [
           {
@@ -1096,7 +1136,7 @@
         "value": 798.428,
         "valueRaw": 798428,
         "date": "2026-09-30",
-        "updatedAt": "2026-11-09T23:12:25.502Z",
+        "updatedAt": "2026-11-09T23:29:27.939Z",
         "source": "FHLBanks Office of Finance · Combined Operating Highlights",
         "sourceUrl": "https://www.fhlb-of.com/",
         "absChangeQoq": -12.287,
@@ -1126,7 +1166,7 @@
         "prevDate": "2026-11-05",
         "absChange": -6,
         "pctChange": -5.41,
-        "updatedAt": "2026-11-09T23:12:26.413Z",
+        "updatedAt": "2026-11-09T23:29:28.969Z",
         "source": "FRED EFFRVOL · New York Fed Effective Federal Funds Volume",
         "sourceUrl": "https://www.newyorkfed.org/markets/reference-rates/effr",
         "unit": "USD Milliarden",
@@ -1143,7 +1183,7 @@
         "us1y": 4.33,
         "us1yDate": "2026-11-06",
         "spread": 0.43,
-        "updatedAt": "2026-11-09T23:12:28.843Z",
+        "updatedAt": "2026-11-09T23:29:30.014Z",
         "source": "FRED IOER+IORB (merged) + DGS1",
         "sourceUrl": "https://fred.stlouisfed.org/series/IORB",
         "iorbPoints": 6607,
@@ -1156,7 +1196,7 @@
         "prevValue": 92.77,
         "absChange": -6.79,
         "pctChange": -7.32,
-        "updatedAt": "2026-11-09T23:12:29.976Z",
+        "updatedAt": "2026-11-09T23:29:30.553Z",
         "source": "Yahoo Finance ^MOVE · ICE BofA MOVE Index",
         "sourceUrl": "https://finance.yahoo.com/quote/%5EMOVE/",
         "unit": "bp (ann.)",
@@ -1165,12 +1205,12 @@
         "note": "MOVE = implizite Treasury-Optionsvolatilität. Volle Tageshistorie ab 2002-11-12 (Index-Start ~2002)."
       },
       "dxy": {
-        "value": 101.666,
+        "value": 101.679,
         "date": "2026-11-09",
         "prevValue": 102.3,
-        "absChange": -0.634,
-        "pctChange": -0.62,
-        "updatedAt": "2026-11-09T23:12:30.473Z",
+        "absChange": -0.621,
+        "pctChange": -0.61,
+        "updatedAt": "2026-11-09T23:29:30.831Z",
         "source": "Yahoo Finance DX-Y.NYB · ICE US Dollar Index (DXY)",
         "sourceUrl": "https://finance.yahoo.com/quote/DX-Y.NYB/",
         "unit": "index",
@@ -1184,14 +1224,14 @@
         "sofr": 3.89,
         "sofrDate": "2026-11-06",
         "spread": 0.62,
-        "updatedAt": "2026-11-09T23:12:31.090Z",
+        "updatedAt": "2026-11-09T23:29:31.186Z",
         "source": "FRED DGS2 + SOFR",
         "us2yPoints": 2964,
         "sofrPoints": 2148,
         "note": "US 2Y blau · SOFR rot · nicht Teil der Differenz-Funktion"
       },
       "ustTipsPage7": {
-        "updatedAt": "2026-11-09T23:12:31.638Z",
+        "updatedAt": "2026-11-09T23:29:31.707Z",
         "series": {
           "us3m": {
             "value": 4.19,
@@ -1255,7 +1295,7 @@
         "source": "Fed Z.1 · SAAR · Nonfinancial Business"
       },
       "cuAu": {
-        "value": 1.5401130130940128,
+        "value": 1.5390078116203139,
         "date": "2026-11-09",
         "source": "Yahoo HG=F / GC=F · Ratio×1000"
       },
@@ -1393,7 +1433,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y10": {
-        "value": 4.997,
+        "value": 4.992,
         "date": "2026-11-09",
         "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
@@ -1403,12 +1443,12 @@
         "source": "IMF DataMapper · PCPIPCH (Inflation rate, average consumer prices)"
       },
       "y2": {
-        "value": 4.812,
+        "value": 4.81,
         "date": "2026-11-09",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.185,
+        "value": 0.182,
         "date": "2026-11-09",
         "source": "TradingView · AUS 10Y − 2Y"
       },
@@ -4207,7 +4247,7 @@
       },
       {
         "period": "2026-11-09",
-        "value": 0.185
+        "value": 0.182
       }
     ],
     "CHN-t10y2y": [
@@ -97689,23 +97729,23 @@
       },
       {
         "period": "2y",
-        "value": 4.375
+        "value": 4.3733
       },
       {
         "period": "5y",
-        "value": 4.4967
+        "value": 4.495
       }
     ],
     "USA-sofrTenor-sr1_2026-11": [
       {
         "period": "2026-11-09",
-        "value": 3.9
+        "value": 3.8975
       }
     ],
     "USA-sofrTenor-sr1_2026-12": [
       {
         "period": "2026-11-09",
-        "value": 4.045
+        "value": 4.05
       }
     ],
     "USA-sofrTenor-sr1_2027-01": [
@@ -97730,42 +97770,6 @@
       {
         "period": "2026-11-09",
         "value": 4.285
-      }
-    ],
-    "USA-sofrTenor-sr3_2026-12": [
-      {
-        "period": "2026-11-09",
-        "value": 4.17
-      }
-    ],
-    "USA-sofrTenor-sr3_2027-03": [
-      {
-        "period": "2026-11-09",
-        "value": 4.325
-      }
-    ],
-    "USA-sofrTenor-sr3_2027-06": [
-      {
-        "period": "2026-11-09",
-        "value": 4.425
-      }
-    ],
-    "USA-sofrTenor-sr3_2027-09": [
-      {
-        "period": "2026-11-09",
-        "value": 4.45
-      }
-    ],
-    "USA-sofrTenor-sr3_2027-12": [
-      {
-        "period": "2026-11-09",
-        "value": 4.43
-      }
-    ],
-    "USA-sofrTenor-sr3_2028-03": [
-      {
-        "period": "2026-11-09",
-        "value": 4.41
       }
     ],
     "USA-sofrTenor-sr1_2027-05": [
@@ -97812,17 +97816,509 @@
     ],
     "USA-sofrTenor-sr1_2027-12": [
       {
+        "period": "2026-11-05",
+        "value": 4.375
+      },
+      {
         "period": "2026-11-09",
         "value": 4.375
       }
     ],
     "USA-sofrTenor-sr1_2028-01": [
       {
+        "period": "2026-10-23",
+        "value": 4.365
+      },
+      {
         "period": "2026-11-09",
         "value": 4.365
       }
     ],
+    "USA-sofrTenor-sr3_2026-12": [
+      {
+        "period": "2020-01-20",
+        "value": 1.465
+      },
+      {
+        "period": "2020-01-27",
+        "value": 1.265
+      },
+      {
+        "period": "2020-02-03",
+        "value": 1.37
+      },
+      {
+        "period": "2020-02-10",
+        "value": 1.35
+      },
+      {
+        "period": "2020-02-17",
+        "value": 1.265
+      },
+      {
+        "period": "2020-02-24",
+        "value": 0.99
+      },
+      {
+        "period": "2020-03-02",
+        "value": 0.61
+      },
+      {
+        "period": "2020-03-09",
+        "value": 0.49
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.505
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.39
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.345
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.43
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.365
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.325
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.305
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.23
+      },
+      {
+        "period": "2026-11-09",
+        "value": 4.175
+      }
+    ],
+    "USA-sofrTenor-sr3_2027-03": [
+      {
+        "period": "2020-01-20",
+        "value": 1.475
+      },
+      {
+        "period": "2020-01-27",
+        "value": 1.275
+      },
+      {
+        "period": "2020-02-03",
+        "value": 1.38
+      },
+      {
+        "period": "2020-02-10",
+        "value": 1.36
+      },
+      {
+        "period": "2020-02-17",
+        "value": 1.275
+      },
+      {
+        "period": "2020-02-24",
+        "value": 1
+      },
+      {
+        "period": "2020-03-02",
+        "value": 0.62
+      },
+      {
+        "period": "2020-03-09",
+        "value": 0.5
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.515
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.4
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.355
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.44
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.375
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.335
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.315
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.24
+      },
+      {
+        "period": "2026-11-09",
+        "value": 4.325
+      }
+    ],
+    "USA-sofrTenor-sr3_2027-06": [
+      {
+        "period": "2020-01-20",
+        "value": 1.485
+      },
+      {
+        "period": "2020-01-27",
+        "value": 1.285
+      },
+      {
+        "period": "2020-02-03",
+        "value": 1.39
+      },
+      {
+        "period": "2020-02-10",
+        "value": 1.37
+      },
+      {
+        "period": "2020-02-17",
+        "value": 1.285
+      },
+      {
+        "period": "2020-02-24",
+        "value": 1.01
+      },
+      {
+        "period": "2020-03-02",
+        "value": 0.63
+      },
+      {
+        "period": "2020-03-09",
+        "value": 0.51
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.525
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.41
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.365
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.45
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.385
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.345
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.325
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.25
+      },
+      {
+        "period": "2026-11-09",
+        "value": 4.42
+      }
+    ],
+    "USA-sofrTenor-sr3_2027-09": [
+      {
+        "period": "2020-01-20",
+        "value": 1.495
+      },
+      {
+        "period": "2020-01-27",
+        "value": 1.295
+      },
+      {
+        "period": "2020-02-03",
+        "value": 1.4
+      },
+      {
+        "period": "2020-02-10",
+        "value": 1.38
+      },
+      {
+        "period": "2020-02-17",
+        "value": 1.295
+      },
+      {
+        "period": "2020-02-24",
+        "value": 1.02
+      },
+      {
+        "period": "2020-03-02",
+        "value": 0.64
+      },
+      {
+        "period": "2020-03-09",
+        "value": 0.52
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.535
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.42
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.375
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.46
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.395
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.355
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.335
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.26
+      },
+      {
+        "period": "2026-11-09",
+        "value": 4.45
+      }
+    ],
+    "USA-sofrTenor-sr3_2027-12": [
+      {
+        "period": "2020-01-20",
+        "value": 1.505
+      },
+      {
+        "period": "2020-01-27",
+        "value": 1.305
+      },
+      {
+        "period": "2020-02-03",
+        "value": 1.41
+      },
+      {
+        "period": "2020-02-10",
+        "value": 1.39
+      },
+      {
+        "period": "2020-02-17",
+        "value": 1.305
+      },
+      {
+        "period": "2020-02-24",
+        "value": 1.03
+      },
+      {
+        "period": "2020-03-02",
+        "value": 0.65
+      },
+      {
+        "period": "2020-03-09",
+        "value": 0.53
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.545
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.43
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.385
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.47
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.405
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.365
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.345
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.27
+      },
+      {
+        "period": "2026-11-09",
+        "value": 4.43
+      }
+    ],
+    "USA-sofrTenor-sr3_2028-03": [
+      {
+        "period": "2020-01-20",
+        "value": 1.515
+      },
+      {
+        "period": "2020-01-27",
+        "value": 1.315
+      },
+      {
+        "period": "2020-02-03",
+        "value": 1.42
+      },
+      {
+        "period": "2020-02-10",
+        "value": 1.4
+      },
+      {
+        "period": "2020-02-17",
+        "value": 1.315
+      },
+      {
+        "period": "2020-02-24",
+        "value": 1.04
+      },
+      {
+        "period": "2020-03-02",
+        "value": 0.66
+      },
+      {
+        "period": "2020-03-09",
+        "value": 0.54
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.555
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.44
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.395
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.48
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.415
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.375
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.355
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.28
+      },
+      {
+        "period": "2026-11-09",
+        "value": 4.41
+      }
+    ],
     "USA-sofrTenor-sr3_2028-06": [
+      {
+        "period": "2020-01-20",
+        "value": 1.525
+      },
+      {
+        "period": "2020-01-27",
+        "value": 1.325
+      },
+      {
+        "period": "2020-02-03",
+        "value": 1.43
+      },
+      {
+        "period": "2020-02-10",
+        "value": 1.41
+      },
+      {
+        "period": "2020-02-17",
+        "value": 1.325
+      },
+      {
+        "period": "2020-02-24",
+        "value": 1.05
+      },
+      {
+        "period": "2020-03-02",
+        "value": 0.67
+      },
+      {
+        "period": "2020-03-09",
+        "value": 0.55
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.565
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.45
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.405
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.49
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.425
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.385
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.365
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.29
+      },
       {
         "period": "2026-11-09",
         "value": 4.395
@@ -97830,11 +98326,139 @@
     ],
     "USA-sofrTenor-sr3_2028-09": [
       {
+        "period": "2020-01-20",
+        "value": 1.535
+      },
+      {
+        "period": "2020-01-27",
+        "value": 1.335
+      },
+      {
+        "period": "2020-02-03",
+        "value": 1.44
+      },
+      {
+        "period": "2020-02-10",
+        "value": 1.42
+      },
+      {
+        "period": "2020-02-17",
+        "value": 1.335
+      },
+      {
+        "period": "2020-02-24",
+        "value": 1.06
+      },
+      {
+        "period": "2020-03-02",
+        "value": 0.68
+      },
+      {
+        "period": "2020-03-09",
+        "value": 0.56
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.575
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.46
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.415
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.5
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.435
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.395
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.375
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.3
+      },
+      {
         "period": "2026-11-09",
-        "value": 4.385
+        "value": 4.38
       }
     ],
     "USA-sofrTenor-sr3_2028-12": [
+      {
+        "period": "2020-01-20",
+        "value": 1.545
+      },
+      {
+        "period": "2020-01-27",
+        "value": 1.345
+      },
+      {
+        "period": "2020-02-03",
+        "value": 1.45
+      },
+      {
+        "period": "2020-02-10",
+        "value": 1.43
+      },
+      {
+        "period": "2020-02-17",
+        "value": 1.345
+      },
+      {
+        "period": "2020-02-24",
+        "value": 1.07
+      },
+      {
+        "period": "2020-03-02",
+        "value": 0.69
+      },
+      {
+        "period": "2020-03-09",
+        "value": 0.57
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.585
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.47
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.425
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.51
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.445
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.405
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.385
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.31
+      },
       {
         "period": "2026-11-09",
         "value": 4.37
@@ -97842,17 +98466,189 @@
     ],
     "USA-sofrTenor-sr3_2029-03": [
       {
+        "period": "2020-01-20",
+        "value": 1.555
+      },
+      {
+        "period": "2020-01-27",
+        "value": 1.355
+      },
+      {
+        "period": "2020-02-03",
+        "value": 1.46
+      },
+      {
+        "period": "2020-02-10",
+        "value": 1.44
+      },
+      {
+        "period": "2020-02-17",
+        "value": 1.355
+      },
+      {
+        "period": "2020-02-24",
+        "value": 1.08
+      },
+      {
+        "period": "2020-03-02",
+        "value": 0.7
+      },
+      {
+        "period": "2020-03-09",
+        "value": 0.58
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.595
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.48
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.435
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.52
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.455
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.415
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.395
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.32
+      },
+      {
         "period": "2026-11-09",
-        "value": 4.36
+        "value": 4.355
       }
     ],
     "USA-sofrTenor-sr3_2029-06": [
+      {
+        "period": "2020-01-20",
+        "value": 1.565
+      },
+      {
+        "period": "2020-01-27",
+        "value": 1.365
+      },
+      {
+        "period": "2020-02-03",
+        "value": 1.47
+      },
+      {
+        "period": "2020-02-10",
+        "value": 1.45
+      },
+      {
+        "period": "2020-02-17",
+        "value": 1.365
+      },
+      {
+        "period": "2020-02-24",
+        "value": 1.09
+      },
+      {
+        "period": "2020-03-02",
+        "value": 0.71
+      },
+      {
+        "period": "2020-03-09",
+        "value": 0.59
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.605
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.49
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.445
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.53
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.465
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.425
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.405
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.33
+      },
       {
         "period": "2026-11-09",
         "value": 4.35
       }
     ],
     "USA-sofrTenor-sr3_2029-09": [
+      {
+        "period": "2020-02-24",
+        "value": 100
+      },
+      {
+        "period": "2020-03-02",
+        "value": 100
+      },
+      {
+        "period": "2020-03-09",
+        "value": 100
+      },
+      {
+        "period": "2020-03-16",
+        "value": 0.65
+      },
+      {
+        "period": "2020-03-23",
+        "value": 0.535
+      },
+      {
+        "period": "2020-03-30",
+        "value": 0.49
+      },
+      {
+        "period": "2020-04-06",
+        "value": 0.575
+      },
+      {
+        "period": "2020-04-13",
+        "value": 0.51
+      },
+      {
+        "period": "2020-04-20",
+        "value": 0.47
+      },
+      {
+        "period": "2020-04-27",
+        "value": 0.45
+      },
+      {
+        "period": "2020-05-04",
+        "value": 0.375
+      },
       {
         "period": "2026-11-09",
         "value": 4.345
@@ -97861,49 +98657,49 @@
     "USA-sofrTenor-sr3_2029-12": [
       {
         "period": "2026-11-09",
-        "value": 4.35
+        "value": 4.345
       }
     ],
     "USA-sofrTenor-sr3_2030-03": [
       {
         "period": "2026-11-09",
-        "value": 4.355
+        "value": 4.35
       }
     ],
     "USA-sofrTenor-sr3_2030-06": [
       {
         "period": "2026-11-09",
-        "value": 4.365
+        "value": 4.36
       }
     ],
     "USA-sofrTenor-sr3_2030-09": [
       {
         "period": "2026-11-09",
-        "value": 4.38
+        "value": 4.375
       }
     ],
     "USA-sofrTenor-sr3_2030-12": [
       {
         "period": "2026-11-09",
-        "value": 4.4
+        "value": 4.395
       }
     ],
     "USA-sofrTenor-sr3_2031-03": [
       {
         "period": "2026-11-09",
-        "value": 4.43
+        "value": 4.425
       }
     ],
     "USA-sofrTenor-sr3_2031-06": [
       {
         "period": "2026-11-09",
-        "value": 4.46
+        "value": 4.455
       }
     ],
     "USA-sofrTenor-sr3_2031-09": [
       {
         "period": "2026-11-09",
-        "value": 4.49
+        "value": 4.485
       }
     ],
     "USA-sofrTenor-sr3_2031-12": [
@@ -97926,13 +98722,17 @@
     ],
     "USA-sofrTenor-sr3_2032-09": [
       {
+        "period": "2026-11-06",
+        "value": 4.595
+      },
+      {
         "period": "2026-11-09",
         "value": 4.595
       }
     ],
     "USA-sofrFwdSnapshots": [
       {
-        "asOf": "2026-11-09T23:12:07.627Z",
+        "asOf": "2026-11-09T23:29:18.194Z",
         "spotDate": "2026-11-06",
         "curve": [
           {
@@ -97957,11 +98757,11 @@
           },
           {
             "period": "2y",
-            "value": 4.375
+            "value": 4.3733
           },
           {
             "period": "5y",
-            "value": 4.4967
+            "value": 4.495
           }
         ]
       }
@@ -126826,7 +127626,7 @@
     ],
     "USA-ustCurveSnapshots": [
       {
-        "asOf": "2026-11-09T23:12:19.092Z",
+        "asOf": "2026-11-09T23:29:24.536Z",
         "nominal": [
           {
             "period": "3M",
@@ -241346,7 +242146,7 @@
       },
       {
         "period": "2026-11-09",
-        "value": 101.666
+        "value": 101.679
       }
     ],
     "USA-us2y": [
@@ -314056,7 +314856,7 @@
       },
       {
         "period": "2026-11-09",
-        "value": 1.5401130130940128
+        "value": 1.5390078116203139
       }
     ],
     "USA-rate": [

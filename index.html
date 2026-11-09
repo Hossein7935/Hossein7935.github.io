@@ -488,6 +488,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(6,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -856,14 +857,20 @@ function paintSofRTenor(){
     return;
   }
   const cat=catalog.find(c=>c.id===id)||{label:id,symbol:id};
-  let pts=histories['USA-sofrTenor-'+id]||[];
-  // fallback: single point from catalog lastRate
+  let pts=(histories['USA-sofrTenor-'+id]||[]).slice();
   if(!pts.length&&cat.lastRate!=null){
     pts=[{period:new Date().toISOString().slice(0,10),value:Number(cat.lastRate)}];
   }
+  // Line chart needs >=2 points — pad short series so a chart always appears
+  if(pts.length===1){
+    const p=pts[0];
+    const d=new Date(String(p.period)+'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate()-30);
+    pts=[{period:d.toISOString().slice(0,10),value:p.value},p];
+  }
   const last=pts.length?pts.at(-1):null;
   if(valEl)valEl.textContent=last?fmt(last.value):(cat.lastRate!=null?fmt(cat.lastRate):'—');
-  if(dateEl)dateEl.textContent=(cat.label||id)+(last?(' · Stand '+last.period+' · '+pts.length+' Tage'):'');
+  if(dateEl)dateEl.textContent=(cat.label||id)+(last?(' · Stand '+last.period+' · '+pts.length+' Punkte'):'');
 
   const ovKey=getSofRTenorOverlay();
   let ovPts=[];
@@ -881,13 +888,16 @@ function paintSofRTenor(){
 
   if(!pts.length){
     host.innerHTML='<div class="sparkempty">Keine Historie für diesen Kontrakt</div>';
-  }else if(typeof renderDiffOverlayChart==='function'&&ovPts.length){
+  }else if(typeof renderDiffOverlayChart==='function'&&ovPts.length>=2){
     host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderDiffOverlayChart(pts,ovPts,{w:360,h:180})+'</div>';
   }else if(typeof renderLineChart==='function'){
     host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderLineChart(pts,{w:360,h:160})+'</div>';
   }
   if(meta)meta.textContent=(cat.symbol||'')+' · '+(pts.length)+' Punkte'+(ovLabel?(' · rot: '+ovLabel):'')+' · Tippen · 6M/1J/3J';
 }
+
+
+
 
 function paintSofRFwd(){
   const host=document.getElementById('sofrFwdChart');
@@ -982,6 +992,8 @@ function paintSofRFwd(){
   try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}
 }
 bindUsaPages();
+
+
 
 
 
@@ -1361,6 +1373,7 @@ function paintYieldPage7(){
   }
   paintYield7Diff();
 }
+
 
 
 
