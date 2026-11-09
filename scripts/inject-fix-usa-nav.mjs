@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** USA page nav: sticky selector + bindUsaPages() call; pages 0..6 */
+/** USA page nav sticky + bindUsaPages + FULL setUsaPage 0..6 (must run last) */
 let html = fs.readFileSync('index.html', 'utf8');
 
 if (!html.includes('/* usa-nav-sticky */')) {
@@ -13,6 +13,37 @@ if (!html.includes('/* usa-nav-sticky */')) {
   if (html.includes('</style>')) {
     html = html.replace('</style>', css + '</style>');
     console.log('sticky css');
+  }
+}
+
+const setUsaPageFn = `function setUsaPage(page){
+  page=Math.max(0,Math.min(6,Number(page)||0));
+  try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
+  document.querySelectorAll('.country').forEach(card=>{
+    if(!card.querySelector('.usa-face-a'))return;
+    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g'];
+    faces.forEach((sel,i)=>{
+      const el=card.querySelector(sel);
+      if(el)el.classList.toggle('hidden',page!==i);
+    });
+    const sel=card.querySelector('#usaPageSelect');
+    if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));
+  });
+  if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);
+  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff();typeof paintUs2ySofr==='function'&&paintUs2ySofr()}catch(e){}},50);
+  if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);
+  if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);
+  if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
+  if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
+}
+`;
+
+if (html.includes('function setUsaPage')) {
+  const s = html.indexOf('function setUsaPage');
+  const e = html.indexOf('function bindUsaPages', s);
+  if (e > s) {
+    html = html.slice(0, s) + setUsaPageFn + '\n' + html.slice(e);
+    console.log('setUsaPage full 0-6');
   }
 }
 
@@ -54,21 +85,12 @@ if (!html.includes('bindUsaPages();')) {
       /if\(!window\.__usaRenderPatched\)\{[\s\S]*?\n\}/,
       (m) => m + '\nbindUsaPages();\n'
     );
-    console.log('bindUsaPages() after render patch');
   }
   if (!html.includes('bindUsaPages();') && html.includes('refresh();')) {
     html = html.replace('refresh();', 'bindUsaPages();refresh();');
   }
 }
 
-if (html.includes('__usaRenderPatched')) {
-  html = html.replace(
-    "try{setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'))}catch(e){}\n    return r;",
-    "try{bindUsaPages()}catch(e){try{setUsaPage(Number(localStorage.getItem('macrowatch-usa-page')||'0'))}catch(e2){}}\n    return r;"
-  );
-}
-
-// Ensure Seite 7 button exists in template
 if (!html.includes('data-page=\"6\"') && !html.includes('data-page="6"')) {
   html = html.replace(
     /(data-page=\"5\"[^>]*>)([^<]*)(<\/button>)/,
@@ -78,8 +100,7 @@ if (!html.includes('data-page=\"6\"') && !html.includes('data-page="6"')) {
     /(data-page="5"[^>]*>)([^<]*)(<\/button>)/,
     '$1$2$3<button type="button" data-page="6">Seite 7</button>'
   );
-  console.log('added page 7 button');
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'has call', html.includes('bindUsaPages();'), 'page6 btn', html.includes('data-page=\"6\"')||html.includes('data-page="6"'));
+console.log('done', html.length, 'page===6', html.includes('page===6'), 'call', html.includes('bindUsaPages();'));
