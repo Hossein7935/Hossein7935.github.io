@@ -348,6 +348,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(6,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -411,8 +412,10 @@ const YIELD7_KEYS=[
   {key:'dfii10',label:'TIPS 10Y'}
 ];
 function ensureUsaFaceG(){
-  const card=document.querySelector('.country');
-  if(!card||!card.querySelector('.usa-face-a'))return null;
+  // Must attach to USA card (has .usa-face-a), not the first .country in the grid
+  const faceA=document.querySelector('.usa-face-a');
+  const card=faceA?faceA.closest('.country'):null;
+  if(!card)return null;
   let g=card.querySelector('.usa-face-g');
   if(g)return g;
   g=document.createElement('div');
@@ -440,7 +443,11 @@ function ensureUsaFaceG(){
   else{
     const e=card.querySelector('.usa-face-e');
     if(e&&e.parentNode)e.after(g);
-    else card.appendChild(g);
+    else{
+      const d=card.querySelector('.usa-face-d');
+      if(d&&d.parentNode)d.after(g);
+      else card.appendChild(g);
+    }
   }
   if(!window.__yield7DiffBound){
     window.__yield7DiffBound=true;
@@ -667,6 +674,7 @@ function paintSofRFwd(){
   }
 }
 bindUsaPages();
+
 
 
 
