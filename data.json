@@ -1343,7 +1343,7 @@
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.18,
+        "value": 0.181,
         "date": "2026-11-09",
         "source": "TradingView · AUS 10Y − 2Y"
       },
@@ -4142,7 +4142,7 @@
       },
       {
         "period": "2026-11-09",
-        "value": 0.18
+        "value": 0.181
       }
     ],
     "CHN-t10y2y": [

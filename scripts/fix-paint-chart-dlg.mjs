@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** paintChartDlg hardened: dual charts + yield7 green third series */
+/** paintChartDlg hardened: dual charts + yield7 green + sofr tenor hist */
 let html = fs.readFileSync('index.html', 'utf8');
 
 const start = html.indexOf('function paintChartDlg');
@@ -169,6 +169,20 @@ const fn = `function paintChartDlg(){
     return;
   }
 
+  if(key==='sofrTenorHist'){
+    const tm=window.__sofrTenorMeta||{};
+    let pts=histories['USA-sofrTenor-'+(tm.id||'')]||[];
+    if(typeof filterByRange==='function'){const p2=filterByRange(pts,range); if(p2.length) pts=p2;}
+    let ov=[];
+    if(tm.ovKey){ov=histories['USA-'+tm.ovKey]||[]; if(typeof filterByRange==='function'){const o2=filterByRange(ov,range); if(o2.length) ov=o2;}}
+    if(!pts.length){body.innerHTML='<div class="sparkempty">Keine Daten</div>';if(meta)meta.textContent='';return;}
+    if(typeof renderDiffOverlayChart==='function'&&ov.length){body.innerHTML=renderDiffOverlayChart(pts,ov,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';}
+    else{body.innerHTML=renderLineChart(pts,{w:720,h:300,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';}
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
+    if(meta)meta.textContent=(tm.label||'SOFR Tenor')+' · '+rLabel+' · '+pts.length+' Punkte'+(tm.ovLabel?(' · rot: '+tm.ovLabel):'');
+    return;
+  }
+
   if(key==='sofrFwd'){
     const pts=histories['USA-sofrFwd']||((data.USA&&data.USA.sofrFwd&&data.USA.sofrFwd.points)||[]);
     if(typeof renderSofRFwdChart==='function'&&pts.length){
@@ -219,7 +233,7 @@ fs.writeFileSync('index.html', html);
 const s2 = html.indexOf('function paintChartDlg');
 const e2 = html.indexOf('function bindBigChartHover');
 const region = html.slice(s2, e2);
-const ok = region.includes('greenPts') && region.includes("key==='rateOverlayDual'");
+const ok = region.includes('sofrTenorHist') && region.includes('greenPts');
 console.log('paintChartDlg ok', ok);
 if (!ok) process.exit(1);
 
