@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** paintChartDlg: dual charts with full render (US2Y+SOFR/IORB/EFFR, IORB+1Y, etc.) */
+/** paintChartDlg: dual charts with full render (US2Y+SOFR/IORB/EFFR, etc.) */
 let html = fs.readFileSync('index.html', 'utf8');
 
 const start = html.indexOf('function paintChartDlg');
@@ -119,16 +119,24 @@ const fn = `function paintChartDlg(){
 html = html.slice(0, start) + fn + html.slice(end);
 fs.writeFileSync('index.html', html);
 
-const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-const js = scripts.join('\n');
+// Validate render is INSIDE paintChartDlg
+const s2 = html.indexOf('function paintChartDlg');
+const e2 = html.indexOf('function bindBigChartHover');
+const region = html.slice(s2, e2);
+const hasRender =
+  region.includes("key==='us2ySofrDual'") &&
+  region.includes('renderUs2ySofrChart(us2y,red') &&
+  region.includes('return;');
+console.log('paintChartDlg ok', 'us2y render in region', hasRender);
+if (!hasRender) {
+  console.error('US2Y enlarge path missing in paintChartDlg');
+  process.exit(1);
+}
+
 try {
-  new Function(js);
+  const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+  new Function(scripts.join('\n'));
   console.log('js ok');
 } catch (e) {
   console.warn('js warn', e.message);
 }
-const hasRender =
-  html.includes("key==='us2ySofrDual'") &&
-  html.includes('renderUs2ySofrChart(us2y,red');
-console.log('paintChartDlg ok', 'us2y render', hasRender);
-if (!hasRender) process.exit(1);
