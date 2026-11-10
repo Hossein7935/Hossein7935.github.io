@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** USA page nav sticky + bindUsaPages + FULL setUsaPage 0..7 */
+/** USA page nav sticky + bindUsaPages + setUsaPage 0..7 (brace-safe replace) */
 let html = fs.readFileSync('index.html', 'utf8');
 
 function dedupeDecl(html, decl) {
@@ -15,6 +15,21 @@ function dedupeDecl(html, decl) {
   }
   return html;
 }
+function replaceFunction(html, name, newSrc) {
+  const start = html.indexOf('function ' + name);
+  if (start < 0) return { html, ok: false };
+  let i = start, depth = 0, started = false, end = -1;
+  for (; i < html.length; i++) {
+    if (html[i] === '{') { depth++; started = true; }
+    else if (html[i] === '}') {
+      depth--;
+      if (started && depth === 0) { end = i; break; }
+    }
+  }
+  if (end < 0) return { html, ok: false };
+  return { html: html.slice(0, start) + newSrc + html.slice(end + 1), ok: true };
+}
+
 html = dedupeDecl(html, 'let _rateDiffOrder=[];');
 html = dedupeDecl(html, 'let _yieldDiffOrder=[];');
 
@@ -34,6 +49,12 @@ if (!html.includes('/* usa-nav-sticky */')) {
 const setUsaPageFn = `function setUsaPage(page){
   page=Math.max(0,Math.min(7,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
+  try{
+    if(page===4){typeof paintFhlb==='function'&&paintFhlb();typeof paintEffrVol==='function'&&paintEffrVol();}
+    if(page===5){typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove();}
+    if(page===6){typeof paintYieldPage7==='function'&&paintYieldPage7();}
+    if(page===7){typeof paintRepoPage==='function'&&paintRepoPage();}
+  }catch(e){}
   document.querySelectorAll('.country').forEach(card=>{
     if(!card.querySelector('.usa-face-a'))return;
     const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h'];
@@ -52,20 +73,13 @@ const setUsaPageFn = `function setUsaPage(page){
   if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
   if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
   if(page===7)setTimeout(()=>{try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}},50);
-}
-`;
+}`;
 
-if (html.includes('function setUsaPage')) {
-  const s = html.indexOf('function setUsaPage');
-  const e = html.indexOf('function bindUsaPages', s);
-  if (e > s) {
-    html = html.slice(0, s) + setUsaPageFn + '\n' + html.slice(e);
-    console.log('setUsaPage full 0-7');
-  }
-}
+const r1 = replaceFunction(html, 'setUsaPage', setUsaPageFn);
+html = r1.html;
+console.log('setUsaPage brace-replace', r1.ok);
 
-const hardened = `
-function bindUsaPages(){
+const hardened = `function bindUsaPages(){
   if(!window.__usaPageClickBound){
     window.__usaPageClickBound=true;
     document.addEventListener('click',e=>{
@@ -83,49 +97,22 @@ function bindUsaPages(){
   try{start=Number(localStorage.getItem('macrowatch-usa-page')||'0')}catch(e){start=0}
   if(!Number.isFinite(start)||start<0||start>7)start=0;
   setUsaPage(start);
-}
-`;
+}`;
 
-if (html.includes('function bindUsaPages')) {
-  const s = html.indexOf('function bindUsaPages');
-  let end = html.indexOf('if(!window.__usaRenderPatched)', s);
-  if (end < 0 || end > s + 900) end = html.indexOf('\nfunction ', s + 10);
-  if (end > s) {
-    html = html.slice(0, s) + hardened + html.slice(end);
-    console.log('bindUsaPages hardened');
-  }
-}
+const r2 = replaceFunction(html, 'bindUsaPages', hardened);
+html = r2.html;
+console.log('bindUsaPages brace-replace', r2.ok);
 
 if (!html.includes('bindUsaPages();')) {
-  if (html.includes('if(!window.__usaRenderPatched)')) {
-    html = html.replace(
-      /if\(!window\.__usaRenderPatched\)\{[\s\S]*?\n\}/,
-      (m) => m + '\nbindUsaPages();\n'
-    );
-  }
-  if (!html.includes('bindUsaPages();') && html.includes('refresh();')) {
+  if (html.includes('refresh();')) {
     html = html.replace('refresh();', 'bindUsaPages();refresh();');
   }
 }
 
-if (!html.includes('data-page=\"7\"') && !html.includes('data-page="7"')) {
-  html = html.replace(
-    /(data-page=\"6\"[^>]*>)([^<]*)(<\/button>)/,
-    '$1$2$3<button type=\"button\" data-page=\"7\">Repo-Markt</button>'
-  );
+if (!html.includes('data-page="7"') && !html.includes('data-page=\"7\"')) {
   html = html.replace(
     /(data-page="6"[^>]*>)([^<]*)(<\/button>)/,
     '$1$2$3<button type="button" data-page="7">Repo-Markt</button>'
-  );
-}
-if (!html.includes('data-page=\"6\"') && !html.includes('data-page="6"')) {
-  html = html.replace(
-    /(data-page=\"5\"[^>]*>)([^<]*)(<\/button>)/,
-    '$1$2$3<button type=\"button\" data-page=\"6\">Seite 7</button>'
-  );
-  html = html.replace(
-    /(data-page="5"[^>]*>)([^<]*)(<\/button>)/,
-    '$1$2$3<button type="button" data-page="6">Seite 7</button>'
   );
 }
 
@@ -133,12 +120,4 @@ html = dedupeDecl(html, 'let _rateDiffOrder=[];');
 html = dedupeDecl(html, 'let _yieldDiffOrder=[];');
 
 fs.writeFileSync('index.html', html);
-
-const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-try {
-  new Function(scripts.join('\n'));
-  console.log('js ok');
-} catch (e) {
-  console.warn('js warn', e.message);
-}
-console.log('done', html.length, 'page===7', html.includes('page===7'), 'button7', html.includes('data-page="7"')||html.includes('data-page=\"7\"'));
+console.log('done', html.length, 'REPO kept', html.includes('const REPO_PAGE_CATALOG') || html.includes('function paintRepoPage'), 'page===7', html.includes('page===7'));
