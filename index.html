@@ -544,6 +544,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(7,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -613,7 +614,6 @@ function paintDxy(){
   }
   if(meta)meta.textContent=(dx.source||'Yahoo DXY')+' · '+(ser.length)+' Tage'+(ser[0]?(' ab '+ser[0].period):'')+' · USD-Korb';
 }
-
 
 
 
@@ -865,8 +865,6 @@ function paintRepoPage(){
   }
   if(vmeta)vmeta.textContent='BLAU=TRI Volumen · ROT='+vSecLabel+(vga&&vgb?' · GRÜN=Diff':'');
 }
-
-
 
 
 
@@ -1503,6 +1501,8 @@ bindUsaPages();
 
 
 
+
+
 let _yieldDiffOrder=[];
 const YIELD7_KEYS=[
   {key:'us3m',label:'US 3M'},
@@ -1841,6 +1841,7 @@ function paintYieldPage7(){
   }
   paintYield7Diff();
 }
+
 
 
 
