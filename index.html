@@ -617,6 +617,7 @@ function paintDxy(){
 
 
 
+
 const REPO_PAGE_CATALOG=[
   {key:'mmfTot',label:'MMF Total ($T)'},
   {key:'mmfRepo',label:'MMF Repo ($T)'},
@@ -873,6 +874,8 @@ function paintRepoPage(){
 
 
 
+
+
 function bindUsaPages(){
   if(!window.__usaPageClickBound){
     window.__usaPageClickBound=true;
@@ -1082,6 +1085,7 @@ function paintRateDiff(){
   if(hint)hint.textContent='Berechnet: '+name;
 }
 document.addEventListener('change',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('rate-diff-cb'))paintRateDiff()});
+
 
 
 
@@ -1348,6 +1352,8 @@ function paintSofRTenor(){
     }
   }
 }
+
+
 
 
 
