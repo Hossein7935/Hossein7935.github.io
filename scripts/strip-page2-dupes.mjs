@@ -1,22 +1,23 @@
 import fs from 'fs';
 
-/** Remove listed charts from USA page 2 faceB only (bounded by faceA.after) */
+/** Remove listed charts from USA page 2 — only inside faceB.innerHTML=`...`; */
 let html = fs.readFileSync('index.html', 'utf8');
 
-const start = html.indexOf('faceB.innerHTML=');
+const open = 'faceB.innerHTML=`';
+const start = html.indexOf(open);
 if (start < 0) {
   console.error('faceB.innerHTML not found');
   process.exit(0);
 }
-const endMarker = 'faceA.after(faceB)';
-const end = html.indexOf(endMarker, start);
-if (end < 0) {
-  console.error('faceA.after(faceB) not found');
+const contentStart = start + open.length;
+const close = html.indexOf('`;', contentStart);
+if (close < 0) {
+  console.error('closing backtick not found');
   process.exit(0);
 }
 
-let block = html.slice(start, end);
-console.log('faceB block length', block.length);
+let content = html.slice(contentStart, close);
+console.log('faceB content length', content.length);
 
 const targets = [
   'CME Term SOFR 3M',
@@ -37,36 +38,31 @@ const targets = [
 function norm(s) {
   return String(s).replace(/[−–—-]/g, '-').replace(/\s+/g, ' ').trim().toLowerCase();
 }
-const targetNorm = new Set(targets.map(norm));
 
-// Remove metric divs by walking from each <div class="metric
 const metricRe = /<div class="metric[^>]*>/g;
-const matches = [...block.matchAll(metricRe)];
-const toRemove = [];
+const matches = [...content.matchAll(metricRe)];
+const removeRanges = [];
 
 for (let mi = 0; mi < matches.length; mi++) {
   const mStart = matches[mi].index;
-  const mEnd = mi + 1 < matches.length ? matches[mi + 1].index : block.length;
-  const chunk = block.slice(mStart, mEnd);
+  const mEnd = mi + 1 < matches.length ? matches[mi + 1].index : content.length;
+  const chunk = content.slice(mStart, mEnd);
   const nm = (chunk.match(/class="name">([^<]*)/) || [])[1] || '';
-  if (targetNorm.has(norm(nm)) || targets.some((t) => norm(nm).includes(norm(t)))) {
+  const n = norm(nm);
+  const drop = targets.some((t) => n === norm(t) || n.includes(norm(t)));
+  if (drop) {
     console.log('drop:', nm);
-    toRemove.push([mStart, mEnd]);
+    removeRanges.push([mStart, mEnd]);
   }
 }
 
-// Apply removals from end to start
-for (let k = toRemove.length - 1; k >= 0; k--) {
-  const [a, b] = toRemove[k];
-  block = block.slice(0, a) + block.slice(b);
+for (let k = removeRanges.length - 1; k >= 0; k--) {
+  const [a, b] = removeRanges[k];
+  content = content.slice(0, a) + content.slice(b);
 }
 
-html = html.slice(0, start) + block + html.slice(end);
+html = html.slice(0, contentStart) + content + html.slice(close);
 fs.writeFileSync('index.html', html);
 
-// Report remaining names in faceB block
-const s2 = html.indexOf('faceB.innerHTML=');
-const e2 = html.indexOf('faceA.after(faceB)', s2);
-const b2 = html.slice(s2, e2);
-const names = [...b2.matchAll(/class="name">([^<]*)/g)].map((x) => x[1]);
+const names = [...content.matchAll(/class="name">([^<]*)/g)].map((x) => x[1]);
 console.log('remaining page2:', names);
