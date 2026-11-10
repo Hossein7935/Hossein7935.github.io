@@ -616,6 +616,7 @@ function paintDxy(){
 
 
 
+
 const REPO_PAGE_CATALOG=[
   {key:'mmfTot',label:'MMF Total ($T)'},
   {key:'mmfRepo',label:'MMF Repo ($T)'},
@@ -680,18 +681,17 @@ function bindRepoToggle(id, lsKey){
   el.addEventListener('change',()=>setRepoToggle(lsKey, !!el.checked));
 }
 function ensureRepoPage(){
-  const card=document.querySelector('.country .usa-face-a')
-    ? document.querySelector('.country .usa-face-a').closest('.country')
-    : null;
+  let card=null;
+  const faceA=document.querySelector('.country .usa-face-a');
+  if(faceA) card=faceA.closest('.country');
   if(!card){
     const cards=[...document.querySelectorAll('.country')];
-    const usa=cards.find(c=>c.querySelector('.code')&&c.querySelector('.code').textContent==='USA');
-    if(!usa)return null;
-    return ensureRepoPageInCard(usa);
+    card=cards.find(c=>{
+      const code=c.querySelector('.code');
+      return code&&code.textContent.trim()==='USA';
+    })||null;
   }
-  return ensureRepoPageInCard(card);
-}
-function ensureRepoPageInCard(card){
+  if(!card)return null;
   let face=card.querySelector('.usa-face-h');
   if(!face){
     face=document.createElement('div');
@@ -709,7 +709,7 @@ function ensureRepoPageInCard(card){
   }
   face.innerHTML=
     '<div class="metric has-chart" id="repoMmfPanel" style="grid-column:1/-1">'+
-      '<div class="namediv class="name">Repo-Markt · MMF Vermögen & Repo-Anteil</div>'+
+      '<div class="name">Repo-Markt · MMF Vermögen & Repo-Anteil</div>'+
       '<div class="value" id="repoMmfValue">—</div>'+
       '<div class="date" id="repoMmfDate">OFR · Farben · Linien abwählbar</div>'+
       '<div id="repoMmfLegend"></div>'+
@@ -865,6 +865,8 @@ function paintRepoPage(){
   }
   if(vmeta)vmeta.textContent='BLAU=TRI Volumen · ROT='+vSecLabel+(vga&&vgb?' · GRÜN=Diff':'');
 }
+
+
 
 
 
@@ -1077,6 +1079,7 @@ function paintRateDiff(){
   if(hint)hint.textContent='Berechnet: '+name;
 }
 document.addEventListener('change',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('rate-diff-cb'))paintRateDiff()});
+
 
 
 
@@ -1343,6 +1346,8 @@ function paintSofRTenor(){
     }
   }
 }
+
+
 
 
 
