@@ -490,6 +490,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(6,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -770,16 +771,68 @@ function paintRateDiff(){
 document.addEventListener('change',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('rate-diff-cb'))paintRateDiff()});
 
 
-const SOFR_PAGE_OVERLAY_CATALOG=[
-  {key:'us3m',label:'US 3M'},{key:'us1y',label:'US 1Y'},{key:'us2y',label:'US 2Y'},
-  {key:'us5y',label:'US 5Y'},{key:'us10y',label:'US 10Y'},{key:'us30y',label:'US 30Y'},
-  {key:'dfii5',label:'TIPS 5Y'},{key:'dfii10',label:'TIPS 10Y'},
-  {key:'effr',label:'EFFR'},{key:'sofr',label:'SOFR'},{key:'iorb',label:'IORB'},
-  {key:'sofrIorb',label:'SOFR−IORB'},{key:'t10y2y',label:'10Y−2Y'},{key:'t10y5y',label:'10Y−5Y'},
-  {key:'move',label:'MOVE'},{key:'dxy',label:'DXY'},{key:'wresbal',label:'WRESBAL'},
-  {key:'effrVol',label:'EFFR Volume'},{key:'cuAu',label:'Copper/Gold'},{key:'rate',label:'Policy Rate'},
-  {key:'inflation',label:'Inflation'}
+
+
+
+const SOFR_USA_CHART_CATALOG=[
+  {key:'us3m',label:'US 3M',hist:'USA-us3m'},
+  {key:'us1y',label:'US 1Y',hist:'USA-us1y'},
+  {key:'us2y',label:'US 2Y',hist:'USA-us2y'},
+  {key:'us5y',label:'US 5Y',hist:'USA-us5y'},
+  {key:'us10y',label:'US 10Y',hist:'USA-us10y'},
+  {key:'us30y',label:'US 30Y',hist:'USA-us30y'},
+  {key:'dfii5',label:'TIPS 5Y',hist:'USA-dfii5'},
+  {key:'dfii10',label:'TIPS 10Y',hist:'USA-dfii10'},
+  {key:'effr',label:'EFFR',hist:'USA-effr'},
+  {key:'sofr',label:'SOFR',hist:'USA-sofr'},
+  {key:'iorb',label:'IORB',hist:'USA-iorb'},
+  {key:'sofrIorb',label:'SOFR−IORB',hist:'USA-sofrIorb'},
+  {key:'t10y2y',label:'10Y−2Y',hist:'USA-t10y2y'},
+  {key:'t10y5y',label:'10Y−5Y',hist:'USA-t10y5y'},
+  {key:'us5yTips',label:'5Y BEI',hist:'USA-us5yTips'},
+  {key:'us10yTips',label:'10Y BEI',hist:'USA-us10yTips'},
+  {key:'move',label:'MOVE',hist:'USA-move'},
+  {key:'dxy',label:'DXY',hist:'USA-dxy'},
+  {key:'wresbal',label:'WRESBAL',hist:'USA-wresbal'},
+  {key:'effrVol',label:'EFFR Volume',hist:'USA-effrVol'},
+  {key:'cuAu',label:'Copper/Gold',hist:'USA-cuAu'},
+  {key:'rate',label:'Policy Rate',hist:'USA-rate'},
+  {key:'inflation',label:'Inflation',hist:'USA-inflation'},
+  {key:'gdp',label:'GDP Growth',hist:'USA-gdp'},
+  {key:'fhlb',label:'FHLB Advances',hist:'USA-fhlb'}
 ];
+function getSofRTenorCatalog(){
+  const fwd=(data.USA&&data.USA.sofrFwd)||{};
+  return fwd.catalog||data.USA.sofrTenorCatalog||[];
+}
+function buildSofRSeriesList(){
+  const list=[];
+  // All SOFR tenor series first
+  for(const c of getSofRTenorCatalog()){
+    list.push({key:'tenor:'+c.id,label:'SOFR · '+c.label,hist:'USA-sofrTenor-'+c.id});
+  }
+  // All USA charts from 7 pages
+  for(const c of SOFR_USA_CHART_CATALOG){
+    list.push({key:'usa:'+c.key,label:c.label,hist:c.hist});
+  }
+  return list;
+}
+function resolveSofRSeries(key){
+  if(!key)return {pts:[],label:''};
+  const list=buildSofRSeriesList();
+  const hit=list.find(x=>x.key===key);
+  if(hit)return {pts:histories[hit.hist]||[],label:hit.label,hist:hit.hist};
+  // fallbacks
+  if(key.startsWith('tenor:')){
+    const id=key.slice(6);
+    return {pts:histories['USA-sofrTenor-'+id]||[],label:id,hist:'USA-sofrTenor-'+id};
+  }
+  if(key.startsWith('usa:')){
+    const k=key.slice(4);
+    return {pts:histories['USA-'+k]||[],label:k,hist:'USA-'+k};
+  }
+  return {pts:histories['USA-'+key]||[],label:key,hist:'USA-'+key};
+}
 function getSofRTenorId(){
   try{return localStorage.getItem('macrowatch-sofr-tenor')||''}catch(e){return ''}
 }
@@ -794,6 +847,38 @@ function setSofRTenorOverlay(k){
   try{localStorage.setItem('macrowatch-sofr-tenor-ov',k||'')}catch(e){}
   try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}
 }
+function getSofRDiffA(){
+  try{return localStorage.getItem('macrowatch-sofr-diff-a')||''}catch(e){return ''}
+}
+function getSofRDiffB(){
+  try{return localStorage.getItem('macrowatch-sofr-diff-b')||''}catch(e){return ''}
+}
+function setSofRDiffA(k){
+  try{localStorage.setItem('macrowatch-sofr-diff-a',k||'')}catch(e){}
+  try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}
+}
+function setSofRDiffB(k){
+  try{localStorage.setItem('macrowatch-sofr-diff-b',k||'')}catch(e){}
+  try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}
+}
+function alignDiffSeries(a,b){
+  const mb=new Map((b||[]).map(p=>[String(p.period),Number(p.value)]));
+  const out=[];
+  for(const p of a||[]){
+    const bv=mb.get(String(p.period));
+    if(!Number.isFinite(Number(p.value))||!Number.isFinite(bv))continue;
+    out.push({period:String(p.period),value:Number(p.value)-bv});
+  }
+  return out;
+}
+function fillSofRSelect(sel,list,cur){
+  if(!sel)return;
+  const opts=['<option value="">— keines —</option>'].concat(
+    list.map(s=>'<option value="'+s.key+'">'+s.label+'</option>')
+  );
+  sel.innerHTML=opts.join('');
+  if(cur)sel.value=cur;
+}
 function ensureSofRTenorPanel(){
   const face=document.querySelector('.usa-face-d');
   if(!face)return null;
@@ -803,16 +888,23 @@ function ensureSofRTenorPanel(){
     '<div class="metric has-chart sofr-fwd-panel" id="sofrTenorPanel" style="grid-column:1/-1">'+
       '<div class="name">SOFR Futures · Laufzeit wählen</div>'+
       '<div class="value" id="sofrTenorValue">—</div>'+
-      '<div class="date" id="sofrTenorDate">CME SR1/SR3 · Historie</div>'+
+      '<div class="date" id="sofrTenorDate">CME SR1/SR3 · Historie · Vergleich · Differenz</div>'+
       '<div class="sofr-fwd-bp" id="sofrTenorControls" style="gap:10px;flex-wrap:wrap;align-items:center;margin:6px 0">'+
         '<label style="font-size:13px">Laufzeit: <select id="sofrTenorSelect" style="margin-left:6px;min-width:180px;padding:4px 6px"></select></label>'+
-        '<label style="font-size:13px">Rot-Overlay: <select id="sofrTenorOverlay" style="margin-left:6px;min-width:160px;padding:4px 6px">'+
-          '<option value="">— keines —</option>'+
-          SOFR_PAGE_OVERLAY_CATALOG.map(s=>'<option value="'+s.key+'">'+s.label+'</option>').join('')+
-        '</select></label>'+
+        '<label style="font-size:13px">Rot-Overlay: <select id="sofrTenorOverlay" style="margin-left:6px;min-width:200px;padding:4px 6px"></select></label>'+
       '</div>'+
       '<div id="sofrTenorChart"></div>'+
-      '<div class="sofr-fwd-meta" id="sofrTenorMeta">Wähle einen SR1/SR3-Kontrakt · volle Historie · Overlay aus allen USA-Seiten</div>'+
+      '<div class="sofr-fwd-meta" id="sofrTenorMeta">Laufzeit + Overlay (alle SOFR + alle USA-Charts)</div>'+
+      '<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line)">'+
+        '<div class="name" style="margin-bottom:6px">Differenz · Chart A − Chart B</div>'+
+        '<div class="sofr-fwd-bp" style="gap:10px;flex-wrap:wrap;align-items:center;margin:6px 0">'+
+          '<label style="font-size:13px">A: <select id="sofrDiffA" style="margin-left:6px;min-width:200px;padding:4px 6px"></select></label>'+
+          '<label style="font-size:13px">B: <select id="sofrDiffB" style="margin-left:6px;min-width:200px;padding:4px 6px"></select></label>'+
+        '</div>'+
+        '<div class="value" id="sofrDiffValue">—</div>'+
+        '<div id="sofrDiffChart"></div>'+
+        '<div class="sofr-fwd-meta" id="sofrDiffMeta">Wähle zwei Serien · gleiche Historie · 6M/1J/3J beim Vergrößern</div>'+
+      '</div>'+
     '</div>';
   face.appendChild(box.firstChild);
   return document.getElementById('sofrTenorPanel');
@@ -820,16 +912,22 @@ function ensureSofRTenorPanel(){
 function paintSofRTenor(){
   const panel=ensureSofRTenorPanel();
   if(!panel)return;
-  const fwd=(data.USA&&data.USA.sofrFwd)||{};
-  const catalog=fwd.catalog||data.USA.sofrTenorCatalog||[];
+  const catalog=getSofRTenorCatalog();
+  const seriesList=buildSofRSeriesList();
   const sel=document.getElementById('sofrTenorSelect');
   const ovSel=document.getElementById('sofrTenorOverlay');
+  const diffA=document.getElementById('sofrDiffA');
+  const diffB=document.getElementById('sofrDiffB');
   const valEl=document.getElementById('sofrTenorValue');
   const dateEl=document.getElementById('sofrTenorDate');
   const host=document.getElementById('sofrTenorChart');
   const meta=document.getElementById('sofrTenorMeta');
+  const diffHost=document.getElementById('sofrDiffChart');
+  const diffVal=document.getElementById('sofrDiffValue');
+  const diffMeta=document.getElementById('sofrDiffMeta');
   if(!sel||!host)return;
 
+  // Main tenor select (SOFR catalog only)
   if(sel.options.length!==catalog.length+1){
     const cur=getSofRTenorId();
     sel.innerHTML='<option value="">— wählen —</option>'+
@@ -841,61 +939,94 @@ function paintSofRTenor(){
     sel.dataset.bound='1';
     sel.addEventListener('change',()=>setSofRTenorId(sel.value||''));
   }
-  if(ovSel){
-    const ov=getSofRTenorOverlay();
-    if(ovSel.value!==ov)ovSel.value=ov;
-    if(!ovSel.dataset.bound){
-      ovSel.dataset.bound='1';
-      ovSel.addEventListener('change',()=>setSofRTenorOverlay(ovSel.value||''));
-    }
+
+  // Overlay + diff selects: ALL SOFR tenors + ALL USA charts
+  fillSofRSelect(ovSel,seriesList,getSofRTenorOverlay());
+  fillSofRSelect(diffA,seriesList,getSofRDiffA());
+  fillSofRSelect(diffB,seriesList,getSofRDiffB());
+  if(ovSel&&!ovSel.dataset.bound){
+    ovSel.dataset.bound='1';
+    ovSel.addEventListener('change',()=>setSofRTenorOverlay(ovSel.value||''));
+  }
+  if(diffA&&!diffA.dataset.bound){
+    diffA.dataset.bound='1';
+    diffA.addEventListener('change',()=>setSofRDiffA(diffA.value||''));
+  }
+  if(diffB&&!diffB.dataset.bound){
+    diffB.dataset.bound='1';
+    diffB.addEventListener('change',()=>setSofRDiffB(diffB.value||''));
   }
 
   const id=sel.value||getSofRTenorId();
   if(!id){
     host.innerHTML='';
     if(valEl)valEl.textContent='—';
-    if(meta)meta.textContent=catalog.length?('Katalog: '+catalog.length+' Laufzeiten'):'Keine Laufzeit gewählt';
-    return;
-  }
-  const cat=catalog.find(c=>c.id===id)||{label:id,symbol:id};
-  let pts=(histories['USA-sofrTenor-'+id]||[]).slice();
-  if(!pts.length&&cat.lastRate!=null){
-    pts=[{period:new Date().toISOString().slice(0,10),value:Number(cat.lastRate)}];
-  }
-  // Line chart needs >=2 points — pad short series so a chart always appears
-  if(pts.length===1){
-    const p=pts[0];
-    const d=new Date(String(p.period)+'T00:00:00Z');
-    d.setUTCDate(d.getUTCDate()-30);
-    pts=[{period:d.toISOString().slice(0,10),value:p.value},p];
-  }
-  const last=pts.length?pts.at(-1):null;
-  if(valEl)valEl.textContent=last?fmt(last.value):(cat.lastRate!=null?fmt(cat.lastRate):'—');
-  if(dateEl)dateEl.textContent=(cat.label||id)+(last?(' · Stand '+last.period+' · '+pts.length+' Punkte'):'');
+    if(meta)meta.textContent=catalog.length?('Katalog: '+catalog.length+' Laufzeiten · Overlay-Liste: '+seriesList.length):'Keine Laufzeit';
+  }else{
+    const cat=catalog.find(c=>c.id===id)||{label:id,symbol:id};
+    let pts=(histories['USA-sofrTenor-'+id]||[]).slice();
+    if(!pts.length&&cat.lastRate!=null){
+      pts=[{period:new Date().toISOString().slice(0,10),value:Number(cat.lastRate)}];
+    }
+    if(pts.length===1){
+      const p=pts[0];
+      const d=new Date(String(p.period)+'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate()-30);
+      pts=[{period:d.toISOString().slice(0,10),value:p.value},p];
+    }
+    const last=pts.length?pts.at(-1):null;
+    if(valEl)valEl.textContent=last?fmt(last.value):(cat.lastRate!=null?fmt(cat.lastRate):'—');
+    if(dateEl)dateEl.textContent=(cat.label||id)+(last?(' · Stand '+last.period+' · '+pts.length+' Punkte'):'');
 
-  const ovKey=getSofRTenorOverlay();
-  let ovPts=[];
-  let ovLabel='';
-  if(ovKey){
-    ovPts=histories['USA-'+ovKey]||[];
-    const c=SOFR_PAGE_OVERLAY_CATALOG.find(x=>x.key===ovKey);
-    ovLabel=c?c.label:ovKey;
+    const ovKey=getSofRTenorOverlay();
+    const ov=resolveSofRSeries(ovKey);
+    let ovPts=ov.pts||[];
     if(pts.length&&ovPts.length){
       const t0=String(pts[0].period), t1=String(pts.at(-1).period);
       ovPts=ovPts.filter(p=>String(p.period)>=t0&&String(p.period)<=t1);
     }
-  }
-  window.__sofrTenorMeta={id,label:cat.label||id,symbol:cat.symbol,ovKey,ovLabel};
+    window.__sofrTenorMeta={id,label:cat.label||id,symbol:cat.symbol,ovKey,ovLabel:ov.label||''};
 
-  if(!pts.length){
-    host.innerHTML='<div class="sparkempty">Keine Historie für diesen Kontrakt</div>';
-  }else if(typeof renderDiffOverlayChart==='function'&&ovPts.length>=2){
-    host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderDiffOverlayChart(pts,ovPts,{w:360,h:180})+'</div>';
-  }else if(typeof renderLineChart==='function'){
-    host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Chart vergrößern (6M/1J/3J)">'+renderLineChart(pts,{w:360,h:160})+'</div>';
+    if(!pts.length){
+      host.innerHTML='<div class="sparkempty">Keine Historie</div>';
+    }else if(typeof renderDiffOverlayChart==='function'&&ovPts.length>=2){
+      host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Vergrößern">'+renderDiffOverlayChart(pts,ovPts,{w:360,h:180})+'</div>';
+    }else if(typeof renderLineChart==='function'){
+      host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Vergrößern">'+renderLineChart(pts,{w:360,h:160})+'</div>';
+    }
+    if(meta)meta.textContent=(cat.symbol||'')+' · '+pts.length+' Punkte'+(ov.label?(' · rot: '+ov.label):'')+' · Overlay-Liste: '+seriesList.length;
   }
-  if(meta)meta.textContent=(cat.symbol||'')+' · '+(pts.length)+' Punkte'+(ovLabel?(' · rot: '+ovLabel):'')+' · Tippen · 6M/1J/3J';
+
+  // Diff chart A − B
+  if(diffHost){
+    const ka=getSofRDiffA(), kb=getSofRDiffB();
+    if(!ka||!kb){
+      diffHost.innerHTML='';
+      if(diffVal)diffVal.textContent='—';
+      if(diffMeta)diffMeta.textContent='Wähle A und B · alle SOFR-Laufzeiten + alle Charts der 7 USA-Seiten ('+seriesList.length+')';
+      window.__sofrDiffMeta=null;
+    }else{
+      const A=resolveSofRSeries(ka);
+      const B=resolveSofRSeries(kb);
+      const diff=alignDiffSeries(A.pts,B.pts);
+      window.__sofrDiffMeta={labelA:A.label,labelB:B.label,keyA:ka,keyB:kb,pts:diff};
+      if(diff.length>=2){
+        const last=diff.at(-1);
+        if(diffVal)diffVal.textContent=(last.value>=0?'+':'')+fmt(last.value);
+        if(typeof renderLineChart==='function'){
+          diffHost.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorDiff|'+(A.label)+' − '+(B.label)+'" title="Differenz vergrößern (6M/1J/3J)">'+renderLineChart(diff,{w:360,h:160})+'</div>';
+        }
+        if(diffMeta)diffMeta.textContent=A.label+' − '+B.label+' · '+diff.length+' Punkte · Tippen · 6M/1J/3J';
+      }else{
+        diffHost.innerHTML='<div class="sparkempty">Keine überlappende Historie</div>';
+        if(diffVal)diffVal.textContent='—';
+        if(diffMeta)diffMeta.textContent=A.label+' − '+B.label+' · zu wenig gemeinsame Datenpunkte';
+      }
+    }
+  }
 }
+
+
 
 
 
@@ -994,6 +1125,8 @@ function paintSofRFwd(){
   try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}
 }
 bindUsaPages();
+
+
 
 
 
@@ -1377,6 +1510,7 @@ function paintYieldPage7(){
   }
   paintYield7Diff();
 }
+
 
 
 
