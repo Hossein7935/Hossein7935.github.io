@@ -80,6 +80,8 @@ jobs:
         run: node scripts/inject-page7-yields.mjs
       - name: Inject USA page 8 Repo-Markt
         run: node scripts/inject-page8-repo.mjs || true
+      - name: Fix USA page-select template if wiped
+        run: node scripts/fix-usa-template.mjs || true
       - name: Fix USA page navigation (sticky)
         run: node scripts/inject-fix-usa-nav.mjs
       - name: Final JS dedupe (after all injects)
@@ -96,18 +98,14 @@ jobs:
         run: node scripts/inject-sofr-enlarge-fix.mjs || true
       - name: Re-apply page 8 Repo-Markt
         run: node scripts/inject-page8-repo.mjs || true
+      - name: Fix USA template again after page8
+        run: node scripts/fix-usa-template.mjs || true
       - name: Check updater syntax
         run: |
           node --check scripts/inject-page7-yields.mjs
-          node --check scripts/inject-rate-overlay.mjs
-          node --check scripts/inject-dxy.mjs
-          node --check scripts/fetch-dxy.mjs
-          node --check scripts/fetch-sofr-futures.mjs || true
-          node --check scripts/fetch-repo-mmf.mjs || true
           node --check scripts/inject-page8-repo.mjs || true
-          node --check scripts/inject-sofr-tenor.mjs || true
+          node --check scripts/fix-usa-template.mjs || true
           node --check scripts/fix-paint-chart-dlg.mjs
-          node --check scripts/fix-js-syntax.mjs
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
@@ -188,11 +186,11 @@ jobs:
           node scripts/inject-sofr-tenor.mjs || true
           node scripts/inject-sofr-enlarge-fix.mjs || true
           node scripts/inject-page8-repo.mjs || true
+          node scripts/fix-usa-template.mjs || true
           node scripts/fix-js-syntax.mjs || true
           node scripts/fix-paint-chart-dlg.mjs || true
-          node scripts/inject-sofr-tenor.mjs || true
-          node scripts/inject-sofr-enlarge-fix.mjs || true
           node scripts/inject-page8-repo.mjs || true
+          node scripts/fix-usa-template.mjs || true
           git add data.json scripts/ index.html || true
           if git diff --cached --quiet; then
             echo "No data changes to commit"
@@ -201,9 +199,8 @@ jobs:
             git pull --no-rebase -X ours origin main || true
             node scripts/fix-js-syntax.mjs || true
             node scripts/fix-paint-chart-dlg.mjs || true
-            node scripts/inject-sofr-tenor.mjs || true
-            node scripts/inject-sofr-enlarge-fix.mjs || true
             node scripts/inject-page8-repo.mjs || true
+            node scripts/fix-usa-template.mjs || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
             git push origin HEAD:main || git push --force-with-lease origin HEAD:main
