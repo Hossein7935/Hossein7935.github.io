@@ -37,11 +37,9 @@ function getSofRTenorCatalog(){
 }
 function buildSofRSeriesList(){
   const list=[];
-  // All SOFR tenor series first
   for(const c of getSofRTenorCatalog()){
     list.push({key:'tenor:'+c.id,label:'SOFR · '+c.label,hist:'USA-sofrTenor-'+c.id});
   }
-  // All USA charts from 7 pages
   for(const c of SOFR_USA_CHART_CATALOG){
     list.push({key:'usa:'+c.key,label:c.label,hist:c.hist});
   }
@@ -52,7 +50,6 @@ function resolveSofRSeries(key){
   const list=buildSofRSeriesList();
   const hit=list.find(x=>x.key===key);
   if(hit)return {pts:histories[hit.hist]||[],label:hit.label,hist:hit.hist};
-  // fallbacks
   if(key.startsWith('tenor:')){
     const id=key.slice(6);
     return {pts:histories['USA-sofrTenor-'+id]||[],label:id,hist:'USA-sofrTenor-'+id};
@@ -103,16 +100,32 @@ function alignDiffSeries(a,b){
 }
 function fillSofRSelect(sel,list,cur){
   if(!sel)return;
-  const opts=['<option value="">— keines —</option>'].concat(
+  sel.innerHTML=['<option value="">— keines —</option>'].concat(
     list.map(s=>'<option value="'+s.key+'">'+s.label+'</option>')
-  );
-  sel.innerHTML=opts.join('');
+  ).join('');
   if(cur)sel.value=cur;
 }
 function ensureSofRTenorPanel(){
   const face=document.querySelector('.usa-face-d');
   if(!face)return null;
-  if(document.getElementById('sofrTenorPanel'))return document.getElementById('sofrTenorPanel');
+  let panel=document.getElementById('sofrTenorPanel');
+  if(panel){
+    // ensure diff controls exist (upgrade old panel)
+    if(!document.getElementById('sofrDiffA')){
+      panel.insertAdjacentHTML('beforeend',
+        '<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line)">'+
+          '<div class="name" style="margin-bottom:6px">Differenz · Chart A − Chart B</div>'+
+          '<div class="sofr-fwd-bp" style="gap:10px;flex-wrap:wrap;align-items:center;margin:6px 0">'+
+            '<label style="font-size:13px">A: <select id="sofrDiffA" style="margin-left:6px;min-width:200px;padding:4px 6px"></select></label>'+
+            '<label style="font-size:13px">B: <select id="sofrDiffB" style="margin-left:6px;min-width:200px;padding:4px 6px"></select></label>'+
+          '</div>'+
+          '<div class="value" id="sofrDiffValue">—</div>'+
+          '<div id="sofrDiffChart"></div>'+
+          '<div class="sofr-fwd-meta" id="sofrDiffMeta">Wähle zwei Serien</div>'+
+        '</div>');
+    }
+    return panel;
+  }
   const box=document.createElement('div');
   box.innerHTML=
     '<div class="metric has-chart sofr-fwd-panel" id="sofrTenorPanel" style="grid-column:1/-1">'+
@@ -157,7 +170,6 @@ function paintSofRTenor(){
   const diffMeta=document.getElementById('sofrDiffMeta');
   if(!sel||!host)return;
 
-  // Main tenor select (SOFR catalog only)
   if(sel.options.length!==catalog.length+1){
     const cur=getSofRTenorId();
     sel.innerHTML='<option value="">— wählen —</option>'+
@@ -170,7 +182,6 @@ function paintSofRTenor(){
     sel.addEventListener('change',()=>setSofRTenorId(sel.value||''));
   }
 
-  // Overlay + diff selects: ALL SOFR tenors + ALL USA charts
   fillSofRSelect(ovSel,seriesList,getSofRTenorOverlay());
   fillSofRSelect(diffA,seriesList,getSofRDiffA());
   fillSofRSelect(diffB,seriesList,getSofRDiffB());
@@ -191,7 +202,7 @@ function paintSofRTenor(){
   if(!id){
     host.innerHTML='';
     if(valEl)valEl.textContent='—';
-    if(meta)meta.textContent=catalog.length?('Katalog: '+catalog.length+' Laufzeiten · Overlay-Liste: '+seriesList.length):'Keine Laufzeit';
+    if(meta)meta.textContent=catalog.length?('Katalog: '+catalog.length+' · Liste: '+seriesList.length):'Keine Laufzeit';
   }else{
     const cat=catalog.find(c=>c.id===id)||{label:id,symbol:id};
     let pts=(histories['USA-sofrTenor-'+id]||[]).slice();
@@ -224,16 +235,15 @@ function paintSofRTenor(){
     }else if(typeof renderLineChart==='function'){
       host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|sofrTenorHist|'+(cat.label||id)+'" title="Vergrößern">'+renderLineChart(pts,{w:360,h:160})+'</div>';
     }
-    if(meta)meta.textContent=(cat.symbol||'')+' · '+pts.length+' Punkte'+(ov.label?(' · rot: '+ov.label):'')+' · Overlay-Liste: '+seriesList.length;
+    if(meta)meta.textContent=(cat.symbol||'')+' · '+pts.length+' Punkte'+(ov.label?(' · rot: '+ov.label):'')+' · Liste: '+seriesList.length;
   }
 
-  // Diff chart A − B
   if(diffHost){
     const ka=getSofRDiffA(), kb=getSofRDiffB();
     if(!ka||!kb){
       diffHost.innerHTML='';
       if(diffVal)diffVal.textContent='—';
-      if(diffMeta)diffMeta.textContent='Wähle A und B · alle SOFR-Laufzeiten + alle Charts der 7 USA-Seiten ('+seriesList.length+')';
+      if(diffMeta)diffMeta.textContent='Wähle A und B · alle SOFR + alle USA-Charts ('+seriesList.length+')';
       window.__sofrDiffMeta=null;
     }else{
       const A=resolveSofRSeries(ka);
@@ -257,9 +267,7 @@ function paintSofRTenor(){
 }
 `;
 
-// Replace or insert paintSofRTenor block
 if (html.includes('function paintSofRTenor')) {
-  // Remove old SOFR tenor helpers + function roughly from SOFR_PAGE or SOFR_USA to end of paintSofRTenor
   const markers = ['const SOFR_PAGE_OVERLAY_CATALOG', 'const SOFR_USA_CHART_CATALOG', 'function getSofRTenorId', 'function ensureSofRTenorPanel', 'function paintSofRTenor'];
   let start = -1;
   for (const m of markers) {
@@ -283,12 +291,10 @@ if (html.includes('function paintSofRTenor')) {
   }
 } else if (html.includes('function paintSofRFwd')) {
   html = html.replace('function paintSofRFwd', block + '\nfunction paintSofRFwd');
-  console.log('inserted before paintSofRFwd');
 } else if (html.includes('function bindUsaPages')) {
   html = html.replace('function bindUsaPages', block + '\nfunction bindUsaPages');
 }
 
-// Ensure page-3 / paintSofRFwd calls
 if (!html.includes("typeof paintSofRTenor==='function'&&paintSofRTenor()")) {
   html = html.replace(
     /typeof paintSofRFwd==='function'&&paintSofRFwd\(\)/g,
@@ -310,5 +316,26 @@ if (html.includes('function paintSofRFwd')) {
   }
 }
 
+// Enlarge support for sofrTenorDiff
+if (!html.includes("key==='sofrTenorDiff'")) {
+  const marker = "if(key==='sofrTenorHist')";
+  const idx = html.indexOf(marker);
+  if (idx >= 0) {
+    const inject =
+      "if(key==='sofrTenorDiff'){\n" +
+      "    const dm=window.__sofrDiffMeta||{};\n" +
+      "    let pts=dm.pts||[];\n" +
+      "    if(typeof filterByRange==='function'){const p2=filterByRange(pts,range); if(p2.length) pts=p2;}\n" +
+      "    if(!pts.length){body.innerHTML='<div class=\\\"sparkempty\\\">Keine Daten</div>';if(meta)meta.textContent='';return;}\n" +
+      "    body.innerHTML=renderLineChart(pts,{w:720,h:300,big:true})+'<div class=\\\"chart-tip-inline\\\" id=\\\"chartDlgTip\\\"></div>';\n" +
+      "    if(typeof bindBigChartHover==='function')bindBigChartHover(body);\n" +
+      "    if(meta)meta.textContent=(dm.labelA||'A')+' − '+(dm.labelB||'B')+' · '+rLabel+' · '+pts.length+' Punkte';\n" +
+      "    return;\n" +
+      "  }\n  ";
+    html = html.slice(0, idx) + inject + html.slice(idx);
+    console.log('sofrTenorDiff enlarge');
+  }
+}
+
 fs.writeFileSync('index.html', html);
-console.log('done', html.includes('sofrDiffA'), html.includes('buildSofRSeriesList'), html.includes('sofrTenorDiff'));
+console.log('done', html.includes('sofrDiffA'), html.includes('buildSofRSeriesList'), html.includes("key==='sofrTenorDiff'"));
