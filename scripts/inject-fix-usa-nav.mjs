@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** USA page nav sticky + bindUsaPages + FULL setUsaPage 0..6 (must run last-ish) */
+/** USA page nav sticky + bindUsaPages + FULL setUsaPage 0..7 */
 let html = fs.readFileSync('index.html', 'utf8');
 
 function dedupeDecl(html, decl) {
@@ -32,11 +32,11 @@ if (!html.includes('/* usa-nav-sticky */')) {
 }
 
 const setUsaPageFn = `function setUsaPage(page){
-  page=Math.max(0,Math.min(6,Number(page)||0));
+  page=Math.max(0,Math.min(7,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
   document.querySelectorAll('.country').forEach(card=>{
     if(!card.querySelector('.usa-face-a'))return;
-    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g'];
+    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h'];
     faces.forEach((sel,i)=>{
       const el=card.querySelector(sel);
       if(el)el.classList.toggle('hidden',page!==i);
@@ -51,6 +51,7 @@ const setUsaPageFn = `function setUsaPage(page){
   if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);
   if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
   if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
+  if(page===7)setTimeout(()=>{try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}},50);
 }
 `;
 
@@ -59,7 +60,7 @@ if (html.includes('function setUsaPage')) {
   const e = html.indexOf('function bindUsaPages', s);
   if (e > s) {
     html = html.slice(0, s) + setUsaPageFn + '\n' + html.slice(e);
-    console.log('setUsaPage full 0-6');
+    console.log('setUsaPage full 0-7');
   }
 }
 
@@ -80,7 +81,7 @@ function bindUsaPages(){
   }
   let start=0;
   try{start=Number(localStorage.getItem('macrowatch-usa-page')||'0')}catch(e){start=0}
-  if(!Number.isFinite(start)||start<0||start>6)start=0;
+  if(!Number.isFinite(start)||start<0||start>7)start=0;
   setUsaPage(start);
 }
 `;
@@ -107,6 +108,16 @@ if (!html.includes('bindUsaPages();')) {
   }
 }
 
+if (!html.includes('data-page=\"7\"') && !html.includes('data-page="7"')) {
+  html = html.replace(
+    /(data-page=\"6\"[^>]*>)([^<]*)(<\/button>)/,
+    '$1$2$3<button type=\"button\" data-page=\"7\">Repo-Markt</button>'
+  );
+  html = html.replace(
+    /(data-page="6"[^>]*>)([^<]*)(<\/button>)/,
+    '$1$2$3<button type="button" data-page="7">Repo-Markt</button>'
+  );
+}
 if (!html.includes('data-page=\"6\"') && !html.includes('data-page="6"')) {
   html = html.replace(
     /(data-page=\"5\"[^>]*>)([^<]*)(<\/button>)/,
@@ -130,4 +141,4 @@ try {
 } catch (e) {
   console.warn('js warn', e.message);
 }
-console.log('done', html.length, 'page===3 tenor', html.includes('paintSofRTenor'), 'page===6', html.includes('page===6'), 'call', html.includes('bindUsaPages();'));
+console.log('done', html.length, 'page===7', html.includes('page===7'), 'button7', html.includes('data-page="7"')||html.includes('data-page=\"7\"'));

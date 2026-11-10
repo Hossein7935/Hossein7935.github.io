@@ -78,6 +78,8 @@ jobs:
         run: node scripts/fix-paint-chart-dlg.mjs
       - name: Inject USA page 7 yields + diff
         run: node scripts/inject-page7-yields.mjs
+      - name: Inject USA page 8 Repo-Markt
+        run: node scripts/inject-page8-repo.mjs || true
       - name: Fix USA page navigation (sticky)
         run: node scripts/inject-fix-usa-nav.mjs
       - name: Final JS dedupe (after all injects)
@@ -92,6 +94,8 @@ jobs:
         run: node scripts/inject-sofr-tenor.mjs || true
       - name: Fix SOFR dual enlarge (keep red overlay)
         run: node scripts/inject-sofr-enlarge-fix.mjs || true
+      - name: Re-apply page 8 Repo-Markt
+        run: node scripts/inject-page8-repo.mjs || true
       - name: Check updater syntax
         run: |
           node --check scripts/inject-page7-yields.mjs
@@ -99,6 +103,8 @@ jobs:
           node --check scripts/inject-dxy.mjs
           node --check scripts/fetch-dxy.mjs
           node --check scripts/fetch-sofr-futures.mjs || true
+          node --check scripts/fetch-repo-mmf.mjs || true
+          node --check scripts/inject-page8-repo.mjs || true
           node --check scripts/inject-sofr-tenor.mjs || true
           node --check scripts/fix-paint-chart-dlg.mjs
           node --check scripts/fix-js-syntax.mjs
@@ -154,6 +160,8 @@ jobs:
         run: node scripts/fetch-us2y-sofr.mjs
       - name: USA page 7 UST + TIPS daily (FRED)
         run: node scripts/fetch-ust-tips-page7.mjs
+      - name: OFR Repo + MMF (Seite 8)
+        run: node scripts/fetch-repo-mmf.mjs
       - name: HH + Business debt growth (Fed Z.1)
         run: node scripts/fetch-nonfin-debt.mjs
       - name: Copper/Gold ratio (Yahoo HG=F / GC=F)
@@ -179,10 +187,12 @@ jobs:
           node scripts/inject-dxy.mjs || true
           node scripts/inject-sofr-tenor.mjs || true
           node scripts/inject-sofr-enlarge-fix.mjs || true
+          node scripts/inject-page8-repo.mjs || true
           node scripts/fix-js-syntax.mjs || true
           node scripts/fix-paint-chart-dlg.mjs || true
           node scripts/inject-sofr-tenor.mjs || true
           node scripts/inject-sofr-enlarge-fix.mjs || true
+          node scripts/inject-page8-repo.mjs || true
           git add data.json scripts/ index.html || true
           if git diff --cached --quiet; then
             echo "No data changes to commit"
@@ -193,6 +203,7 @@ jobs:
             node scripts/fix-paint-chart-dlg.mjs || true
             node scripts/inject-sofr-tenor.mjs || true
             node scripts/inject-sofr-enlarge-fix.mjs || true
+            node scripts/inject-page8-repo.mjs || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
             git push origin HEAD:main || git push --force-with-lease origin HEAD:main
