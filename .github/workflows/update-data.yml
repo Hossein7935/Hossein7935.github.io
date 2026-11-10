@@ -93,7 +93,7 @@ jobs:
       - name: Re-apply DXY panel
         run: node scripts/inject-dxy.mjs
       - name: Re-apply SOFR tenor panel
-        run: node scripts/scripts/inject-sofr-tenor.mjs || true
+        run: node scripts/inject-sofr-tenor.mjs || true
       - name: Fix SOFR dual enlarge (keep red overlay)
         run: node scripts/inject-sofr-enlarge-fix.mjs || true
       - name: Re-apply page 8 Repo-Markt
@@ -104,11 +104,13 @@ jobs:
         run: node scripts/fix-usa-face-visibility.mjs || true
       - name: Repo-Markt enlarge dual charts
         run: node scripts/inject-repo-enlarge-fix.mjs || true
+      - name: Strip USA page 2 duplicate charts
+        run: node scripts/strip-page2-dupes.mjs || true
       - name: Check updater syntax
         run: |
           node --check scripts/inject-page8-repo.mjs || true
           node --check scripts/inject-repo-enlarge-fix.mjs || true
-          node --check scripts/fix-usa-face-visibility.mjs || true
+          node --check scripts/strip-page2-dupes.mjs || true
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
@@ -189,6 +191,7 @@ jobs:
           node scripts/fix-usa-face-visibility.mjs || true
           node scripts/fix-paint-chart-dlg.mjs || true
           node scripts/inject-repo-enlarge-fix.mjs || true
+          node scripts/strip-page2-dupes.mjs || true
           git add data.json scripts/ index.html || true
           if git diff --cached --quiet; then
             echo "No data changes to commit"
@@ -199,6 +202,7 @@ jobs:
             node scripts/inject-repo-enlarge-fix.mjs || true
             node scripts/inject-page8-repo.mjs || true
             node scripts/fix-usa-face-visibility.mjs || true
+            node scripts/strip-page2-dupes.mjs || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
             git push origin HEAD:main || git push --force-with-lease origin HEAD:main
