@@ -3,34 +3,33 @@ import fs from 'fs';
 /** USA Seite 8 / face-h: Repo-Markt — MMF + Repo OFR charts */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// Ensure face-h shell exists inside USA card
-if (!html.includes('usa-face-h')) {
-  if (html.includes('usa-face-g')) {
-    html = html.replace(
-      /(<div class="usa-face-g[\s\S]*?<\/div>\s*)(<\/div>\s*<div class="usa-flip-toggle|<\/div>\s*<\/article|<\/div>\s*<\/div>)/,
-      '$1<div class="usa-face-h hidden" data-usa-face="7"></div>$2'
-    );
-    if (!html.includes('usa-face-h')) {
-      html = html.replace(
-        '<div class="usa-flip-toggle"',
-        '<div class="usa-face-h hidden" data-usa-face="7"></div>\n<div class="usa-flip-toggle"'
-      );
-    }
-    console.log('face-h added', html.includes('usa-face-h'));
-  }
-}
+// Remove broken template face-h injection (empty div before flip-toggle)
+html = html.replace(
+  /\$\{c\.id==='USA'\?`<div class="usa-face-h[^`]*>`\s*:\s*''\}/g,
+  "${c.id==='USA'?``:''}"
+);
+// cleaner: remove standalone face-h from USA ternary if glued to flip-toggle
+html = html.replace(
+  /<div class="usa-face-h hidden" data-usa-face="7"><\/div>\s*/g,
+  ''
+);
 
-// Seite 8 button
+// Deduplicate Repo-Markt / Seite 7 buttons in template
+html = html.replace(
+  /(<button type="button" data-page="7">Repo-Markt<\/button>)(\s*<button type="button" data-page="7">Repo-Markt<\/button>)+/g,
+  '$1'
+);
+html = html.replace(
+  /(<button type="button" data-page="6">Seite 7<\/button>)(\s*<button type="button" data-page="6">Seite 7<\/button>)+/g,
+  '$1'
+);
+
+// Ensure one Repo-Markt button exists
 if (!html.includes('data-page="7"') && !html.includes("data-page=\"7\"")) {
   html = html.replace(
     /(data-page="6"[^>]*>)([^<]*)(<\/button>)/,
     '$1$2$3<button type="button" data-page="7">Repo-Markt</button>'
   );
-  html = html.replace(
-    /(data-page=\"6\"[^>]*>)([^<]*)(<\/button>)/,
-    '$1$2$3<button type=\"button\" data-page=\"7\">Repo-Markt</button>'
-  );
-  console.log('button 7', html.includes('data-page="7"') || html.includes('data-page=\"7\"'));
 }
 
 const block = `
@@ -81,16 +80,13 @@ function alignRepoDiff(a,b){
   return out;
 }
 function repoLegendHtml(items){
-  // items: [{color,label,toggleId,on}]
-  return '<div class="repo-legend" style="display:flex;flex-wrap:wrap;gap:10px 14px;margin:6px 0 4px;font-size:12px;align-items:center">'+
+  return '<div class="repo-legend" style="display:flex;flex-direction:column;gap:8px;margin:10px 0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:rgba(127,127,127,0.08);font-size:13px">'+
+    '<div style="font-weight:600;margin-bottom:2px">Farben · Linie ein/aus</div>'+
     items.map(it=>{
-      const sw='<span style="display:inline-block;width:14px;height:3px;background:'+it.color+';vertical-align:middle;margin-right:5px;border-radius:1px"></span>';
-      if(it.toggleId){
-        return '<label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer">'+
-          '<input type="checkbox" id="'+it.toggleId+'" '+(it.on?'checked':'')+' style="margin:0">'+
-          sw+'<span>'+it.label+'</span></label>';
-      }
-      return '<span>'+sw+it.label+'</span>';
+      const sw='<span style="display:inline-block;width:22px;height:4px;background:'+it.color+';border-radius:2px;margin-right:8px"></span>';
+      return '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;min-height:28px">'+
+        '<input type="checkbox" id="'+it.toggleId+'" '+(it.on?'checked':'')+' style="width:18px;height:18px;margin:0;flex-shrink:0">'+
+        sw+'<span>'+it.label+'</span></label>';
     }).join('')+
   '</div>';
 }
@@ -101,14 +97,31 @@ function bindRepoToggle(id, lsKey){
   el.addEventListener('change',()=>setRepoToggle(lsKey, !!el.checked));
 }
 function ensureRepoPage(){
-  const face=document.querySelector('.usa-face-h');
-  if(!face)return null;
-  if(document.getElementById('repoMmfPanel'))return face;
+  const card=document.querySelector('.country .usa-face-a')
+    ? document.querySelector('.country .usa-face-a').closest('.country')
+    : document.querySelector('.country');
+  if(!card)return null;
+  let face=card.querySelector('.usa-face-h');
+  if(!face){
+    face=document.createElement('div');
+    face.className='metrics usa-face usa-face-h hidden';
+    face.setAttribute('data-usa-face','7');
+    const g=card.querySelector('.usa-face-g');
+    if(g&&g.parentNode)g.after(face);
+    else{
+      const toggle=card.querySelector('.usa-flip-toggle');
+      if(toggle&&toggle.parentNode)toggle.after(face);
+      else card.appendChild(face);
+    }
+  }else{
+    face.classList.add('metrics','usa-face','usa-face-h');
+  }
+  // Always rebuild panel markup so legend/toggles stay present
   face.innerHTML=
     '<div class="metric has-chart" id="repoMmfPanel" style="grid-column:1/-1">'+
       '<div class="name">Repo-Markt · MMF Vermögen & Repo-Anteil</div>'+
       '<div class="value" id="repoMmfValue">—</div>'+
-      '<div class="date" id="repoMmfDate">OFR · Farben siehe Legende · Linien abwählbar</div>'+
+      '<div class="date" id="repoMmfDate">OFR · siehe Farben unten · Linien abwählbar</div>'+
       '<div id="repoMmfLegend"></div>'+
       '<div class="sofr-fwd-bp" style="gap:8px;flex-wrap:wrap;margin:6px 0">'+
         '<label style="font-size:12px">Rot-Overlay <select id="repoMmfRed">'+repoCatOptions()+'</select></label>'+
@@ -116,12 +129,12 @@ function ensureRepoPage(){
         '<label style="font-size:12px">− B <select id="repoMmfGb">'+repoCatOptions()+'</select></label>'+
       '</div>'+
       '<div id="repoMmfChart"></div>'+
-      '<div class="sofr-fwd-meta" id="repoMmfMeta">OFR MMF-MMF_TOT-M / MMF-MMF_RP_TOT-M · $ Billionen</div>'+
+      '<div class="sofr-fwd-meta" id="repoMmfMeta">Blau = MMF Total · Zweitlinie = MMF Repo (oder Overlay)</div>'+
     '</div>'+
     '<div class="metric has-chart" id="repoVolPanel" style="grid-column:1/-1">'+
       '<div class="name">Repo-Markt · Volumen & Konditionen</div>'+
       '<div class="value" id="repoVolValue">—</div>'+
-      '<div class="date" id="repoVolDate">OFR · Farben siehe Legende · Linien abwählbar</div>'+
+      '<div class="date" id="repoVolDate">OFR · siehe Farben unten · Linien abwählbar</div>'+
       '<div id="repoVolLegend"></div>'+
       '<div class="sofr-fwd-bp" style="gap:8px;flex-wrap:wrap;margin:6px 0">'+
         '<label style="font-size:12px">Rot-Overlay <select id="repoVolRed">'+repoCatOptions()+'</select></label>'+
@@ -129,7 +142,7 @@ function ensureRepoPage(){
         '<label style="font-size:12px">− B <select id="repoVolGb">'+repoCatOptions()+'</select></label>'+
       '</div>'+
       '<div id="repoVolChart"></div>'+
-      '<div class="sofr-fwd-meta" id="repoVolMeta">OFR REPO-TRI/DVP · Volumen $B · Sätze %</div>'+
+      '<div class="sofr-fwd-meta" id="repoVolMeta">Blau = TRI Volumen $B · Zweitlinie = TRI Satz %</div>'+
     '</div>';
   return face;
 }
@@ -166,7 +179,6 @@ function paintRepoPage(){
 
   const showBlue=getRepoToggle('macrowatch-repo-mmf-blue', true);
   const showSec=getRepoToggle('macrowatch-repo-mmf-sec', true);
-  const showRed=getRepoToggle('macrowatch-repo-mmf-redline', true);
   const showGreen=getRepoToggle('macrowatch-repo-mmf-green', true);
 
   const redKey=getRepoLS('macrowatch-repo-mmf-red');
@@ -175,26 +187,29 @@ function paintRepoPage(){
   let greenPts=[];
   if(ga&&gb) greenPts=alignRepoDiff(histories['USA-'+ga]||[], histories['USA-'+gb]||[]);
 
-  // Secondary default = MMF Repo (unless user picked red overlay as secondary)
-  const secLabel=redKey?((REPO_PAGE_CATALOG.find(c=>c.key===redKey)||{}).label||redKey):'MMF Repo ($T)';
+  const secLabel=redKey?(((REPO_PAGE_CATALOG.find(c=>c.key===redKey)||{}).label)||redKey):'MMF Repo ($T)';
   const secPts=redKey?redPts:mmfRepo;
+  const secColor=redKey?'#ef4444':'#ef4444';
 
   if(legEl){
-    legEl.innerHTML=repoLegendHtml([
-      {color:'#3b82f6',label:'Blau · MMF Total ($T)',toggleId:'repoMmfBlueTog',on:showBlue},
-      {color:redKey?'#ef4444':'#14b8a6',label:(redKey?'Rot · ':'Türkis · ')+secLabel,toggleId:'repoMmfSecTog',on:showSec},
-      ...(redKey&&showSec?[]:[]),
-      ...(ga&&gb?[{color:'#22c55e',label:'Grün · Diff '+(REPO_PAGE_CATALOG.find(c=>c.key===ga)||{}).label+' − '+(REPO_PAGE_CATALOG.find(c=>c.key===gb)||{}).label,toggleId:'repoMmfGreenTog',on:showGreen}]:[])
-    ]);
+    const items=[
+      {color:'#3b82f6',label:'BLAU = MMF Total Assets ($ Billionen)',toggleId:'repoMmfBlueTog',on:showBlue},
+      {color:secColor,label:'ROT = '+secLabel,toggleId:'repoMmfSecTog',on:showSec}
+    ];
+    if(ga&&gb){
+      const la=((REPO_PAGE_CATALOG.find(c=>c.key===ga)||{}).label)||ga;
+      const lb=((REPO_PAGE_CATALOG.find(c=>c.key===gb)||{}).label)||gb;
+      items.push({color:'#22c55e',label:'GRÜN = Diff '+la+' − '+lb,toggleId:'repoMmfGreenTog',on:showGreen});
+    }
+    legEl.innerHTML=repoLegendHtml(items);
     bindRepoToggle('repoMmfBlueTog','macrowatch-repo-mmf-blue');
     bindRepoToggle('repoMmfSecTog','macrowatch-repo-mmf-sec');
     bindRepoToggle('repoMmfGreenTog','macrowatch-repo-mmf-green');
   }
 
-  let base=showBlue?mmfTot:[];
-  let ov=showSec?secPts:[];
-  let gr=showGreen?greenPts:[];
-  // if blue off but sec on, use sec as base so chart still renders
+  let base=showBlue?mmfTot.slice():[];
+  let ov=showSec?secPts.slice():[];
+  let gr=showGreen?greenPts.slice():[];
   if(!base.length&&ov.length){base=ov;ov=[];}
   window.__repoMmfMeta={redKey,ga,gb,greenPts:gr,redPts:ov,mmfTot:base,mmfRepo:ov,showBlue,showSec,showGreen};
 
@@ -205,14 +220,11 @@ function paintRepoPage(){
     }else if(typeof renderLineChart==='function'&&base.length){
       host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoMmfDual|MMF" title="Vergrößern">'+renderLineChart(base,{w:360,h:160})+'</div>';
     }else{
-      host.innerHTML='<div class="sparkempty">Keine Linie aktiv</div>';
+      host.innerHTML='<div class="sparkempty">Keine Linie aktiv — Kästchen in der Legende setzen</div>';
     }
   }
-  if(meta){
-    meta.textContent='Legende + Kästchen: Linien ein/aus · OFR $T · Rot-Overlay ersetzt Zweitlinie';
-  }
+  if(meta)meta.textContent='BLAU=MMF Total · ROT='+secLabel+(ga&&gb?' · GRÜN=Diff':'')+' · Kästchen = Linie an/aus';
 
-  // Volume / rates panel
   const triVol=histories['USA-repoTriVol']||[];
   const triRate=histories['USA-repoTriRate']||[];
   const sofr=histories['USA-sofr']||[];
@@ -237,23 +249,28 @@ function paintRepoPage(){
   let vGreen=[];
   if(vga&&vgb) vGreen=alignRepoDiff(histories['USA-'+vga]||[], histories['USA-'+vgb]||[]);
 
-  const vSecLabel=vRed?((REPO_PAGE_CATALOG.find(c=>c.key===vRed)||{}).label||vRed):'TRI Overnight-Satz (%)';
+  const vSecLabel=vRed?(((REPO_PAGE_CATALOG.find(c=>c.key===vRed)||{}).label)||vRed):'TRI Overnight-Satz (%)';
   const vSecPts=vRed?vRedPts:(triRate.length?triRate:sofr);
 
   if(vleg){
-    vleg.innerHTML=repoLegendHtml([
-      {color:'#3b82f6',label:'Blau · TRI Repo-Volumen ($B)',toggleId:'repoVolBlueTog',on:vShowBlue},
-      {color:vRed?'#ef4444':'#f97316',label:(vRed?'Rot · ':'Orange · ')+vSecLabel,toggleId:'repoVolSecTog',on:vShowSec},
-      ...(vga&&vgb?[{color:'#22c55e',label:'Grün · Diff '+(REPO_PAGE_CATALOG.find(c=>c.key===vga)||{}).label+' − '+(REPO_PAGE_CATALOG.find(c=>c.key===vgb)||{}).label,toggleId:'repoVolGreenTog',on:vShowGreen}]:[])
-    ]);
+    const items=[
+      {color:'#3b82f6',label:'BLAU = TRI Repo-Volumen ($ Milliarden)',toggleId:'repoVolBlueTog',on:vShowBlue},
+      {color:'#ef4444',label:'ROT = '+vSecLabel,toggleId:'repoVolSecTog',on:vShowSec}
+    ];
+    if(vga&&vgb){
+      const la=((REPO_PAGE_CATALOG.find(c=>c.key===vga)||{}).label)||vga;
+      const lb=((REPO_PAGE_CATALOG.find(c=>c.key===vgb)||{}).label)||vgb;
+      items.push({color:'#22c55e',label:'GRÜN = Diff '+la+' − '+lb,toggleId:'repoVolGreenTog',on:vShowGreen});
+    }
+    vleg.innerHTML=repoLegendHtml(items);
     bindRepoToggle('repoVolBlueTog','macrowatch-repo-vol-blue');
     bindRepoToggle('repoVolSecTog','macrowatch-repo-vol-sec');
     bindRepoToggle('repoVolGreenTog','macrowatch-repo-vol-green');
   }
 
-  let baseVol=vShowBlue?(triVol.length?triVol:(histories['USA-repoVolSum']||[])):[];
-  let rateLine=vShowSec?vSecPts:[];
-  let vGr=vShowGreen?vGreen:[];
+  let baseVol=vShowBlue?(triVol.length?triVol.slice():(histories['USA-repoVolSum']||[]).slice()):[];
+  let rateLine=vShowSec?vSecPts.slice():[];
+  let vGr=vShowGreen?vGreen.slice():[];
   if(!baseVol.length&&rateLine.length){baseVol=rateLine;rateLine=[];}
   window.__repoVolMeta={redKey:vRed,ga:vga,gb:vgb,greenPts:vGr,baseVol,rateLine,redPts:rateLine};
 
@@ -264,17 +281,16 @@ function paintRepoPage(){
     }else if(typeof renderLineChart==='function'&&baseVol.length){
       vhost.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoVolDual|Repo" title="Vergrößern">'+renderLineChart(baseVol,{w:360,h:160})+'</div>';
     }else{
-      vhost.innerHTML='<div class="sparkempty">Keine Linie aktiv</div>';
+      vhost.innerHTML='<div class="sparkempty">Keine Linie aktiv — Kästchen in der Legende setzen</div>';
     }
   }
-  if(vmeta){
-    vmeta.textContent='Legende + Kästchen: Linien ein/aus · OFR täglich · Volumen $B / Sätze %';
-  }
+  if(vmeta)vmeta.textContent='BLAU=TRI Volumen · ROT='+vSecLabel+(vga&&vgb?' · GRÜN=Diff':'')+' · Kästchen = Linie an/aus';
 }
 `;
 
+// Replace existing block
 if (html.includes('function paintRepoPage')) {
-  const markers = ['const REPO_PAGE_CATALOG', 'function paintRepoPage', 'function ensureRepoPage', 'function getRepoLS'];
+  const markers = ['const REPO_PAGE_CATALOG', 'function paintRepoPage', 'function ensureRepoPage', 'function getRepoLS', 'function getRepoToggle'];
   let start = -1;
   for (const m of markers) {
     const i = html.indexOf(m);
@@ -298,19 +314,10 @@ if (html.includes('function paintRepoPage')) {
 } else if (html.includes('function bindUsaPages')) {
   html = html.replace('function bindUsaPages', block + '\nfunction bindUsaPages');
   console.log('paintRepoPage injected');
-} else if (html.includes('function setUsaPage')) {
-  html = html.replace('function setUsaPage', block + '\nfunction setUsaPage');
 }
 
-// Expand setUsaPage to page 7
-html = html.replace(
-  /page=Math\.max\(0,Math\.min\(6,Number\(page\)\|\|0\)\)/g,
-  'page=Math.max(0,Math.min(7,Number(page)||0))'
-);
-html = html.replace(
-  /page=Math\.max\(0,Math\.min\(7,Number\(page\)\|\|0\)\)/g,
-  'page=Math.max(0,Math.min(7,Number(page)||0))'
-);
+// setUsaPage page 7
+html = html.replace(/page=Math\.max\(0,Math\.min\(6,Number\(page\)\|\|0\)\)/g, 'page=Math.max(0,Math.min(7,Number(page)||0))');
 if (!html.includes(".usa-face-h'")) {
   html = html.replace(
     "const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g']",
@@ -324,7 +331,7 @@ if (!html.includes('page===7')) {
   );
 }
 
-// paintChartDlg enlarge for repo duals
+// enlarge handlers
 if (!html.includes("key==='repoMmfDual'")) {
   const marker = "if(key==='sofrTenorHist')";
   const idx = html.indexOf(marker);
@@ -356,4 +363,4 @@ if (!html.includes("key==='repoMmfDual'")) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.includes('repoLegendHtml'), html.includes('repoMmfBlueTog'), html.includes('paintRepoPage'));
+console.log('done', html.includes('Farben · Linie ein/aus'), html.includes('BLAU = MMF Total'), html.includes('paintRepoPage'));
