@@ -3,14 +3,12 @@ import fs from 'fs';
 /** USA Seite 8 / face-h: Repo-Markt — DO NOT wipe USA page-select template */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// NEVER replace the USA ternary with empty string.
-// Only remove a standalone empty face-h div if present, keep flip-toggle.
+// Only remove standalone empty face-h before flip-toggle; never empty the whole USA ternary
 html = html.replace(
   /<div class="usa-face-h hidden" data-usa-face="7"><\/div>\s*(?=<div class="usa-flip-toggle")/g,
   ''
 );
 
-// Deduplicate Repo-Markt buttons only
 html = html.replace(
   /(<button type="button" data-page="7">Repo-Markt<\/button>)(\s*<button type="button" data-page="7">Repo-Markt<\/button>)+/g,
   '$1'
@@ -20,8 +18,7 @@ html = html.replace(
   '$1'
 );
 
-// Ensure Repo-Markt button exists inside usaPageSelect
-if (html.includes('usaPageSelect') && !html.includes('>Repo-Markt</button>') && !html.includes('>Repo-Markt<\\/button>')) {
+if (html.includes('usaPageSelect') && !html.includes('>Repo-Markt</button>')) {
   html = html.replace(
     /(data-page="6"[^>]*>)([^<]*)(<\/button>)/,
     '$1$2$3<button type="button" data-page="7">Repo-Markt</button>'
@@ -93,18 +90,17 @@ function bindRepoToggle(id, lsKey){
   el.addEventListener('change',()=>setRepoToggle(lsKey, !!el.checked));
 }
 function ensureRepoPage(){
-  const card=document.querySelector('.country .usa-face-a')
-    ? document.querySelector('.country .usa-face-a').closest('.country')
-    : null;
+  let card=null;
+  const faceA=document.querySelector('.country .usa-face-a');
+  if(faceA) card=faceA.closest('.country');
   if(!card){
     const cards=[...document.querySelectorAll('.country')];
-    const usa=cards.find(c=>c.querySelector('.code')&&c.querySelector('.code').textContent==='USA');
-    if(!usa)return null;
-    return ensureRepoPageInCard(usa);
+    card=cards.find(c=>{
+      const code=c.querySelector('.code');
+      return code&&code.textContent.trim()==='USA';
+    })||null;
   }
-  return ensureRepoPageInCard(card);
-}
-function ensureRepoPageInCard(card){
+  if(!card)return null;
   let face=card.querySelector('.usa-face-h');
   if(!face){
     face=document.createElement('div');
@@ -122,7 +118,7 @@ function ensureRepoPageInCard(card){
   }
   face.innerHTML=
     '<div class="metric has-chart" id="repoMmfPanel" style="grid-column:1/-1">'+
-      '<div class="namediv class="name">Repo-Markt · MMF Vermögen & Repo-Anteil</div>'+
+      '<div class="name">Repo-Markt · MMF Vermögen & Repo-Anteil</div>'+
       '<div class="value" id="repoMmfValue">—</div>'+
       '<div class="date" id="repoMmfDate">OFR · Farben · Linien abwählbar</div>'+
       '<div id="repoMmfLegend"></div>'+
@@ -306,7 +302,6 @@ if (html.includes('function paintRepoPage')) {
   html = html.replace('function bindUsaPages', block + '\nfunction bindUsaPages');
 }
 
-// Ensure setUsaPage knows page 7
 html = html.replace(/page=Math\.max\(0,Math\.min\(6,Number\(page\)\|\|0\)\)/g, 'page=Math.max(0,Math.min(7,Number(page)||0))');
 if (!html.includes(".usa-face-h'")) {
   html = html.replace(
@@ -348,7 +343,7 @@ if (!html.includes("key==='repoMmfDual'")) {
   }
 }
 
-// Safety: if USA template still empty, restore toggle
+// CRITICAL: restore USA page-select if wiped
 if (html.includes("${c.id==='USA'?``:''}")) {
   const good = "${c.id==='USA'?`<div class=\"usa-flip-toggle\"><div class=\"usa-page-select\" id=\"usaPageSelect\"><button type=\"button\" data-page=\"0\">Seite 1</button><button type=\"button\" data-page=\"1\">Seite 2</button><button type=\"button\" data-page=\"2\">Seite 3</button><button type=\"button\" data-page=\"3\">Seite 4</button><button type=\"button\" data-page=\"4\">Seite 5</button><button type=\"button\" data-page=\"5\">Seite 6</button><button type=\"button\" data-page=\"6\">Seite 7</button><button type=\"button\" data-page=\"7\">Repo-Markt</button></div></div>`:''}";
   html = html.replace("${c.id==='USA'?``:''}", good);
@@ -356,4 +351,4 @@ if (html.includes("${c.id==='USA'?``:''}")) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.includes('paintRepoPage'), html.includes('usaPageSelect'), html.includes("${c.id==='USA'?``:''}")===false);
+console.log('done', html.includes('paintRepoPage'), html.includes('usaPageSelect'), !html.includes("${c.id==='USA'?``:''}"));
