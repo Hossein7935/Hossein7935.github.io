@@ -1,27 +1,24 @@
 import fs from 'fs';
 
-/** Fix: faces created after setUsaPage stay .hidden → USA looks empty */
+/** Fix USA empty pages without deleting functions between setUsaPage and bindUsaPages */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// 1) After paintRepoPage creates face-h, force visible when on page 7
-if (html.includes('function paintRepoPage') && !html.includes('/* face-h-unhide */')) {
-  html = html.replace(
-    'function paintRepoPage(){\n  const face=ensureRepoPage();\n  if(!face)return;',
-    `function paintRepoPage(){\n  const face=ensureRepoPage();\n  if(!face)return;\n  /* face-h-unhide */\n  try{\n    const p=Number(localStorage.getItem('macrowatch-usa-page')||'0');\n    if(p===7){face.classList.remove('hidden');}\n  }catch(e){face.classList.remove('hidden');}`
-  );
-  console.log('paintRepoPage unhide');
+function replaceFunction(html, name, newSrc) {
+  const start = html.indexOf('function ' + name);
+  if (start < 0) return { html, ok: false };
+  let i = start, depth = 0, started = false, end = -1;
+  for (; i < html.length; i++) {
+    const ch = html[i];
+    if (ch === '{') { depth++; started = true; }
+    else if (ch === '}') {
+      depth--;
+      if (started && depth === 0) { end = i; break; }
+    }
+  }
+  if (end < 0) return { html, ok: false };
+  return { html: html.slice(0, start) + newSrc + html.slice(end + 1), ok: true };
 }
 
-// Also unhide at end of ensureRepoPage when building face
-if (html.includes('function ensureRepoPage') && !html.includes('/* ensure-unhide */')) {
-  html = html.replace(
-    /return face;\n\}\nfunction bindRepoSelect/,
-    `try{const p=Number(localStorage.getItem('macrowatch-usa-page')||'0'); if(p===7) face.classList.remove('hidden'); else face.classList.add('hidden');}catch(e){}\n  /* ensure-unhide */\n  return face;\n}\nfunction bindRepoSelect`
-  );
-  console.log('ensureRepoPage unhide');
-}
-
-// 2) Harden setUsaPage: paint late faces FIRST, then toggle visibility
 const better = `function setUsaPage(page){
   page=Math.max(0,Math.min(7,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -50,17 +47,23 @@ const better = `function setUsaPage(page){
   if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
   if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
   if(page===7)setTimeout(()=>{try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}},50);
-}
-`;
+}`;
 
-if (html.includes('function setUsaPage')) {
-  const s = html.indexOf('function setUsaPage');
-  const e = html.indexOf('function bindUsaPages', s);
-  if (e > s) {
-    html = html.slice(0, s) + better + '\n' + html.slice(e);
-    console.log('setUsaPage paint-before-toggle');
-  }
+const r = replaceFunction(html, 'setUsaPage', better);
+html = r.html;
+console.log('setUsaPage replaced', r.ok);
+
+// Unhide face-h inside paintRepoPage without deleting it
+if (html.includes('function paintRepoPage') && !html.includes('/* face-h-unhide */')) {
+  html = html.replace(
+    'function paintRepoPage(){\n  const face=ensureRepoPage();\n  if(!face)return;',
+    `function paintRepoPage(){\n  const face=ensureRepoPage();\n  if(!face)return;\n  /* face-h-unhide */\n  try{\n    const p=Number(localStorage.getItem('macrowatch-usa-page')||'0');\n    if(p===7) face.classList.remove('hidden');\n  }catch(e){try{face.classList.remove('hidden')}catch(_e){}}`
+  );
+  console.log('paintRepoPage unhide patched', html.includes('face-h-unhide'));
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.includes('face-h-unhide') || html.includes('paint-before') || html.includes('Create dynamic faces'));
+console.log('has REPO catalog', html.includes('const REPO_PAGE_CATALOG'));
+console.log('has paintRepoPage', html.includes('function paintRepoPage'));
+console.log('has ensureRepoPage', html.includes('function ensureRepoPage'));
+console.log('Create dynamic', html.includes('Create dynamic faces'));
