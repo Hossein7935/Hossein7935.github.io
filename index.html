@@ -201,6 +201,26 @@ function paintChartDlg(){
     return;
   }
 
+  if(key==='repoMmfDual'||key==='repoVolDual'){
+    const rm=key==='repoMmfDual'?(window.__repoMmfMeta||{}):(window.__repoVolMeta||{});
+    let base=key==='repoMmfDual'?(rm.mmfTot||histories['USA-mmfTot']||[]):(rm.baseVol||histories['USA-repoTriVol']||[]);
+    let ov=rm.redPts&&rm.redPts.length?rm.redPts:(key==='repoMmfDual'?(rm.mmfRepo||histories['USA-mmfRepo']||[]):(rm.rateLine||histories['USA-repoTriRate']||[]));
+    let gr=rm.greenPts||[];
+    if(typeof filterByRange==='function'){
+      const b2=filterByRange(base,range); if(b2.length) base=b2;
+      const o2=filterByRange(ov,range); if(o2.length) ov=o2;
+      const g2=filterByRange(gr,range); if(g2.length) gr=g2;
+    }
+    if(!base.length){body.innerHTML='<div class="sparkempty">Keine Daten</div>';if(meta)meta.textContent='';return;}
+    if(typeof renderDiffOverlayChart==='function'){
+      body.innerHTML=renderDiffOverlayChart(base,ov,{w:720,h:320,big:true,greenPts:gr})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    } else {
+      body.innerHTML=renderLineChart(base,{w:720,h:300,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
+    }
+    if(typeof bindBigChartHover==='function')bindBigChartHover(body);
+    if(meta)meta.textContent=(key==='repoMmfDual'?'MMF Total/Repo':'Repo Vol/Rate')+' · '+rLabel+' · '+base.length+' Punkte';
+    return;
+  }
   if(key==='sofrTenorHist'){
     const tm=window.__sofrTenorMeta||{};
     const id=(typeof getSofRTenorId==='function'&&getSofRTenorId())||tm.id||'';
@@ -346,7 +366,8 @@ function bindBigChartHover(body){
 
 
 function historyHTML(country,key){let arr=histories[country+'-'+key]||[];if(key==='inflation'){const range=(document.querySelector('#inflRange')||{}).value||'3y';arr=filterByRange(arr,range)}if(!arr.length)return '<div class="sparkempty">Verlauf nicht verfügbar</div>';const pts=arr.map(x=>({period:String(x.period),value:Number(x.value)})).filter(x=>Number.isFinite(x.value));if(!pts.length)return '<div class="sparkempty">Keine gültigen Werte</div>';if(key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='inflation'||key==='gdp'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit'||key==='sofr3m'||key==='t10y2y'||key==='t10y5y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'||key==='us10yTips'||key==='us5yTips'||key==='sofrIorb'||key==='wresbal'||key==='effr'||key==='sofr'||key==='iorb'||key==='cuAu'){const extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',t10y5y:'10Y − 5Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield',us10yTips:'US10Y − TIPS10Y',us5yTips:'US5Y − TIPS5Y',sofrIorb:'SOFR − IORB',wresbal:'Bankreserven (WRESBAL)',effr:'EFFR',sofr:'SOFR',iorb:'IORB',cuAu:'Kupfer / Gold Ratio',diff:'Differenz',sofrFwd:'SOFR Erwartungskurve',ustCurve:'US Zinsstruktur',fhlbAdv:'FHLB Advances',fhlbAdvQoq:'FHLB Advances QoQ %',fhlbAdvYoy:'FHLB Advances YoY %',effrVol:'Fed Funds Volume',effrVolChg:'Fed Funds Vol Δ%',effr:'EFFR',iorb:'IORB',us1y:'US 1Y',iorbUs1yDual:'IORB + US 1Y',move:'MOVE Index',us2y:'US 2Y',us2ySofrDual:'US 2Y + SOFR',dxy:'DXY'};const label=extraLabels[key]||(defs.find(d=>d[0]===key)||[key,key])[1];const chart=renderLineChart(pts,{w:220,h:58});return `<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="${country}|${key}|${esc(label)}" title="Chart vergrößern">${chart}</div>`}let min=Math.min(0,...pts.map(p=>p.value)),max=Math.max(0,...pts.map(p=>p.value));if(max===min)max=min+1;const range=max-min||1;return `<div class="spark">${pts.slice(-5).map(x=>{const v=x.value,hh=Math.max(2,Math.round(((v-min)/range)*22));return `<div class="barwrap" title="${esc(x.period)}: ${fmt(v)}"><div class="bar ${v<0?'neg':''}" style="height:${hh}px"></div><div class="barlabel">${esc(String(x.period).replace(/^\d{4}-Q/,'Q').slice(0,7))}</div></div>`}).join('')}</div><div class="sparkcaption">Letzte ${Math.min(5,pts.length)} Werte</div>`}
-function render(){const grid=document.querySelector('#grid');grid.innerHTML='';for(const c of countries){const card=document.createElement('section');card.className='country';card.innerHTML=`<div class="ctop"><div class="flag">${c.flag}</div><div><h2>${c.name}</h2><div class="code">${c.id}</div></div></div>${c.id==='USA'?`<div class="usa-flip-toggle"><div class="usa-page-select" id="usaPageSelect"><button type="button" data-page="0">Seite 1</button><button type="button" data-page="1">Seite 2</button><button type="button" data-page="2">Seite 3</button><button type="button" data-page="3">Seite 4</button><button type="button" data-page="4">Seite 5</button><button type="button" data-page="5">Seite 6</button><button type="button" data-page="6">Seite 7</button><button type="button" data-page="6">Seite 7</button></div></div>`:''}<div class="metrics">${defs.map(([key,label])=>{if((key==='reservesGdp'||key==='tips5'||key==='tips10')&&c.id!=='USA')return'';const m=valueFor(c.id,key);const value=m?fmt(m.value):'Nicht verfügbar';const date=m?`${esc(m.source)} · ${esc(m.date)}`:'Quelle hat keinen Wert geliefert';const spark=key==='inflation'||key==='gdp'||key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit';return `<div class="metric${spark?' has-chart':''}"><div class="name">${label}</div><div class="value ${m?'':'na'}">${value}</div><div class="date">${date}</div>${spark?historyHTML(c.id,key):`<button class="btn" data-edit="${c.id}|${key}">Manuell eintragen</button>`}</div>`}).join('')}</div><div class="links"><a href="${c.links.inflation}" target="_blank" rel="noopener">Inflation ↗</a><a href="${c.links.rate}" target="_blank" rel="noopener">Leitzins ↗</a><a href="${c.links.bonds}" target="_blank" rel="noopener">Anleihen ↗</a><a href="${c.links.gdp}" target="_blank" rel="noopener">IMF-BIP ↗</a></div>`;
+function render(){const grid=document.querySelector('#grid');grid.innerHTML='';for(const c of countries){const card=document.createElement('section');card.className='country';card.innerHTML=`<div class="ctop"><div class="flag">${c.flag}</div><div><h2>${c.name}</h2><div class="code">${c.id}</div></div></div>${c.id==='USA'?`<div class="usa-face-h hidden" data-usa-face="7"></div>
+<div class="usa-flip-toggle"><div class="usa-page-select" id="usaPageSelect"><button type="button" data-page="0">Seite 1</button><button type="button" data-page="1">Seite 2</button><button type="button" data-page="2">Seite 3</button><button type="button" data-page="3">Seite 4</button><button type="button" data-page="4">Seite 5</button><button type="button" data-page="5">Seite 6</button><button type="button" data-page="6">Seite 7</button><button type="button" data-page="7">Repo-Markt</button><button type="button" data-page="7">Repo-Markt</button><button type="button" data-page="6">Seite 7</button></div></div>`:''}<div class="metrics">${defs.map(([key,label])=>{if((key==='reservesGdp'||key==='tips5'||key==='tips10')&&c.id!=='USA')return'';const m=valueFor(c.id,key);const value=m?fmt(m.value):'Nicht verfügbar';const date=m?`${esc(m.source)} · ${esc(m.date)}`:'Quelle hat keinen Wert geliefert';const spark=key==='inflation'||key==='gdp'||key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit';return `<div class="metric${spark?' has-chart':''}"><div class="name">${label}</div><div class="value ${m?'':'na'}">${value}</div><div class="date">${date}</div>${spark?historyHTML(c.id,key):`<button class="btn" data-edit="${c.id}|${key}">Manuell eintragen</button>`}</div>`}).join('')}</div><div class="links"><a href="${c.links.inflation}" target="_blank" rel="noopener">Inflation ↗</a><a href="${c.links.rate}" target="_blank" rel="noopener">Leitzins ↗</a><a href="${c.links.bonds}" target="_blank" rel="noopener">Anleihen ↗</a><a href="${c.links.gdp}" target="_blank" rel="noopener">IMF-BIP ↗</a></div>`;
 if(c.id==='USA'){
   const faceA=card.querySelector('.metrics');
   if(faceA){
@@ -522,12 +543,13 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
-  page=Math.max(0,Math.min(6,Number(page)||0));
+  page=Math.max(0,Math.min(7,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
   document.querySelectorAll('.country').forEach(card=>{
     if(!card.querySelector('.usa-face-a'))return;
-    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g'];
+    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h'];
     faces.forEach((sel,i)=>{
       const el=card.querySelector(sel);
       if(el)el.classList.toggle('hidden',page!==i);
@@ -542,6 +564,7 @@ function setUsaPage(page){
   if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);
   if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
   if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
+  if(page===7)setTimeout(()=>{try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}},50);
 }
 
 
@@ -591,6 +614,169 @@ function paintDxy(){
   if(meta)meta.textContent=(dx.source||'Yahoo DXY')+' · '+(ser.length)+' Tage'+(ser[0]?(' ab '+ser[0].period):'')+' · USD-Korb';
 }
 
+
+const REPO_PAGE_CATALOG=[
+  {key:'mmfTot',label:'MMF Total ($T)'},
+  {key:'mmfRepo',label:'MMF Repo ($T)'},
+  {key:'repoTriVol',label:'Repo TRI Vol ($B)'},
+  {key:'repoDvpVol',label:'Repo DVP Vol ($B)'},
+  {key:'repoVolSum',label:'Repo Vol Summe ($B)'},
+  {key:'repoTriRate',label:'Repo TRI Rate %'},
+  {key:'repoDvpRate',label:'Repo DVP Rate %'},
+  {key:'us3m',label:'US 3M'},{key:'us1y',label:'US 1Y'},{key:'us2y',label:'US 2Y'},
+  {key:'us5y',label:'US 5Y'},{key:'us10y',label:'US 10Y'},{key:'us30y',label:'US 30Y'},
+  {key:'dfii5',label:'TIPS 5Y'},{key:'dfii10',label:'TIPS 10Y'},
+  {key:'effr',label:'EFFR'},{key:'sofr',label:'SOFR'},{key:'iorb',label:'IORB'},
+  {key:'sofrIorb',label:'SOFR−IORB'},{key:'t10y2y',label:'10Y−2Y'},{key:'t10y5y',label:'10Y−5Y'},
+  {key:'move',label:'MOVE'},{key:'dxy',label:'DXY'},{key:'wresbal',label:'WRESBAL'},
+  {key:'effrVol',label:'EFFR Volume'},{key:'cuAu',label:'Copper/Gold'},
+  {key:'rate',label:'Policy Rate'},{key:'inflation',label:'Inflation'}
+];
+function repoCatOptions(){
+  return '<option value="">— keines —</option>'+REPO_PAGE_CATALOG.map(c=>'<option value="'+c.key+'">'+c.label+'</option>').join('');
+}
+function getRepoLS(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
+function setRepoLS(k,v,repaint){
+  try{localStorage.setItem(k,v||'')}catch(e){}
+  if(repaint){try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}}
+}
+function alignRepoDiff(a,b){
+  const mb=new Map((b||[]).map(p=>[String(p.period),Number(p.value)]));
+  const out=[];
+  for(const p of a||[]){
+    const bv=mb.get(String(p.period));
+    if(!Number.isFinite(Number(p.value))||!Number.isFinite(bv))continue;
+    out.push({period:String(p.period),value:Number(p.value)-bv});
+  }
+  return out;
+}
+function ensureRepoPage(){
+  const face=document.querySelector('.usa-face-h');
+  if(!face)return null;
+  if(document.getElementById('repoMmfPanel'))return face;
+  face.innerHTML=
+    '<div class="metric has-chart" id="repoMmfPanel" style="grid-column:1/-1">'+
+      '<div class="name">Repo-Markt · MMF Vermögen & Repo-Anteil</div>'+
+      '<div class="value" id="repoMmfValue">—</div>'+
+      '<div class="date" id="repoMmfDate">OFR · MMF Total (blau) · MMF Repo (türkis)</div>'+
+      '<div class="sofr-fwd-bp" style="gap:8px;flex-wrap:wrap;margin:6px 0">'+
+        '<label style="font-size:12px">Rot-Overlay <select id="repoMmfRed">'+repoCatOptions()+'</select></label>'+
+        '<label style="font-size:12px">Grün Diff A <select id="repoMmfGa">'+repoCatOptions()+'</select></label>'+
+        '<label style="font-size:12px">− B <select id="repoMmfGb">'+repoCatOptions()+'</select></label>'+
+      '</div>'+
+      '<div id="repoMmfChart"></div>'+
+      '<div class="sofr-fwd-meta" id="repoMmfMeta">OFR MMF-MMF_TOT-M / MMF-MMF_RP_TOT-M · $ Billionen</div>'+
+    '</div>'+
+    '<div class="metric has-chart" id="repoVolPanel" style="grid-column:1/-1">'+
+      '<div class="name">Repo-Markt · Volumen & Konditionen</div>'+
+      '<div class="value" id="repoVolValue">—</div>'+
+      '<div class="date" id="repoVolDate">OFR · TRI/DVP Overnight Volumen + Sätze · SOFR</div>'+
+      '<div class="sofr-fwd-bp" style="gap:8px;flex-wrap:wrap;margin:6px 0">'+
+        '<label style="font-size:12px">Rot-Overlay <select id="repoVolRed">'+repoCatOptions()+'</select></label>'+
+        '<label style="font-size:12px">Grün Diff A <select id="repoVolGa">'+repoCatOptions()+'</select></label>'+
+        '<label style="font-size:12px">− B <select id="repoVolGb">'+repoCatOptions()+'</select></label>'+
+      '</div>'+
+      '<div id="repoVolChart"></div>'+
+      '<div class="sofr-fwd-meta" id="repoVolMeta">OFR REPO-TRI/DVP · Volumen $B · Sätze %</div>'+
+    '</div>';
+  return face;
+}
+function bindRepoSelect(id, lsKey){
+  const el=document.getElementById(id);
+  if(!el||el.dataset.bound)return;
+  el.dataset.bound='1';
+  el.value=getRepoLS(lsKey);
+  el.addEventListener('change',()=>setRepoLS(lsKey,el.value,true));
+}
+function paintRepoPage(){
+  const face=ensureRepoPage();
+  if(!face)return;
+  ['repoMmfRed','repoMmfGa','repoMmfGb','repoVolRed','repoVolGa','repoVolGb'].forEach((id,i)=>{
+    const keys=['macrowatch-repo-mmf-red','macrowatch-repo-mmf-ga','macrowatch-repo-mmf-gb','macrowatch-repo-vol-red','macrowatch-repo-vol-ga','macrowatch-repo-vol-gb'];
+    bindRepoSelect(id, keys[i]);
+    const el=document.getElementById(id);
+    if(el)el.value=getRepoLS(keys[i]);
+  });
+
+  const mmfTot=histories['USA-mmfTot']||[];
+  const mmfRepo=histories['USA-mmfRepo']||[];
+  const info=(data.USA&&data.USA.repoMmf)||{};
+  const vEl=document.getElementById('repoMmfValue');
+  const dEl=document.getElementById('repoMmfDate');
+  const host=document.getElementById('repoMmfChart');
+  const meta=document.getElementById('repoMmfMeta');
+  if(vEl){
+    const t=mmfTot.at(-1), r=mmfRepo.at(-1);
+    vEl.textContent=(t?fmt(t.value)+'T':'—')+' · Repo '+(r?fmt(r.value)+'T':'—');
+  }
+  if(dEl)dEl.textContent='Stand '+(info.mmfTotLast&&info.mmfTotLast.period||'')+' · OFR monatlich';
+
+  const redKey=getRepoLS('macrowatch-repo-mmf-red');
+  let redPts=redKey?(histories['USA-'+redKey]||[]):[];
+  const ga=getRepoLS('macrowatch-repo-mmf-ga'), gb=getRepoLS('macrowatch-repo-mmf-gb');
+  let greenPts=[];
+  if(ga&&gb) greenPts=alignRepoDiff(histories['USA-'+ga]||[], histories['USA-'+gb]||[]);
+  window.__repoMmfMeta={redKey,ga,gb,greenPts,redPts,mmfTot,mmfRepo};
+
+  if(host){
+    if(typeof renderDiffOverlayChart==='function'&&(mmfTot.length||mmfRepo.length)){
+      // blue=mmfTot as "diff" axis, red=overlay or mmfRepo, green=diff
+      const base=mmfTot.length?mmfTot:mmfRepo;
+      const ov=redPts.length?redPts:mmfRepo;
+      host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoMmfDual|MMF Total / Repo" title="Vergrößern">'+
+        renderDiffOverlayChart(base,ov,{w:360,h:180,greenPts:greenPts})+'</div>';
+    }else if(typeof renderLineChart==='function'){
+      host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoMmfDual|MMF" title="Vergrößern">'+renderLineChart(mmfTot,{w:360,h:160})+'</div>';
+    }
+  }
+  if(meta){
+    const bits=['OFR MMF Total blau'];
+    if(redKey)bits.push('rot: '+(REPO_PAGE_CATALOG.find(c=>c.key===redKey)||{}).label||redKey);
+    else bits.push('türkis/rot: MMF Repo');
+    if(ga&&gb)bits.push('grün: Diff');
+    meta.textContent=bits.join(' · ')+' · $T';
+  }
+
+  // Volume / rates panel
+  const triVol=histories['USA-repoTriVol']||[];
+  const triRate=histories['USA-repoTriRate']||[];
+  const sofr=histories['USA-sofr']||[];
+  const vv=document.getElementById('repoVolValue');
+  const vd=document.getElementById('repoVolDate');
+  const vhost=document.getElementById('repoVolChart');
+  const vmeta=document.getElementById('repoVolMeta');
+  if(vv){
+    const tv=triVol.at(-1), tr=triRate.at(-1);
+    vv.textContent=(tv?fmt(tv.value)+'B':'—')+' · '+(tr?fmt(tr.value)+'%':'—');
+  }
+  if(vd)vd.textContent='TRI Overnight · Stand '+(triVol.at(-1)||{}).period;
+
+  const vRed=getRepoLS('macrowatch-repo-vol-red');
+  let vRedPts=vRed?(histories['USA-'+vRed]||[]):[];
+  const vga=getRepoLS('macrowatch-repo-vol-ga'), vgb=getRepoLS('macrowatch-repo-vol-gb');
+  let vGreen=[];
+  if(vga&&vgb) vGreen=alignRepoDiff(histories['USA-'+vga]||[], histories['USA-'+vgb]||[]);
+  // default dual: volume blue, tri rate as red if no overlay
+  const baseVol=triVol.length?triVol:(histories['USA-repoVolSum']||[]);
+  const rateLine=vRedPts.length?vRedPts:(triRate.length?triRate:sofr);
+  window.__repoVolMeta={redKey:vRed,ga:vga,gb:vgb,greenPts:vGreen,baseVol,rateLine};
+
+  if(vhost){
+    if(typeof renderDiffOverlayChart==='function'&&baseVol.length){
+      vhost.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoVolDual|Repo Vol / Rate" title="Vergrößern">'+
+        renderDiffOverlayChart(baseVol,rateLine,{w:360,h:180,greenPts:vGreen})+'</div>';
+    }else if(typeof renderLineChart==='function'){
+      vhost.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoVolDual|Repo" title="Vergrößern">'+renderLineChart(baseVol,{w:360,h:160})+'</div>';
+    }
+  }
+  if(vmeta){
+    const bits=['TRI Vol $B blau'];
+    bits.push(vRed?('rot: '+((REPO_PAGE_CATALOG.find(c=>c.key===vRed)||{}).label||vRed)):'rot: TRI Rate %');
+    if(vga&&vgb)bits.push('grün: Diff');
+    vmeta.textContent=bits.join(' · ')+' · OFR täglich';
+  }
+}
+
 function bindUsaPages(){
   if(!window.__usaPageClickBound){
     window.__usaPageClickBound=true;
@@ -607,7 +793,7 @@ function bindUsaPages(){
   }
   let start=0;
   try{start=Number(localStorage.getItem('macrowatch-usa-page')||'0')}catch(e){start=0}
-  if(!Number.isFinite(start)||start<0||start>6)start=0;
+  if(!Number.isFinite(start)||start<0||start>7)start=0;
   setUsaPage(start);
 }
 if(!window.__usaRenderPatched){
@@ -800,7 +986,6 @@ function paintRateDiff(){
   if(hint)hint.textContent='Berechnet: '+name;
 }
 document.addEventListener('change',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('rate-diff-cb'))paintRateDiff()});
-
 
 
 
@@ -1074,8 +1259,6 @@ function paintSofRTenor(){
 
 
 
-
-
 function paintSofRFwd(){
   const host=document.getElementById('sofrFwdChart');
   const valEl=document.getElementById('sofrFwdValue');
@@ -1169,6 +1352,8 @@ function paintSofRFwd(){
   try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}
 }
 bindUsaPages();
+
+
 
 
 
@@ -1560,6 +1745,7 @@ function paintYieldPage7(){
   }
   paintYield7Diff();
 }
+
 
 
 
