@@ -1,31 +1,27 @@
 import fs from 'fs';
 
-/** USA Seite 8 / face-h: Repo-Markt — MMF + Repo OFR charts */
+/** USA Seite 8 / face-h: Repo-Markt — DO NOT wipe USA page-select template */
 let html = fs.readFileSync('index.html', 'utf8');
 
-// Remove broken template face-h injection (empty div before flip-toggle)
+// NEVER replace the USA ternary with empty string.
+// Only remove a standalone empty face-h div if present, keep flip-toggle.
 html = html.replace(
-  /\$\{c\.id==='USA'\?`<div class="usa-face-h[^`]*>`\s*:\s*''\}/g,
-  "${c.id==='USA'?``:''}"
-);
-// cleaner: remove standalone face-h from USA ternary if glued to flip-toggle
-html = html.replace(
-  /<div class="usa-face-h hidden" data-usa-face="7"><\/div>\s*/g,
+  /<div class="usa-face-h hidden" data-usa-face="7"><\/div>\s*(?=<div class="usa-flip-toggle")/g,
   ''
 );
 
-// Deduplicate Repo-Markt / Seite 7 buttons in template
+// Deduplicate Repo-Markt buttons only
 html = html.replace(
   /(<button type="button" data-page="7">Repo-Markt<\/button>)(\s*<button type="button" data-page="7">Repo-Markt<\/button>)+/g,
   '$1'
 );
 html = html.replace(
-  /(<button type="button" data-page="6">Seite 7<\/button>)(\s*<button type="button" data-page="6">Seite 7<\/button>)+/g,
+  /(<button type=\"button\" data-page=\"7\">Repo-Markt<\/button>)(\s*<button type=\"button\" data-page=\"7\">Repo-Markt<\/button>)+/g,
   '$1'
 );
 
-// Ensure one Repo-Markt button exists
-if (!html.includes('data-page="7"') && !html.includes("data-page=\"7\"")) {
+// Ensure Repo-Markt button exists inside usaPageSelect
+if (html.includes('usaPageSelect') && !html.includes('>Repo-Markt</button>') && !html.includes('>Repo-Markt<\\/button>')) {
   html = html.replace(
     /(data-page="6"[^>]*>)([^<]*)(<\/button>)/,
     '$1$2$3<button type="button" data-page="7">Repo-Markt</button>'
@@ -99,8 +95,16 @@ function bindRepoToggle(id, lsKey){
 function ensureRepoPage(){
   const card=document.querySelector('.country .usa-face-a')
     ? document.querySelector('.country .usa-face-a').closest('.country')
-    : document.querySelector('.country');
-  if(!card)return null;
+    : null;
+  if(!card){
+    const cards=[...document.querySelectorAll('.country')];
+    const usa=cards.find(c=>c.querySelector('.code')&&c.querySelector('.code').textContent==='USA');
+    if(!usa)return null;
+    return ensureRepoPageInCard(usa);
+  }
+  return ensureRepoPageInCard(card);
+}
+function ensureRepoPageInCard(card){
   let face=card.querySelector('.usa-face-h');
   if(!face){
     face=document.createElement('div');
@@ -116,12 +120,11 @@ function ensureRepoPage(){
   }else{
     face.classList.add('metrics','usa-face','usa-face-h');
   }
-  // Always rebuild panel markup so legend/toggles stay present
   face.innerHTML=
     '<div class="metric has-chart" id="repoMmfPanel" style="grid-column:1/-1">'+
-      '<div class="name">Repo-Markt · MMF Vermögen & Repo-Anteil</div>'+
+      '<div class="namediv class="name">Repo-Markt · MMF Vermögen & Repo-Anteil</div>'+
       '<div class="value" id="repoMmfValue">—</div>'+
-      '<div class="date" id="repoMmfDate">OFR · siehe Farben unten · Linien abwählbar</div>'+
+      '<div class="date" id="repoMmfDate">OFR · Farben · Linien abwählbar</div>'+
       '<div id="repoMmfLegend"></div>'+
       '<div class="sofr-fwd-bp" style="gap:8px;flex-wrap:wrap;margin:6px 0">'+
         '<label style="font-size:12px">Rot-Overlay <select id="repoMmfRed">'+repoCatOptions()+'</select></label>'+
@@ -129,12 +132,12 @@ function ensureRepoPage(){
         '<label style="font-size:12px">− B <select id="repoMmfGb">'+repoCatOptions()+'</select></label>'+
       '</div>'+
       '<div id="repoMmfChart"></div>'+
-      '<div class="sofr-fwd-meta" id="repoMmfMeta">Blau = MMF Total · Zweitlinie = MMF Repo (oder Overlay)</div>'+
+      '<div class="sofr-fwd-meta" id="repoMmfMeta">Blau = MMF Total · Rot = MMF Repo / Overlay</div>'+
     '</div>'+
     '<div class="metric has-chart" id="repoVolPanel" style="grid-column:1/-1">'+
       '<div class="name">Repo-Markt · Volumen & Konditionen</div>'+
       '<div class="value" id="repoVolValue">—</div>'+
-      '<div class="date" id="repoVolDate">OFR · siehe Farben unten · Linien abwählbar</div>'+
+      '<div class="date" id="repoVolDate">OFR · Farben · Linien abwählbar</div>'+
       '<div id="repoVolLegend"></div>'+
       '<div class="sofr-fwd-bp" style="gap:8px;flex-wrap:wrap;margin:6px 0">'+
         '<label style="font-size:12px">Rot-Overlay <select id="repoVolRed">'+repoCatOptions()+'</select></label>'+
@@ -142,7 +145,7 @@ function ensureRepoPage(){
         '<label style="font-size:12px">− B <select id="repoVolGb">'+repoCatOptions()+'</select></label>'+
       '</div>'+
       '<div id="repoVolChart"></div>'+
-      '<div class="sofr-fwd-meta" id="repoVolMeta">Blau = TRI Volumen $B · Zweitlinie = TRI Satz %</div>'+
+      '<div class="sofr-fwd-meta" id="repoVolMeta">Blau = TRI Volumen · Rot = TRI Satz / Overlay</div>'+
     '</div>';
   return face;
 }
@@ -180,21 +183,18 @@ function paintRepoPage(){
   const showBlue=getRepoToggle('macrowatch-repo-mmf-blue', true);
   const showSec=getRepoToggle('macrowatch-repo-mmf-sec', true);
   const showGreen=getRepoToggle('macrowatch-repo-mmf-green', true);
-
   const redKey=getRepoLS('macrowatch-repo-mmf-red');
   let redPts=redKey?(histories['USA-'+redKey]||[]):[];
   const ga=getRepoLS('macrowatch-repo-mmf-ga'), gb=getRepoLS('macrowatch-repo-mmf-gb');
   let greenPts=[];
   if(ga&&gb) greenPts=alignRepoDiff(histories['USA-'+ga]||[], histories['USA-'+gb]||[]);
-
   const secLabel=redKey?(((REPO_PAGE_CATALOG.find(c=>c.key===redKey)||{}).label)||redKey):'MMF Repo ($T)';
   const secPts=redKey?redPts:mmfRepo;
-  const secColor=redKey?'#ef4444':'#ef4444';
 
   if(legEl){
     const items=[
       {color:'#3b82f6',label:'BLAU = MMF Total Assets ($ Billionen)',toggleId:'repoMmfBlueTog',on:showBlue},
-      {color:secColor,label:'ROT = '+secLabel,toggleId:'repoMmfSecTog',on:showSec}
+      {color:'#ef4444',label:'ROT = '+secLabel,toggleId:'repoMmfSecTog',on:showSec}
     ];
     if(ga&&gb){
       const la=((REPO_PAGE_CATALOG.find(c=>c.key===ga)||{}).label)||ga;
@@ -211,19 +211,16 @@ function paintRepoPage(){
   let ov=showSec?secPts.slice():[];
   let gr=showGreen?greenPts.slice():[];
   if(!base.length&&ov.length){base=ov;ov=[];}
-  window.__repoMmfMeta={redKey,ga,gb,greenPts:gr,redPts:ov,mmfTot:base,mmfRepo:ov,showBlue,showSec,showGreen};
+  window.__repoMmfMeta={redKey,ga,gb,greenPts:gr,redPts:ov,mmfTot:base,mmfRepo:ov};
 
   if(host){
     if(typeof renderDiffOverlayChart==='function'&&base.length){
-      host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoMmfDual|MMF Total / Repo" title="Vergrößern">'+
-        renderDiffOverlayChart(base,ov,{w:360,h:180,greenPts:gr})+'</div>';
+      host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoMmfDual|MMF Total / Repo" title="Vergrößern">'+renderDiffOverlayChart(base,ov,{w:360,h:180,greenPts:gr})+'</div>';
     }else if(typeof renderLineChart==='function'&&base.length){
       host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoMmfDual|MMF" title="Vergrößern">'+renderLineChart(base,{w:360,h:160})+'</div>';
-    }else{
-      host.innerHTML='<div class="sparkempty">Keine Linie aktiv — Kästchen in der Legende setzen</div>';
-    }
+    }else host.innerHTML='<div class="sparkempty">Keine Linie aktiv</div>';
   }
-  if(meta)meta.textContent='BLAU=MMF Total · ROT='+secLabel+(ga&&gb?' · GRÜN=Diff':'')+' · Kästchen = Linie an/aus';
+  if(meta)meta.textContent='BLAU=MMF Total · ROT='+secLabel+(ga&&gb?' · GRÜN=Diff':'');
 
   const triVol=histories['USA-repoTriVol']||[];
   const triRate=histories['USA-repoTriRate']||[];
@@ -242,13 +239,11 @@ function paintRepoPage(){
   const vShowBlue=getRepoToggle('macrowatch-repo-vol-blue', true);
   const vShowSec=getRepoToggle('macrowatch-repo-vol-sec', true);
   const vShowGreen=getRepoToggle('macrowatch-repo-vol-green', true);
-
   const vRed=getRepoLS('macrowatch-repo-vol-red');
   let vRedPts=vRed?(histories['USA-'+vRed]||[]):[];
   const vga=getRepoLS('macrowatch-repo-vol-ga'), vgb=getRepoLS('macrowatch-repo-vol-gb');
   let vGreen=[];
   if(vga&&vgb) vGreen=alignRepoDiff(histories['USA-'+vga]||[], histories['USA-'+vgb]||[]);
-
   const vSecLabel=vRed?(((REPO_PAGE_CATALOG.find(c=>c.key===vRed)||{}).label)||vRed):'TRI Overnight-Satz (%)';
   const vSecPts=vRed?vRedPts:(triRate.length?triRate:sofr);
 
@@ -276,19 +271,15 @@ function paintRepoPage(){
 
   if(vhost){
     if(typeof renderDiffOverlayChart==='function'&&baseVol.length){
-      vhost.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoVolDual|Repo Vol / Rate" title="Vergrößern">'+
-        renderDiffOverlayChart(baseVol,rateLine,{w:360,h:180,greenPts:vGr})+'</div>';
+      vhost.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoVolDual|Repo Vol / Rate" title="Vergrößern">'+renderDiffOverlayChart(baseVol,rateLine,{w:360,h:180,greenPts:vGr})+'</div>';
     }else if(typeof renderLineChart==='function'&&baseVol.length){
       vhost.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoVolDual|Repo" title="Vergrößern">'+renderLineChart(baseVol,{w:360,h:160})+'</div>';
-    }else{
-      vhost.innerHTML='<div class="sparkempty">Keine Linie aktiv — Kästchen in der Legende setzen</div>';
-    }
+    }else vhost.innerHTML='<div class="sparkempty">Keine Linie aktiv</div>';
   }
-  if(vmeta)vmeta.textContent='BLAU=TRI Volumen · ROT='+vSecLabel+(vga&&vgb?' · GRÜN=Diff':'')+' · Kästchen = Linie an/aus';
+  if(vmeta)vmeta.textContent='BLAU=TRI Volumen · ROT='+vSecLabel+(vga&&vgb?' · GRÜN=Diff':'');
 }
 `;
 
-// Replace existing block
 if (html.includes('function paintRepoPage')) {
   const markers = ['const REPO_PAGE_CATALOG', 'function paintRepoPage', 'function ensureRepoPage', 'function getRepoLS', 'function getRepoToggle'];
   let start = -1;
@@ -313,10 +304,9 @@ if (html.includes('function paintRepoPage')) {
   }
 } else if (html.includes('function bindUsaPages')) {
   html = html.replace('function bindUsaPages', block + '\nfunction bindUsaPages');
-  console.log('paintRepoPage injected');
 }
 
-// setUsaPage page 7
+// Ensure setUsaPage knows page 7
 html = html.replace(/page=Math\.max\(0,Math\.min\(6,Number\(page\)\|\|0\)\)/g, 'page=Math.max(0,Math.min(7,Number(page)||0))');
 if (!html.includes(".usa-face-h'")) {
   html = html.replace(
@@ -331,7 +321,6 @@ if (!html.includes('page===7')) {
   );
 }
 
-// enlarge handlers
 if (!html.includes("key==='repoMmfDual'")) {
   const marker = "if(key==='sofrTenorHist')";
   const idx = html.indexOf(marker);
@@ -350,17 +339,21 @@ if (!html.includes("key==='repoMmfDual'")) {
       "    if(!base.length){body.innerHTML='<div class=\"sparkempty\">Keine Daten</div>';if(meta)meta.textContent='';return;}\n" +
       "    if(typeof renderDiffOverlayChart==='function'){\n" +
       "      body.innerHTML=renderDiffOverlayChart(base,ov,{w:720,h:320,big:true,greenPts:gr})+'<div class=\"chart-tip-inline\" id=\"chartDlgTip\"></div>';\n" +
-      "    } else {\n" +
-      "      body.innerHTML=renderLineChart(base,{w:720,h:300,big:true})+'<div class=\"chart-tip-inline\" id=\"chartDlgTip\"></div>';\n" +
-      "    }\n" +
+      "    } else body.innerHTML=renderLineChart(base,{w:720,h:300,big:true})+'<div class=\"chart-tip-inline\" id=\"chartDlgTip\"></div>';\n" +
       "    if(typeof bindBigChartHover==='function')bindBigChartHover(body);\n" +
-      "    if(meta)meta.textContent=(key==='repoMmfDual'?'MMF Total/Repo':'Repo Vol/Rate')+' · '+rLabel+' · '+base.length+' Punkte';\n" +
+      "    if(meta)meta.textContent=(key==='repoMmfDual'?'MMF':'Repo')+' · '+rLabel;\n" +
       "    return;\n" +
       "  }\n  ";
     html = html.slice(0, idx) + inject + html.slice(idx);
-    console.log('repo enlarge');
   }
 }
 
+// Safety: if USA template still empty, restore toggle
+if (html.includes("${c.id==='USA'?``:''}")) {
+  const good = "${c.id==='USA'?`<div class=\"usa-flip-toggle\"><div class=\"usa-page-select\" id=\"usaPageSelect\"><button type=\"button\" data-page=\"0\">Seite 1</button><button type=\"button\" data-page=\"1\">Seite 2</button><button type=\"button\" data-page=\"2\">Seite 3</button><button type=\"button\" data-page=\"3\">Seite 4</button><button type=\"button\" data-page=\"4\">Seite 5</button><button type=\"button\" data-page=\"5\">Seite 6</button><button type=\"button\" data-page=\"6\">Seite 7</button><button type=\"button\" data-page=\"7\">Repo-Markt</button></div></div>`:''}";
+  html = html.replace("${c.id==='USA'?``:''}", good);
+  console.log('restored USA page-select template');
+}
+
 fs.writeFileSync('index.html', html);
-console.log('done', html.includes('Farben · Linie ein/aus'), html.includes('BLAU = MMF Total'), html.includes('paintRepoPage'));
+console.log('done', html.includes('paintRepoPage'), html.includes('usaPageSelect'), html.includes("${c.id==='USA'?``:''}")===false);
