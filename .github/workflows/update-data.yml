@@ -90,6 +90,8 @@ jobs:
         run: node scripts/inject-dxy.mjs
       - name: Re-apply SOFR tenor panel
         run: node scripts/inject-sofr-tenor.mjs || true
+      - name: Fix SOFR dual enlarge (keep red overlay)
+        run: node scripts/inject-sofr-enlarge-fix.mjs || true
       - name: Check updater syntax
         run: |
           node --check scripts/inject-page7-yields.mjs
@@ -135,7 +137,7 @@ jobs:
       - name: EFFR + SOFR + IORB daily (USA page 3)
         run: node scripts/fetch-effr-sofr-iorb.mjs
       - name: SOFR forward curve (SR1 + NY Fed, Seite 4)
-        run: node scripts/fetch-sofr-futures.mjs || true
+        run: node scripts/fetch-sofr-futures.mjs
       - name: US Treasury + TIPS curve (Seite 4)
         run: node scripts/fetch-ust-curve.mjs
       - name: FHLBank Advances (Office of Finance PDFs)
@@ -176,9 +178,11 @@ jobs:
           node scripts/inject-rate-overlay.mjs || true
           node scripts/inject-dxy.mjs || true
           node scripts/inject-sofr-tenor.mjs || true
+          node scripts/inject-sofr-enlarge-fix.mjs || true
           node scripts/fix-js-syntax.mjs || true
           node scripts/fix-paint-chart-dlg.mjs || true
           node scripts/inject-sofr-tenor.mjs || true
+          node scripts/inject-sofr-enlarge-fix.mjs || true
           git add data.json scripts/ index.html || true
           if git diff --cached --quiet; then
             echo "No data changes to commit"
@@ -188,6 +192,7 @@ jobs:
             node scripts/fix-js-syntax.mjs || true
             node scripts/fix-paint-chart-dlg.mjs || true
             node scripts/inject-sofr-tenor.mjs || true
+            node scripts/inject-sofr-enlarge-fix.mjs || true
             git add data.json scripts/ index.html || true
             git commit -m "Merge data update" || true
             git push origin HEAD:main || git push --force-with-lease origin HEAD:main
