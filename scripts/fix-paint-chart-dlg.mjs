@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** paintChartDlg hardened: dual charts + yield7 green + sofr tenor dual overlay */
+/** paintChartDlg hardened: dual charts + SOFR dual re-resolve on enlarge */
 let html = fs.readFileSync('index.html', 'utf8');
 
 const start = html.indexOf('function paintChartDlg');
@@ -182,21 +182,32 @@ const fn = `function paintChartDlg(){
 
   if(key==='sofrTenorHist'){
     const tm=window.__sofrTenorMeta||{};
-    let pts=(tm.pts&&tm.pts.length)?tm.pts.slice():(histories['USA-sofrTenor-'+(tm.id||'')]||[]);
+    const id=(typeof getSofRTenorId==='function'&&getSofRTenorId())||tm.id||'';
+    const ovKey=(typeof getSofRTenorOverlay==='function'&&getSofRTenorOverlay())||tm.ovKey||'';
+    let pts=[];
+    if(id) pts=(histories['USA-sofrTenor-'+id]||[]).slice();
+    if((!pts||!pts.length)&&tm.pts&&tm.pts.length) pts=tm.pts.slice();
     if(typeof filterByRange==='function'){const p2=filterByRange(pts,range); if(p2.length) pts=p2;}
-    let ov=[];
-    if(tm.ovPts&&tm.ovPts.length){ov=tm.ovPts.slice();}
-    else if(tm.ovKey&&typeof resolveSofRSeries==='function'){ov=(resolveSofRSeries(tm.ovKey).pts||[]).slice();}
-    else if(tm.ovKey){ov=histories['USA-'+tm.ovKey]||[];}
+    let ov=[]; let ovLabel=tm.ovLabel||'';
+    if(ovKey&&typeof resolveSofRSeries==='function'){
+      const r=resolveSofRSeries(ovKey);
+      ov=(r.pts||[]).slice();
+      ovLabel=r.label||ovLabel;
+    } else if(tm.ovPts&&tm.ovPts.length){
+      ov=tm.ovPts.slice();
+    } else if(ovKey){
+      ov=(histories['USA-'+ovKey]||[]).slice();
+    }
     if(typeof filterByRange==='function'&&ov.length){const o2=filterByRange(ov,range); if(o2.length) ov=o2;}
     if(!pts.length){body.innerHTML='<div class="sparkempty">Keine Daten</div>';if(meta)meta.textContent='';return;}
-    if(typeof renderDiffOverlayChart==='function'&&ov.length>=2){
+    if(typeof renderDiffOverlayChart==='function'&&ov.length>=1){
       body.innerHTML=renderDiffOverlayChart(pts,ov,{w:720,h:320,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
-    }else{
+    } else {
       body.innerHTML=renderLineChart(pts,{w:720,h:300,big:true})+'<div class="chart-tip-inline" id="chartDlgTip"></div>';
     }
     if(typeof bindBigChartHover==='function')bindBigChartHover(body);
-    if(meta)meta.textContent=(tm.label||'SOFR')+(tm.ovLabel?(' · rot: '+tm.ovLabel):'')+' · '+rLabel+' · '+pts.length+(ov.length?('/'+ov.length):'')+' Punkte';
+    const lab=tm.label||id||'SOFR';
+    if(meta)meta.textContent=lab+(ovLabel?(' · rot: '+ovLabel):'')+' · '+rLabel+' · '+pts.length+(ov.length?('/'+ov.length):'')+' Punkte';
     return;
   }
 
@@ -247,17 +258,7 @@ const fn = `function paintChartDlg(){
 html = html.slice(0, start) + fn + html.slice(end);
 fs.writeFileSync('index.html', html);
 
-const s2 = html.indexOf('function paintChartDlg');
-const e2 = html.indexOf('function bindBigChartHover');
-const region = html.slice(s2, e2);
-const ok = region.includes('sofrTenorHist') && region.includes('tm.ovPts') && region.includes('resolveSofRSeries');
+const region = html.slice(html.indexOf('function paintChartDlg'), html.indexOf('function bindBigChartHover'));
+const ok = region.includes('getSofRTenorOverlay') && region.includes('resolveSofRSeries');
 console.log('paintChartDlg ok', ok);
 if (!ok) process.exit(1);
-
-try {
-  const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-  new Function(scripts.join('\n'));
-  console.log('js ok');
-} catch (e) {
-  console.warn('js warn', e.message);
-}
