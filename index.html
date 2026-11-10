@@ -522,6 +522,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(6,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -805,7 +806,6 @@ document.addEventListener('change',e=>{if(e.target&&e.target.classList&&e.target
 
 
 
-
 const SOFR_USA_CHART_CATALOG=[
   {key:'us3m',label:'US 3M',hist:'USA-us3m'},
   {key:'us1y',label:'US 1Y',hist:'USA-us1y'},
@@ -1074,8 +1074,6 @@ function paintSofRTenor(){
 
 
 
-
-
 function paintSofRFwd(){
   const host=document.getElementById('sofrFwdChart');
   const valEl=document.getElementById('sofrFwdValue');
@@ -1169,6 +1167,8 @@ function paintSofRFwd(){
   try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}
 }
 bindUsaPages();
+
+
 
 
 
@@ -1560,6 +1560,7 @@ function paintYieldPage7(){
   }
   paintYield7Diff();
 }
+
 
 
 
