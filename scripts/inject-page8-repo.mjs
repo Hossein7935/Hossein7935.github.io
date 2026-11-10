@@ -5,14 +5,12 @@ let html = fs.readFileSync('index.html', 'utf8');
 
 // Ensure face-h shell exists inside USA card
 if (!html.includes('usa-face-h')) {
-  // after face-g closing
   if (html.includes('usa-face-g')) {
     html = html.replace(
       /(<div class="usa-face-g[\s\S]*?<\/div>\s*)(<\/div>\s*<div class="usa-flip-toggle|<\/div>\s*<\/article|<\/div>\s*<\/div>)/,
       '$1<div class="usa-face-h hidden" data-usa-face="7"></div>$2'
     );
     if (!html.includes('usa-face-h')) {
-      // simpler: append before usa-flip-toggle if present
       html = html.replace(
         '<div class="usa-flip-toggle"',
         '<div class="usa-face-h hidden" data-usa-face="7"></div>\n<div class="usa-flip-toggle"'
@@ -61,6 +59,17 @@ function setRepoLS(k,v,repaint){
   try{localStorage.setItem(k,v||'')}catch(e){}
   if(repaint){try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}}
 }
+function getRepoToggle(k, def){
+  try{
+    const v=localStorage.getItem(k);
+    if(v===null||v===undefined||v==='')return !!def;
+    return v==='1'||v==='true';
+  }catch(e){return !!def}
+}
+function setRepoToggle(k,on){
+  try{localStorage.setItem(k,on?'1':'0')}catch(e){}
+  try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}
+}
 function alignRepoDiff(a,b){
   const mb=new Map((b||[]).map(p=>[String(p.period),Number(p.value)]));
   const out=[];
@@ -71,6 +80,26 @@ function alignRepoDiff(a,b){
   }
   return out;
 }
+function repoLegendHtml(items){
+  // items: [{color,label,toggleId,on}]
+  return '<div class="repo-legend" style="display:flex;flex-wrap:wrap;gap:10px 14px;margin:6px 0 4px;font-size:12px;align-items:center">'+
+    items.map(it=>{
+      const sw='<span style="display:inline-block;width:14px;height:3px;background:'+it.color+';vertical-align:middle;margin-right:5px;border-radius:1px"></span>';
+      if(it.toggleId){
+        return '<label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer">'+
+          '<input type="checkbox" id="'+it.toggleId+'" '+(it.on?'checked':'')+' style="margin:0">'+
+          sw+'<span>'+it.label+'</span></label>';
+      }
+      return '<span>'+sw+it.label+'</span>';
+    }).join('')+
+  '</div>';
+}
+function bindRepoToggle(id, lsKey){
+  const el=document.getElementById(id);
+  if(!el||el.dataset.bound)return;
+  el.dataset.bound='1';
+  el.addEventListener('change',()=>setRepoToggle(lsKey, !!el.checked));
+}
 function ensureRepoPage(){
   const face=document.querySelector('.usa-face-h');
   if(!face)return null;
@@ -79,7 +108,8 @@ function ensureRepoPage(){
     '<div class="metric has-chart" id="repoMmfPanel" style="grid-column:1/-1">'+
       '<div class="name">Repo-Markt · MMF Vermögen & Repo-Anteil</div>'+
       '<div class="value" id="repoMmfValue">—</div>'+
-      '<div class="date" id="repoMmfDate">OFR · MMF Total (blau) · MMF Repo (türkis)</div>'+
+      '<div class="date" id="repoMmfDate">OFR · Farben siehe Legende · Linien abwählbar</div>'+
+      '<div id="repoMmfLegend"></div>'+
       '<div class="sofr-fwd-bp" style="gap:8px;flex-wrap:wrap;margin:6px 0">'+
         '<label style="font-size:12px">Rot-Overlay <select id="repoMmfRed">'+repoCatOptions()+'</select></label>'+
         '<label style="font-size:12px">Grün Diff A <select id="repoMmfGa">'+repoCatOptions()+'</select></label>'+
@@ -91,7 +121,8 @@ function ensureRepoPage(){
     '<div class="metric has-chart" id="repoVolPanel" style="grid-column:1/-1">'+
       '<div class="name">Repo-Markt · Volumen & Konditionen</div>'+
       '<div class="value" id="repoVolValue">—</div>'+
-      '<div class="date" id="repoVolDate">OFR · TRI/DVP Overnight Volumen + Sätze · SOFR</div>'+
+      '<div class="date" id="repoVolDate">OFR · Farben siehe Legende · Linien abwählbar</div>'+
+      '<div id="repoVolLegend"></div>'+
       '<div class="sofr-fwd-bp" style="gap:8px;flex-wrap:wrap;margin:6px 0">'+
         '<label style="font-size:12px">Rot-Overlay <select id="repoVolRed">'+repoCatOptions()+'</select></label>'+
         '<label style="font-size:12px">Grün Diff A <select id="repoVolGa">'+repoCatOptions()+'</select></label>'+
@@ -126,36 +157,59 @@ function paintRepoPage(){
   const dEl=document.getElementById('repoMmfDate');
   const host=document.getElementById('repoMmfChart');
   const meta=document.getElementById('repoMmfMeta');
+  const legEl=document.getElementById('repoMmfLegend');
   if(vEl){
     const t=mmfTot.at(-1), r=mmfRepo.at(-1);
     vEl.textContent=(t?fmt(t.value)+'T':'—')+' · Repo '+(r?fmt(r.value)+'T':'—');
   }
   if(dEl)dEl.textContent='Stand '+(info.mmfTotLast&&info.mmfTotLast.period||'')+' · OFR monatlich';
 
+  const showBlue=getRepoToggle('macrowatch-repo-mmf-blue', true);
+  const showSec=getRepoToggle('macrowatch-repo-mmf-sec', true);
+  const showRed=getRepoToggle('macrowatch-repo-mmf-redline', true);
+  const showGreen=getRepoToggle('macrowatch-repo-mmf-green', true);
+
   const redKey=getRepoLS('macrowatch-repo-mmf-red');
   let redPts=redKey?(histories['USA-'+redKey]||[]):[];
   const ga=getRepoLS('macrowatch-repo-mmf-ga'), gb=getRepoLS('macrowatch-repo-mmf-gb');
   let greenPts=[];
   if(ga&&gb) greenPts=alignRepoDiff(histories['USA-'+ga]||[], histories['USA-'+gb]||[]);
-  window.__repoMmfMeta={redKey,ga,gb,greenPts,redPts,mmfTot,mmfRepo};
+
+  // Secondary default = MMF Repo (unless user picked red overlay as secondary)
+  const secLabel=redKey?((REPO_PAGE_CATALOG.find(c=>c.key===redKey)||{}).label||redKey):'MMF Repo ($T)';
+  const secPts=redKey?redPts:mmfRepo;
+
+  if(legEl){
+    legEl.innerHTML=repoLegendHtml([
+      {color:'#3b82f6',label:'Blau · MMF Total ($T)',toggleId:'repoMmfBlueTog',on:showBlue},
+      {color:redKey?'#ef4444':'#14b8a6',label:(redKey?'Rot · ':'Türkis · ')+secLabel,toggleId:'repoMmfSecTog',on:showSec},
+      ...(redKey&&showSec?[]:[]),
+      ...(ga&&gb?[{color:'#22c55e',label:'Grün · Diff '+(REPO_PAGE_CATALOG.find(c=>c.key===ga)||{}).label+' − '+(REPO_PAGE_CATALOG.find(c=>c.key===gb)||{}).label,toggleId:'repoMmfGreenTog',on:showGreen}]:[])
+    ]);
+    bindRepoToggle('repoMmfBlueTog','macrowatch-repo-mmf-blue');
+    bindRepoToggle('repoMmfSecTog','macrowatch-repo-mmf-sec');
+    bindRepoToggle('repoMmfGreenTog','macrowatch-repo-mmf-green');
+  }
+
+  let base=showBlue?mmfTot:[];
+  let ov=showSec?secPts:[];
+  let gr=showGreen?greenPts:[];
+  // if blue off but sec on, use sec as base so chart still renders
+  if(!base.length&&ov.length){base=ov;ov=[];}
+  window.__repoMmfMeta={redKey,ga,gb,greenPts:gr,redPts:ov,mmfTot:base,mmfRepo:ov,showBlue,showSec,showGreen};
 
   if(host){
-    if(typeof renderDiffOverlayChart==='function'&&(mmfTot.length||mmfRepo.length)){
-      // blue=mmfTot as "diff" axis, red=overlay or mmfRepo, green=diff
-      const base=mmfTot.length?mmfTot:mmfRepo;
-      const ov=redPts.length?redPts:mmfRepo;
+    if(typeof renderDiffOverlayChart==='function'&&base.length){
       host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoMmfDual|MMF Total / Repo" title="Vergrößern">'+
-        renderDiffOverlayChart(base,ov,{w:360,h:180,greenPts:greenPts})+'</div>';
-    }else if(typeof renderLineChart==='function'){
-      host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoMmfDual|MMF" title="Vergrößern">'+renderLineChart(mmfTot,{w:360,h:160})+'</div>';
+        renderDiffOverlayChart(base,ov,{w:360,h:180,greenPts:gr})+'</div>';
+    }else if(typeof renderLineChart==='function'&&base.length){
+      host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoMmfDual|MMF" title="Vergrößern">'+renderLineChart(base,{w:360,h:160})+'</div>';
+    }else{
+      host.innerHTML='<div class="sparkempty">Keine Linie aktiv</div>';
     }
   }
   if(meta){
-    const bits=['OFR MMF Total blau'];
-    if(redKey)bits.push('rot: '+(REPO_PAGE_CATALOG.find(c=>c.key===redKey)||{}).label||redKey);
-    else bits.push('türkis/rot: MMF Repo');
-    if(ga&&gb)bits.push('grün: Diff');
-    meta.textContent=bits.join(' · ')+' · $T';
+    meta.textContent='Legende + Kästchen: Linien ein/aus · OFR $T · Rot-Overlay ersetzt Zweitlinie';
   }
 
   // Volume / rates panel
@@ -166,46 +220,86 @@ function paintRepoPage(){
   const vd=document.getElementById('repoVolDate');
   const vhost=document.getElementById('repoVolChart');
   const vmeta=document.getElementById('repoVolMeta');
+  const vleg=document.getElementById('repoVolLegend');
   if(vv){
     const tv=triVol.at(-1), tr=triRate.at(-1);
     vv.textContent=(tv?fmt(tv.value)+'B':'—')+' · '+(tr?fmt(tr.value)+'%':'—');
   }
   if(vd)vd.textContent='TRI Overnight · Stand '+(triVol.at(-1)||{}).period;
 
+  const vShowBlue=getRepoToggle('macrowatch-repo-vol-blue', true);
+  const vShowSec=getRepoToggle('macrowatch-repo-vol-sec', true);
+  const vShowGreen=getRepoToggle('macrowatch-repo-vol-green', true);
+
   const vRed=getRepoLS('macrowatch-repo-vol-red');
   let vRedPts=vRed?(histories['USA-'+vRed]||[]):[];
   const vga=getRepoLS('macrowatch-repo-vol-ga'), vgb=getRepoLS('macrowatch-repo-vol-gb');
   let vGreen=[];
   if(vga&&vgb) vGreen=alignRepoDiff(histories['USA-'+vga]||[], histories['USA-'+vgb]||[]);
-  // default dual: volume blue, tri rate as red if no overlay
-  const baseVol=triVol.length?triVol:(histories['USA-repoVolSum']||[]);
-  const rateLine=vRedPts.length?vRedPts:(triRate.length?triRate:sofr);
-  window.__repoVolMeta={redKey:vRed,ga:vga,gb:vgb,greenPts:vGreen,baseVol,rateLine};
+
+  const vSecLabel=vRed?((REPO_PAGE_CATALOG.find(c=>c.key===vRed)||{}).label||vRed):'TRI Overnight-Satz (%)';
+  const vSecPts=vRed?vRedPts:(triRate.length?triRate:sofr);
+
+  if(vleg){
+    vleg.innerHTML=repoLegendHtml([
+      {color:'#3b82f6',label:'Blau · TRI Repo-Volumen ($B)',toggleId:'repoVolBlueTog',on:vShowBlue},
+      {color:vRed?'#ef4444':'#f97316',label:(vRed?'Rot · ':'Orange · ')+vSecLabel,toggleId:'repoVolSecTog',on:vShowSec},
+      ...(vga&&vgb?[{color:'#22c55e',label:'Grün · Diff '+(REPO_PAGE_CATALOG.find(c=>c.key===vga)||{}).label+' − '+(REPO_PAGE_CATALOG.find(c=>c.key===vgb)||{}).label,toggleId:'repoVolGreenTog',on:vShowGreen}]:[])
+    ]);
+    bindRepoToggle('repoVolBlueTog','macrowatch-repo-vol-blue');
+    bindRepoToggle('repoVolSecTog','macrowatch-repo-vol-sec');
+    bindRepoToggle('repoVolGreenTog','macrowatch-repo-vol-green');
+  }
+
+  let baseVol=vShowBlue?(triVol.length?triVol:(histories['USA-repoVolSum']||[])):[];
+  let rateLine=vShowSec?vSecPts:[];
+  let vGr=vShowGreen?vGreen:[];
+  if(!baseVol.length&&rateLine.length){baseVol=rateLine;rateLine=[];}
+  window.__repoVolMeta={redKey:vRed,ga:vga,gb:vgb,greenPts:vGr,baseVol,rateLine,redPts:rateLine};
 
   if(vhost){
     if(typeof renderDiffOverlayChart==='function'&&baseVol.length){
       vhost.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoVolDual|Repo Vol / Rate" title="Vergrößern">'+
-        renderDiffOverlayChart(baseVol,rateLine,{w:360,h:180,greenPts:vGreen})+'</div>';
-    }else if(typeof renderLineChart==='function'){
+        renderDiffOverlayChart(baseVol,rateLine,{w:360,h:180,greenPts:vGr})+'</div>';
+    }else if(typeof renderLineChart==='function'&&baseVol.length){
       vhost.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|repoVolDual|Repo" title="Vergrößern">'+renderLineChart(baseVol,{w:360,h:160})+'</div>';
+    }else{
+      vhost.innerHTML='<div class="sparkempty">Keine Linie aktiv</div>';
     }
   }
   if(vmeta){
-    const bits=['TRI Vol $B blau'];
-    bits.push(vRed?('rot: '+((REPO_PAGE_CATALOG.find(c=>c.key===vRed)||{}).label||vRed)):'rot: TRI Rate %');
-    if(vga&&vgb)bits.push('grün: Diff');
-    vmeta.textContent=bits.join(' · ')+' · OFR täglich';
+    vmeta.textContent='Legende + Kästchen: Linien ein/aus · OFR täglich · Volumen $B / Sätze %';
   }
 }
 `;
 
-if (!html.includes('function paintRepoPage')) {
-  if (html.includes('function bindUsaPages')) {
-    html = html.replace('function bindUsaPages', block + '\nfunction bindUsaPages');
-  } else if (html.includes('function setUsaPage')) {
-    html = html.replace('function setUsaPage', block + '\nfunction setUsaPage');
+if (html.includes('function paintRepoPage')) {
+  const markers = ['const REPO_PAGE_CATALOG', 'function paintRepoPage', 'function ensureRepoPage', 'function getRepoLS'];
+  let start = -1;
+  for (const m of markers) {
+    const i = html.indexOf(m);
+    if (i >= 0 && (start < 0 || i < start)) start = i;
   }
+  const pStart = html.indexOf('function paintRepoPage');
+  if (pStart >= 0) {
+    let i = pStart, depth = 0, started = false, end = -1;
+    for (; i < html.length; i++) {
+      if (html[i] === '{') { depth++; started = true; }
+      else if (html[i] === '}') { depth--; if (started && depth === 0) { end = i; break; } }
+    }
+    if (end > 0 && start >= 0 && start < end) {
+      html = html.slice(0, start) + block + '\n' + html.slice(end + 1);
+      console.log('replaced repo page block');
+    } else if (end > pStart) {
+      html = html.slice(0, pStart) + block + '\n' + html.slice(end + 1);
+      console.log('replaced paintRepoPage only');
+    }
+  }
+} else if (html.includes('function bindUsaPages')) {
+  html = html.replace('function bindUsaPages', block + '\nfunction bindUsaPages');
   console.log('paintRepoPage injected');
+} else if (html.includes('function setUsaPage')) {
+  html = html.replace('function setUsaPage', block + '\nfunction setUsaPage');
 }
 
 // Expand setUsaPage to page 7
@@ -214,10 +308,9 @@ html = html.replace(
   'page=Math.max(0,Math.min(7,Number(page)||0))'
 );
 html = html.replace(
-  /const faces=\['\.usa-face-a',\.usa-face-b',\.usa-face-c',\.usa-face-d',\.usa-face-e',\.usa-face-f',\.usa-face-g'\]/g,
-  "const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h']"
+  /page=Math\.max\(0,Math\.min\(7,Number\(page\)\|\|0\)\)/g,
+  'page=Math.max(0,Math.min(7,Number(page)||0))'
 );
-// fix typo if replace failed - do explicit
 if (!html.includes(".usa-face-h'")) {
   html = html.replace(
     "const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g']",
@@ -230,9 +323,6 @@ if (!html.includes('page===7')) {
     "if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);\n  if(page===7)setTimeout(()=>{try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}},50);"
   );
 }
-html = html.replace(/start>6/g, 'start>7');
-html = html.replace(/start>6\)/g, 'start>7)');
-html = html.replace(/start<0\|\|start>6/g, 'start<0||start>7');
 
 // paintChartDlg enlarge for repo duals
 if (!html.includes("key==='repoMmfDual'")) {
@@ -266,4 +356,4 @@ if (!html.includes("key==='repoMmfDual'")) {
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.includes('paintRepoPage'), html.includes('usa-face-h'), html.includes('repoMmfDual'));
+console.log('done', html.includes('repoLegendHtml'), html.includes('repoMmfBlueTog'), html.includes('paintRepoPage'));
