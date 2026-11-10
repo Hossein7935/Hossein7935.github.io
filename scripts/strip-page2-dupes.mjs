@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** Remove listed charts from USA page 2 — only inside faceB.innerHTML=`...`; */
+/** strip-page2-dupes v4 — remove listed charts from USA page 2 faceB only */
 let html = fs.readFileSync('index.html', 'utf8');
 
 const open = 'faceB.innerHTML=`';
@@ -17,7 +17,7 @@ if (close < 0) {
 }
 
 let content = html.slice(contentStart, close);
-console.log('faceB content length', content.length);
+console.log('v4 faceB content length', content.length);
 
 const targets = [
   'CME Term SOFR 3M',
@@ -39,23 +39,19 @@ function norm(s) {
   return String(s).replace(/[−–—-]/g, '-').replace(/\s+/g, ' ').trim().toLowerCase();
 }
 
-const metricRe = /<div class="metric[^>]*>/g;
-const matches = [...content.matchAll(metricRe)];
+const matches = [...content.matchAll(/<div class="metric[^>]*>/g)];
 const removeRanges = [];
-
 for (let mi = 0; mi < matches.length; mi++) {
   const mStart = matches[mi].index;
   const mEnd = mi + 1 < matches.length ? matches[mi + 1].index : content.length;
   const chunk = content.slice(mStart, mEnd);
   const nm = (chunk.match(/class="name">([^<]*)/) || [])[1] || '';
   const n = norm(nm);
-  const drop = targets.some((t) => n === norm(t) || n.includes(norm(t)));
-  if (drop) {
+  if (targets.some((t) => n === norm(t) || n.includes(norm(t)))) {
     console.log('drop:', nm);
     removeRanges.push([mStart, mEnd]);
   }
 }
-
 for (let k = removeRanges.length - 1; k >= 0; k--) {
   const [a, b] = removeRanges[k];
   content = content.slice(0, a) + content.slice(b);
@@ -63,6 +59,4 @@ for (let k = removeRanges.length - 1; k >= 0; k--) {
 
 html = html.slice(0, contentStart) + content + html.slice(close);
 fs.writeFileSync('index.html', html);
-
-const names = [...content.matchAll(/class="name">([^<]*)/g)].map((x) => x[1]);
-console.log('remaining page2:', names);
+console.log('remaining page2:', [...content.matchAll(/class="name">([^<]*)/g)].map((x) => x[1]));
