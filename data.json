@@ -28,7 +28,7 @@
         "source": "TradingView · TVC:CN10Y (China 10 Year Government Bonds Yield)"
       },
       "t10y2y": {
-        "value": 0.363,
+        "value": 0.362,
         "date": "2026-11-10",
         "source": "TradingView · CHN 10Y − 2Y"
       },
@@ -50,7 +50,7 @@
         "source": "IMF DataMapper · NGDP_RPCH"
       },
       "y2": {
-        "value": 4.559,
+        "value": 4.561,
         "date": "2026-11-10",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
@@ -4450,7 +4450,7 @@
     "CHN-t10y2y": [
       {
         "period": "2026-11-10",
-        "value": 0.363
+        "value": 0.362
       }
     ],
     "USA-tips5": [
