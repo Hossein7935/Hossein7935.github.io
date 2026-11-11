@@ -2,7 +2,7 @@ name: MacroWatch data update
 on:
   workflow_dispatch:
   schedule:
-    - cron: '12 * * * *'
+    - cron: '15 */3 * * *'
   push:
     branches: [main, master]
     paths-ignore:
@@ -111,6 +111,7 @@ jobs:
           node --check scripts/inject-page8-repo.mjs || true
           node --check scripts/inject-repo-enlarge-fix.mjs || true
           node --check scripts/strip-page2-dupes.mjs || true
+          node --check scripts/fetch-ust-tips-page7.mjs || true
       - name: Fetch official economic data
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
@@ -161,7 +162,7 @@ jobs:
         run: node scripts/fetch-dxy.mjs
       - name: US 2Y + SOFR dual (FRED)
         run: node scripts/fetch-us2y-sofr.mjs
-      - name: USA page 7 UST + TIPS daily (FRED)
+      - name: USA page 7 UST + TIPS (FRED history + TradingView live)
         run: node scripts/fetch-ust-tips-page7.mjs
       - name: OFR Repo + MMF (Seite 8)
         run: node scripts/fetch-repo-mmf.mjs
