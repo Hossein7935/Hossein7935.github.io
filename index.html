@@ -562,6 +562,7 @@ document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefau
 
 
 
+
 function setUsaPage(page){
   page=Math.max(0,Math.min(7,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -591,7 +592,6 @@ function setUsaPage(page){
   if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
   if(page===7)setTimeout(()=>{try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}},50);
 }
-
 
 
 
@@ -849,8 +849,6 @@ function paintRepoPage(){
   }
   if(vmeta)vmeta.textContent='BLAU=TRI Volumen · ROT='+vSecLabel+(vga&&vgb?' · GRÜN=Diff':'');
 }
-
-
 
 
 
@@ -1563,6 +1561,8 @@ bindUsaPages();
 
 
 
+
+
 let _yieldDiffOrder=[];
 const YIELD7_KEYS=[
   {key:'us3m',label:'US 3M'},
@@ -1901,6 +1901,7 @@ function paintYieldPage7(){
   }
   paintYield7Diff();
 }
+
 
 
 
