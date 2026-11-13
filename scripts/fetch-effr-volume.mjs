@@ -2,11 +2,8 @@ import fs from 'node:fs';
 
 /**
  * Federal Funds Market Daily Volume (Billions USD)
- * Primary: FRED series EFFRVOL (NY Fed → FRED)
- * Secondary: NY Fed markets API for latest cross-check
- * Also stores EFFR rate for optional dual view
- *
- * Unit: Billions of USD, business days only
+ * FRED EFFRVOL + NY Fed volume cross-check
+ * EFFR rate is MERGED into existing history (never clobber newer points)
  */
 
 const FRED_VOL = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=EFFRVOL&cosd=2016-01-01';
@@ -16,7 +13,7 @@ const NYFED =
 
 async function loadCsvSeries(url) {
   const r = await fetch(url, {
-    headers: { 'User-Agent': 'MacroWatch/1.0', Accept: 'text/csv' },
+    headers: { 'User-Agent': 'MacroWatch/1.7', Accept: 'text/csv' },
     signal: AbortSignal.timeout(60000),
     cache: 'no-store'
   });
@@ -29,9 +26,23 @@ async function loadCsvSeries(url) {
     if (!d || v === '.' || v == null || v === '') continue;
     const n = Number(v);
     if (!Number.isFinite(n)) continue;
-    out.push({ period: d.trim(), value: n });
+    out.push({ period: d.trim().slice(0, 10), value: n });
   }
   return out;
+}
+
+function mergeSeries(...lists) {
+  const map = new Map();
+  for (const list of lists) {
+    for (const p of list || []) {
+      if (p?.period && Number.isFinite(Number(p.value))) {
+        map.set(String(p.period).slice(0, 10), Number(p.value));
+      }
+    }
+  }
+  return [...map.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([period, value]) => ({ period, value: Math.round(value * 10000) / 10000 }));
 }
 
 function pctChange(cur, prev) {
@@ -51,7 +62,7 @@ const histories = payload.histories || {};
 const data = payload.data || {};
 data.USA = data.USA || {};
 const errors = Array.isArray(payload.errors)
-  ? payload.errors.filter(e => !String(e).startsWith('USA EFFRVOL'))
+  ? payload.errors.filter((e) => !String(e).startsWith('USA EFFRVOL'))
   : [];
 const asOf = new Date().toISOString();
 
@@ -59,40 +70,37 @@ try {
   const vol = await loadCsvSeries(FRED_VOL);
   if (vol.length < 50) throw new Error('EFFRVOL too short');
 
-  // Merge NY Fed latest if newer
+  // Merge NY Fed volume if present
   try {
     const r = await fetch(NYFED, {
-      headers: { Accept: 'application/json', 'User-Agent': 'MacroWatch/1.0' },
+      headers: { Accept: 'application/json', 'User-Agent': 'MacroWatch/1.7' },
       signal: AbortSignal.timeout(30000),
       cache: 'no-store'
     });
     if (r.ok) {
       const j = await r.json();
       const rows = j?.refRates || [];
-      const byDate = new Map(vol.map(p => [p.period, p.value]));
-      for (const row of rows) {
-        const d = row.effectiveDate;
-        const v = Number(row.volumeInBillions);
+      const byDate = new Map(vol.map((p) => [p.period, p.value]));
+      for (const x of rows) {
+        const d = String(x.effectiveDate || '').slice(0, 10);
+        const v = Number(x.volumeInBillions);
         if (d && Number.isFinite(v)) byDate.set(d, v);
       }
       vol.length = 0;
       for (const [period, value] of [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
         vol.push({ period, value });
       }
-      console.log('NY Fed merge ok, n=', vol.length);
     }
   } catch (e) {
-    console.warn('NY Fed merge skip', e.message);
+    console.warn('NYFed vol merge', e.message);
   }
 
-  // Deduplicate by date (keep last)
   const map = new Map();
   for (const p of vol) map.set(p.period, p.value);
   const series = [...map.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([period, value]) => ({ period, value }));
 
-  // Daily % change (skip weekends/gaps — compare consecutive available days)
   const chg = [];
   for (let i = 1; i < series.length; i++) {
     const c = series[i];
@@ -104,22 +112,49 @@ try {
   let rateSeries = [];
   try {
     rateSeries = await loadCsvSeries(FRED_RATE);
-    console.log('EFFR rate points', rateSeries.length);
+    console.log('EFFR rate points', rateSeries.length, 'last', rateSeries.at(-1));
   } catch (e) {
     console.warn('EFFR rate', e.message);
   }
 
+  // NY Fed rate overlay
+  try {
+    const r = await fetch(
+      'https://markets.newyorkfed.org/api/rates/unsecured/effr/last/30.json',
+      {
+        headers: { Accept: 'application/json', 'User-Agent': 'MacroWatch/1.7' },
+        signal: AbortSignal.timeout(20000),
+        cache: 'no-store'
+      }
+    );
+    if (r.ok) {
+      const j = await r.json();
+      const extra = [];
+      for (const x of j.refRates || []) {
+        const period = String(x.effectiveDate || '').slice(0, 10);
+        const value = Number(x.percentRate);
+        if (period && Number.isFinite(value)) extra.push({ period, value });
+      }
+      rateSeries = mergeSeries(rateSeries, extra);
+      console.log('EFFR after NYFed', rateSeries.at(-1));
+    }
+  } catch (e) {
+    console.warn('NYFed EFFR rate', e.message);
+  }
+
   histories['USA-effrVol'] = series.map(({ period, value }) => ({ period, value }));
   histories['USA-effrVolChg'] = chg.map(({ period, value }) => ({ period, value }));
-  if (rateSeries.length) histories['USA-effr'] = rateSeries;
+  // MERGE rate — do not replace a newer series with a staler FRED pull
+  if (rateSeries.length) {
+    histories['USA-effr'] = mergeSeries(histories['USA-effr'], rateSeries);
+  }
 
   const last = series.at(-1);
   const prev = series.at(-2);
   const absChg = prev ? Math.round((last.value - prev.value) * 100) / 100 : null;
   const pctChg = prev ? pctChange(last.value, prev.value) : null;
 
-  // Alert: |daily %| vs recent 1y std
-  const recentChg = chg.slice(-252).map(p => p.value);
+  const recentChg = chg.slice(-252).map((p) => p.value);
   const { mean, std } = meanStd(recentChg);
   let alert = 'normal';
   let alertNote = 'Volumen im üblichen Tagesbereich.';
@@ -137,43 +172,32 @@ try {
     }
   }
 
-  const lastRate = rateSeries.length ? rateSeries.at(-1) : null;
+  const lastRate = (histories['USA-effr'] || []).at(-1) || null;
 
   data.USA.effrVol = {
     value: last.value,
     date: last.period,
-    prevValue: prev ? prev.value : null,
-    prevDate: prev ? prev.period : null,
+    prevValue: prev?.value ?? null,
     absChange: absChg,
     pctChange: pctChg,
-    updatedAt: asOf,
-    source: 'FRED EFFRVOL · New York Fed Effective Federal Funds Volume',
-    sourceUrl: 'https://www.newyorkfed.org/markets/reference-rates/effr',
-    unit: 'USD Milliarden',
-    points: series.length,
+    unit: 'Billions USD',
     alert,
     alertNote,
-    effr: lastRate ? lastRate.value : null,
-    effrDate: lastRate ? lastRate.period : null,
-    note:
-      'Tägliches Handelsvolumen im Federal-Funds-Markt (Overnight). Quelle: NY Fed über FRED (EFFRVOL). Wochenenden/Feiertage ohne Beobachtung.'
+    rate: lastRate ? lastRate.value : null,
+    rateDate: lastRate ? lastRate.period : null,
+    points: series.length,
+    source: 'FRED EFFRVOL + NY Fed',
+    updatedAt: asOf
   };
 
   console.log(
-    'EFFRVOL',
-    last.period,
-    last.value + 'B',
-    'chg',
-    absChg,
-    pctChg + '%',
-    'alert',
-    alert,
-    'n=',
-    series.length
+    'EFFRVOL', last.period, last.value,
+    'chg', pctChg,
+    'EFFR last', lastRate?.period, lastRate?.value
   );
 } catch (e) {
   errors.push(`USA EFFRVOL: ${e.message}`);
-  console.error('EFFRVOL failed', e.message);
+  console.error(e.message);
 }
 
 payload.histories = histories;
@@ -181,4 +205,4 @@ payload.data = data;
 payload.errors = errors;
 payload.updatedAt = asOf;
 fs.writeFileSync('data.json', JSON.stringify(payload));
-console.log('done');
+console.log('done effr-volume');
