@@ -2,7 +2,7 @@ name: MacroWatch data update
 on:
   workflow_dispatch:
   schedule:
-    - cron: '15 */3 * * *'
+    - cron: '20 * * * *'
   push:
     branches: [main, master]
     paths-ignore:
@@ -154,7 +154,7 @@ jobs:
         run: node scripts/fetch-fhlb-advances.mjs
       - name: Federal Funds Market Volume (FRED EFFRVOL)
         run: node scripts/fetch-effr-volume.mjs
-      - name: IORB + US 1Y (FRED)
+      - name: IORB + US 1Y (FRED + Treasury + TV)
         run: node scripts/fetch-iorb-us1y.mjs
       - name: MOVE Index (Yahoo ^MOVE)
         run: node scripts/fetch-move.mjs
@@ -162,7 +162,7 @@ jobs:
         run: node scripts/fetch-dxy.mjs
       - name: US 2Y + SOFR dual (FRED)
         run: node scripts/fetch-us2y-sofr.mjs
-      - name: USA page 7 UST + TIPS (FRED history + TradingView live)
+      - name: USA page 7 UST + TIPS (FRED + Treasury + TV)
         run: node scripts/fetch-ust-tips-page7.mjs
       - name: OFR Repo + MMF (Seite 8)
         run: node scripts/fetch-repo-mmf.mjs
