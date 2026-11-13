@@ -1417,14 +1417,14 @@
             "label": "US 2Y"
           },
           "us5y": {
-            "value": 4.958,
+            "value": 4.96,
             "date": "2026-11-13",
             "n": 2968,
             "source": "Treasury/FRED + TV · TVC:US05Y",
             "label": "US 5Y"
           },
           "us10y": {
-            "value": 5.121,
+            "value": 5.125,
             "date": "2026-11-13",
             "n": 2968,
             "source": "Treasury/FRED + TV · TVC:US10Y",
@@ -337047,7 +337047,7 @@
       },
       {
         "period": "2026-11-13",
-        "value": 4.958
+        "value": 4.96
       }
     ],
     "USA-us10y": [
@@ -348921,7 +348921,7 @@
       },
       {
         "period": "2026-11-13",
-        "value": 5.121
+        "value": 5.125
       }
     ],
     "USA-us30y": [
