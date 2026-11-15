@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-14T23:05:54.931Z",
+  "updatedAt": "2026-11-15T02:50:57.468Z",
   "data": {
     "CHN": {
       "rate": {
@@ -19,17 +19,17 @@
       },
       "y2": {
         "value": 1.23,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · TVC:CN02Y (China 2 Year Government Bonds Yield)"
       },
       "y10": {
         "value": 1.598,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · TVC:CN10Y (China 10 Year Government Bonds Yield)"
       },
       "t10y2y": {
         "value": 0.368,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · CHN 10Y − 2Y"
       },
       "deficit": {
@@ -51,12 +51,12 @@
       },
       "y2": {
         "value": 4.852,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · TVC:US02Y (United States 2 Year Government Bonds Yield)"
       },
       "y10": {
         "value": 5.139,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · TVC:US10Y (United States 10 Year Government Bonds Yield)"
       },
       "inflation": {
@@ -81,7 +81,7 @@
       },
       "us3m": {
         "value": 4.235,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · TVC:US03MY (US 3M T-Bill)"
       },
       "bofaCcc": {
@@ -132,8 +132,8 @@
       },
       "sofrFwd": {
         "value": 4.775,
-        "date": "2026-11-14",
-        "updatedAt": "2026-11-14T23:04:45.767Z",
+        "date": "2026-11-15",
+        "updatedAt": "2026-11-15T02:49:42.211Z",
         "curve": [
           {
             "period": "Heute",
@@ -1168,7 +1168,7 @@
       "ustCurve": {
         "value": 5.1,
         "date": "2026-11-12",
-        "updatedAt": "2026-11-14T23:04:56.513Z",
+        "updatedAt": "2026-11-15T02:49:59.764Z",
         "source": "FRED · DGS* + DFII* (TIPS real yields)",
         "nominal": [
           {
@@ -1290,7 +1290,7 @@
         "value": 798.428,
         "valueRaw": 798428,
         "date": "2026-09-30",
-        "updatedAt": "2026-11-14T23:05:00.232Z",
+        "updatedAt": "2026-11-15T02:50:03.192Z",
         "source": "FHLBanks Office of Finance · Combined Operating Highlights",
         "sourceUrl": "https://www.fhlb-of.com/",
         "absChangeQoq": -12.287,
@@ -1326,10 +1326,10 @@
         "rateDate": "2026-11-12",
         "points": 2689,
         "source": "FRED EFFRVOL + NY Fed",
-        "updatedAt": "2026-11-14T23:05:01.240Z"
+        "updatedAt": "2026-11-15T02:50:04.305Z"
       },
       "iorbUs1y": {
-        "updatedAt": "2026-11-14T23:05:02.348Z",
+        "updatedAt": "2026-11-15T02:50:06.272Z",
         "iorb": {
           "value": 3.9,
           "date": "2026-11-16",
@@ -1337,13 +1337,13 @@
         },
         "us1y": {
           "value": 4.611,
-          "date": "2026-11-14",
+          "date": "2026-11-15",
           "source": "FRED DGS1 + Treasury + TV US01Y"
         }
       },
       "us1y": {
         "value": 4.611,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "FRED DGS1 + Treasury + TV US01Y"
       },
       "move": {
@@ -1352,7 +1352,7 @@
         "prevValue": 98.43,
         "absChange": 0.36,
         "pctChange": 0.37,
-        "updatedAt": "2026-11-14T23:05:04.330Z",
+        "updatedAt": "2026-11-15T02:50:07.344Z",
         "source": "Yahoo Finance ^MOVE · ICE BofA MOVE Index",
         "sourceUrl": "https://finance.yahoo.com/quote/%5EMOVE/",
         "unit": "bp (ann.)",
@@ -1366,7 +1366,7 @@
         "prevValue": 103.17,
         "absChange": 0.24,
         "pctChange": 0.23,
-        "updatedAt": "2026-11-14T23:05:04.630Z",
+        "updatedAt": "2026-11-15T02:50:07.771Z",
         "source": "Yahoo Finance DX-Y.NYB · ICE US Dollar Index (DXY)",
         "sourceUrl": "https://finance.yahoo.com/quote/DX-Y.NYB/",
         "unit": "index",
@@ -1380,46 +1380,46 @@
         "sofr": 3.9,
         "sofrDate": "2026-11-12",
         "spread": 0.96,
-        "updatedAt": "2026-11-14T23:05:05.027Z",
+        "updatedAt": "2026-11-15T02:50:08.226Z",
         "source": "FRED DGS2 + SOFR (merged)",
         "us2yPoints": 2967,
         "sofrPoints": 2151,
         "note": "US 2Y blau · SOFR rot · nicht Teil der Differenz-Funktion"
       },
       "ustTipsPage7": {
-        "updatedAt": "2026-11-14T23:05:05.459Z",
+        "updatedAt": "2026-11-15T02:50:08.849Z",
         "series": {
           "us3m": {
             "value": 4.235,
-            "date": "2026-11-14",
+            "date": "2026-11-15",
             "n": 2969,
             "source": "Treasury/FRED + TV · TVC:US03MY",
             "label": "US 3M"
           },
           "us2y": {
             "value": 4.852,
-            "date": "2026-11-14",
+            "date": "2026-11-15",
             "n": 2969,
             "source": "Treasury/FRED + TV · TVC:US02Y",
             "label": "US 2Y"
           },
           "us5y": {
             "value": 4.963,
-            "date": "2026-11-14",
+            "date": "2026-11-15",
             "n": 2969,
             "source": "Treasury/FRED + TV · TVC:US05Y",
             "label": "US 5Y"
           },
           "us10y": {
             "value": 5.139,
-            "date": "2026-11-14",
+            "date": "2026-11-15",
             "n": 2969,
             "source": "Treasury/FRED + TV · TVC:US10Y",
             "label": "US 10Y"
           },
           "us30y": {
             "value": 5.47,
-            "date": "2026-11-14",
+            "date": "2026-11-15",
             "n": 2969,
             "source": "Treasury/FRED + TV · TVC:US30Y",
             "label": "US 30Y"
@@ -1442,7 +1442,7 @@
         "sourceNote": "FRED + Treasury nominal/real CSV + TradingView live"
       },
       "repoMmf": {
-        "updatedAt": "2026-11-14T23:05:44.290Z",
+        "updatedAt": "2026-11-15T02:50:48.843Z",
         "source": "OFR Short-Term Funding Monitor (mmf + repo + fnyr)",
         "mmfTotLast": {
           "period": "2026-09-30",
@@ -1511,11 +1511,6 @@
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · NGDP_RPCH"
       },
-      "y10": {
-        "value": 2.859,
-        "date": "2026-11-14",
-        "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
-      },
       "inflation": {
         "value": 2,
         "date": "IMF WEO · 2026",
@@ -1523,12 +1518,17 @@
       },
       "y2": {
         "value": 1.878,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · TVC:JP02Y (Japan 2 Year LSEG Government Bonds Yield)"
+      },
+      "y10": {
+        "value": 2.859,
+        "date": "2026-11-15",
+        "source": "TradingView · TVC:JP10Y (Japan 10 Year LSEG Government Bonds Yield)"
       },
       "t10y2y": {
         "value": 0.981,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · JPN 10Y − 2Y"
       },
       "deficit": {
@@ -1540,18 +1540,13 @@
     "FRA": {
       "rate": {
         "value": 2.5,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
         "value": 0.4,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · NGDP_RPCH"
-      },
-      "y10": {
-        "value": 4.9308,
-        "date": "2026-11-14",
-        "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
       "inflation": {
         "value": 2.4,
@@ -1560,12 +1555,17 @@
       },
       "y2": {
         "value": 3.629,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · TVC:FR02Y (France 2 Year Government Bonds Yield)"
+      },
+      "y10": {
+        "value": 4.9308,
+        "date": "2026-11-15",
+        "source": "TradingView · TVC:FR10Y (France 10 Year Government Bonds Yield)"
       },
       "t10y2y": {
         "value": 1.302,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · FRA 10Y − 2Y"
       },
       "deficit": {
@@ -1577,18 +1577,13 @@
     "DEU": {
       "rate": {
         "value": 2.5,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "ECB · Einlagefazilität"
       },
       "gdp": {
         "value": 1.3,
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · NGDP_RPCH"
-      },
-      "y10": {
-        "value": 3.3896,
-        "date": "2026-11-14",
-        "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
       "inflation": {
         "value": 2.7,
@@ -1597,12 +1592,17 @@
       },
       "y2": {
         "value": 3.1148,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · TVC:DE02Y (Germany 2 Year Government Bonds Yield)"
+      },
+      "y10": {
+        "value": 3.3896,
+        "date": "2026-11-15",
+        "source": "TradingView · TVC:DE10Y (Germany 10 Year Government Bonds Yield)"
       },
       "t10y2y": {
         "value": 0.275,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · DEU 10Y − 2Y"
       },
       "deficit": {
@@ -1622,11 +1622,6 @@
         "date": "IMF WEO · 2026",
         "source": "IMF DataMapper · NGDP_RPCH"
       },
-      "y10": {
-        "value": 5.143,
-        "date": "2026-11-14",
-        "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
-      },
       "inflation": {
         "value": 3.9,
         "date": "IMF WEO · 2026",
@@ -1634,12 +1629,17 @@
       },
       "y2": {
         "value": 4.92,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · TVC:AU02Y (Australia 2 Year Government Bonds Yield)"
+      },
+      "y10": {
+        "value": 5.143,
+        "date": "2026-11-15",
+        "source": "TradingView · TVC:AU10Y (Australia 10 Year Government Bonds Yield)"
       },
       "t10y2y": {
         "value": 0.223,
-        "date": "2026-11-14",
+        "date": "2026-11-15",
         "source": "TradingView · AUS 10Y − 2Y"
       },
       "deficit": {
@@ -2878,7 +2878,7 @@
         "value": 0.834
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 0.275
       }
     ],
@@ -3400,7 +3400,7 @@
         "value": 1.842
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 1.302
       }
     ],
@@ -3918,7 +3918,7 @@
         "value": 1.38
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 0.981
       }
     ],
@@ -4436,13 +4436,13 @@
         "value": 0.505
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 0.223
       }
     ],
     "CHN-t10y2y": [
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 0.368
       }
     ],
@@ -23030,7 +23030,7 @@
         "value": 4.32
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.235
       }
     ],
@@ -129139,7 +129139,7 @@
         "value": 3.902
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 3.902
       }
     ],
@@ -130221,7 +130221,7 @@
         "value": 4.1
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.1
       }
     ],
@@ -131303,7 +131303,7 @@
         "value": 4.215
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.215
       }
     ],
@@ -132385,7 +132385,7 @@
         "value": 4.365
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.365
       }
     ],
@@ -133467,7 +133467,7 @@
         "value": 4.445
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.445
       }
     ],
@@ -134549,7 +134549,7 @@
         "value": 4.535
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.535
       }
     ],
@@ -135631,7 +135631,7 @@
         "value": 4.61
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.61
       }
     ],
@@ -136713,7 +136713,7 @@
         "value": 4.68
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.68
       }
     ],
@@ -137795,7 +137795,7 @@
         "value": 4.72
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.72
       }
     ],
@@ -138877,7 +138877,7 @@
         "value": 4.76
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.76
       }
     ],
@@ -139959,7 +139959,7 @@
         "value": 4.75
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.75
       }
     ],
@@ -141041,7 +141041,7 @@
         "value": 4.78
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.78
       }
     ],
@@ -142123,7 +142123,7 @@
         "value": 4.775
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.775
       }
     ],
@@ -143205,7 +143205,7 @@
         "value": 4.795
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.795
       }
     ],
@@ -144287,7 +144287,7 @@
         "value": 4.79
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.79
       }
     ],
@@ -145433,7 +145433,7 @@
         "value": 4.305
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.305
       }
     ],
@@ -146579,7 +146579,7 @@
         "value": 4.6
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.6
       }
     ],
@@ -147725,7 +147725,7 @@
         "value": 4.77
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.77
       }
     ],
@@ -148871,7 +148871,7 @@
         "value": 4.82
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.82
       }
     ],
@@ -150017,7 +150017,7 @@
         "value": 4.8
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.8
       }
     ],
@@ -151163,7 +151163,7 @@
         "value": 4.765
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.765
       }
     ],
@@ -152309,7 +152309,7 @@
         "value": 4.73
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.73
       }
     ],
@@ -153455,7 +153455,7 @@
         "value": 4.705
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.705
       }
     ],
@@ -154601,7 +154601,7 @@
         "value": 4.68
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.68
       }
     ],
@@ -155747,7 +155747,7 @@
         "value": 4.66
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.66
       }
     ],
@@ -156893,7 +156893,7 @@
         "value": 4.645
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.645
       }
     ],
@@ -158019,7 +158019,7 @@
         "value": 4.64
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.64
       }
     ],
@@ -159101,7 +159101,7 @@
         "value": 4.635
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.635
       }
     ],
@@ -160183,7 +160183,7 @@
         "value": 4.635
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.635
       }
     ],
@@ -161265,7 +161265,7 @@
         "value": 4.645
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.645
       }
     ],
@@ -162347,7 +162347,7 @@
         "value": 4.655
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.655
       }
     ],
@@ -163429,7 +163429,7 @@
         "value": 4.675
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.675
       }
     ],
@@ -164511,7 +164511,7 @@
         "value": 4.7
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.7
       }
     ],
@@ -165593,7 +165593,7 @@
         "value": 4.725
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.725
       }
     ],
@@ -166675,7 +166675,7 @@
         "value": 4.755
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.755
       }
     ],
@@ -167757,7 +167757,7 @@
         "value": 4.785
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.785
       }
     ],
@@ -168839,7 +168839,7 @@
         "value": 4.815
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.815
       }
     ],
@@ -169921,7 +169921,7 @@
         "value": 4.84
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.84
       }
     ],
@@ -171003,13 +171003,13 @@
         "value": 4.87
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.87
       }
     ],
     "USA-sofrFwdSnapshots": [
       {
-        "asOf": "2026-11-14T23:04:45.767Z",
+        "asOf": "2026-11-15T02:49:42.211Z",
         "spotDate": "2026-11-12",
         "curve": [
           {
@@ -199903,7 +199903,7 @@
     ],
     "USA-ustCurveSnapshots": [
       {
-        "asOf": "2026-11-14T23:04:56.513Z",
+        "asOf": "2026-11-15T02:49:59.764Z",
         "nominal": [
           {
             "period": "3M",
@@ -234002,7 +234002,7 @@
         "value": 4.65
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.611
       }
     ],
@@ -326372,7 +326372,7 @@
         "value": 4.88
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.852
       }
     ],
@@ -338250,7 +338250,7 @@
         "value": 4.98
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 4.963
       }
     ],
@@ -350128,7 +350128,7 @@
         "value": 5.15
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 5.139
       }
     ],
@@ -362006,7 +362006,7 @@
         "value": 5.47
       },
       {
-        "period": "2026-11-14",
+        "period": "2026-11-15",
         "value": 5.47
       }
     ],
