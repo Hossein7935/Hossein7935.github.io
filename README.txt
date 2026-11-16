@@ -43,6 +43,14 @@ Cron-Dienst den Workflow per API:
    Erfolgreich ist der Aufruf, wenn GitHub mit Status 204 antwortet.
 Der Token gehört NICHT in index.html oder ins Repository.
 
+USA-SEITE „CREDIT VERGABE“ (credit.js + scripts/fetch-credit.mjs)
+- Credit Supply: SLOOS-Kreditstandards (DRTSCILM, DRTSCIS, DRTSCLCC), Bankkredite H.8
+  (TOTBKCR, TOTCI als Wachstum J/J), Kreditlinien (SLOOS SUBLPDCILTMNQ, SUBLPDCISTMNQ)
+- Credit Demand: SLOOS-Kreditnachfrage (DRSDCILM, DRSDCIS) und Kreditanfragen
+- Credit Stress: SKSI aus github.com/Hossein7935/sksi-credit-stress-index (data/sksi_weekly.csv,
+  latest.json, calibration.json) plus Bausteine HY-OAS, IG-OAS, Baa−Aaa, NFCI von FRED
+- Alle Charts: Klick = Großansicht mit 6 Monate / 1 / 3 / 10 Jahre / Max und Fadenkreuz
+
 DATENQUELLEN (Aktualisierung)
 - TradingView (Renditen 2J/10J aller Länder, US 3M/1Y/2Y/5Y/10Y/30Y): laufend
 - Yahoo Finance (DXY, Kupfer/Gold, SOFR-Futures, MOVE): laufend bzw. Tagesschluss
