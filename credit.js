@@ -164,7 +164,7 @@
   }
 
   function labelFor(key) {
-    var map = { sloosInquiries: 'Kreditanfragen · C&I-Kreditlinien', bankCreditYoy: 'Bankkredite gesamt · Wachstum J/J', ciLoansYoy: 'Unternehmenskredite (C&I) · Wachstum J/J' };
+    var map = { sloosInquiries: 'Kreditanfragen · Unternehmenskredite (C&I)', bankCreditYoy: 'Bankkredite gesamt · Wachstum J/J', ciLoansYoy: 'Unternehmenskredite (C&I) · Wachstum J/J' };
     return map[key] || key;
   }
 

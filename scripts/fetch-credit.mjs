@@ -133,7 +133,7 @@ const SERIES = [
   // Credit Demand
   { key: 'sloosDemLarge', id: 'DRSDCILM', group: 'demand', unit: 'pct', label: 'Kreditnachfrage C&I · große/mittlere Firmen', note: 'SLOOS · Netto-% melden stärkere Nachfrage' },
   { key: 'sloosDemSmall', id: 'DRSDCIS', group: 'demand', unit: 'pct', label: 'Kreditnachfrage C&I · kleine Firmen', note: 'SLOOS · Netto-% melden stärkere Nachfrage' },
-  { key: 'sloosInquiries', id: null, group: 'demand', unit: 'pct', label: 'Kreditanfragen · C&I-Kreditlinien', note: 'SLOOS · Netto-% melden mehr Anfragen', discover: findInquiriesSeries },
+  { key: 'sloosInquiries', id: null, group: 'demand', unit: 'pct', label: 'Kreditanfragen · Unternehmenskredite (C&I)', note: 'SLOOS · Netto-% melden mehr Anfragen', discover: findInquiriesSeries },
   // Credit Stress – Bausteine des SKSI
   { key: 'hyOas', id: 'BAMLH0A0HYM2', group: 'stress', unit: 'pct', label: 'High-Yield-OAS', note: 'ICE BofA via FRED · Angst vor Ausfällen schwacher Firmen', comp: 'hy', start: '2015-01-01', daily: true },
   { key: 'igOas', id: 'BAMLC0A0CM', group: 'stress', unit: 'pct', label: 'Investment-Grade-OAS', note: 'ICE BofA via FRED · Stress greift auf solide Firmen über', comp: 'ig', start: '2015-01-01', daily: true },
