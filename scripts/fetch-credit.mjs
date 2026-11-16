@@ -79,35 +79,41 @@ function yoy(points, lagDays = 364, tolDays = 4) {
 }
 
 // --- SLOOS „Kreditanfragen“: ID per Kandidaten + FRED-Suche ermitteln ---------------
-async function findInquiriesSeries() {
+async function findInquiriesSeries(knownId, knownTitle) {
+  if (knownId) {
+    try {
+      const pts = await fred(knownId);
+      if (pts.length > 8) return { id: knownId, pts, how: 'gespeichert', title: knownTitle || '' };
+    } catch {}
+  }
   const candidates = ['SUBLPDCIINQNQ', 'SUBLPDCIINNQ', 'SUBLPDCIIQNQ', 'SUBLPDCINQNQ', 'SUBLPDCIINQLGNQ', 'SUBLPDCIIQLGNQ'];
   for (const id of candidates) {
     try {
       const pts = await fred(id);
-      if (pts.length > 8) return { id, pts, how: 'Kandidat' };
+      if (pts.length > 8) return { id, pts, how: 'Kandidat', title: '' };
     } catch {}
   }
   for (const q of ['Increased Number of Inquiries for Commercial and Industrial', 'inquiries credit lines domestic banks']) {
     try {
       const html = await getText(`https://fred.stlouisfed.org/searchresults/?st=${encodeURIComponent(q)}`, 'text/html');
-      const ids = new Set();
+      const ids = new Map();
       const re = /\/series\/([A-Z0-9]{6,20})["'?#][^>]*>([^<]*)</g;
       let m;
       while ((m = re.exec(html))) {
-        if (/inquir/i.test(m[2]) && !/foreign/i.test(m[2])) ids.add(m[1]);
+        if (/inquir/i.test(m[2]) && !/foreign/i.test(m[2])) ids.set(m[1], m[2].replace(/&amp;/g, '&').trim());
       }
       // falls der Titel nicht direkt im Link steht: alle SUBLP…-IDs mit „inquir“ in der Nähe
       if (!ids.size) {
         const re2 = /\/series\/(SUBLP[A-Z0-9]+)/g;
         while ((m = re2.exec(html))) {
           const near = html.slice(Math.max(0, m.index - 400), m.index + 400);
-          if (/inquir/i.test(near) && !/foreign/i.test(near)) ids.add(m[1]);
+          if (/inquir/i.test(near) && !/foreign/i.test(near) && !ids.has(m[1])) ids.set(m[1], '');
         }
       }
-      for (const id of ids) {
+      for (const [id, title] of ids) {
         try {
           const pts = await fred(id);
-          if (pts.length > 8) return { id, pts, how: 'FRED-Suche' };
+          if (pts.length > 8) return { id, pts, how: 'FRED-Suche', title };
         } catch {}
       }
     } catch {}
@@ -161,10 +167,13 @@ for (const s of SERIES) {
       pts = baa.filter((p) => m.has(p.period)).map((p) => ({ period: p.period, value: round(p.value - m.get(p.period), 3) }));
       id = 'DBAA − DAAA';
     } else if (s.discover) {
-      const found = await s.discover();
+      const known = (prev.items || {})[s.key] || {};
+      const found = await s.discover(known.seriesId, known.seriesTitle);
       pts = found.pts;
       id = found.id;
-      console.log(`${s.key}: ${found.id} (${found.how})`);
+      s.seriesId = found.id;
+      s.seriesTitle = found.title || '';
+      console.log(`${s.key}: ${found.id} (${found.how}) ${found.title || ''}`);
     } else {
       pts = await fred(s.id, s.start || '1990-01-01');
     }
@@ -188,6 +197,11 @@ for (const s of SERIES) {
       group: s.group,
       source: s.discover ? `FRED ${id}` : `FRED ${id}`
     };
+    if (s.seriesId) {
+      item.seriesId = s.seriesId;
+      item.seriesTitle = s.seriesTitle;
+      if (s.seriesTitle) item.note = `SLOOS · ${s.seriesTitle}`;
+    }
     if (level) {
       item.level = round(level.value / 1000, 3); // Mrd. → Bio. $
       item.levelDate = level.period;

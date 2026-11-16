@@ -2,7 +2,7 @@ MacroWatch – automatische Datenaktualisierung
 
 ABLAUF
 1. Der Workflow „MacroWatch data update“ (.github/workflows/update-data.yml) läuft alle
-   30 Minuten (und bei jedem Push / manuell über „Run workflow“).
+   15 Minuten (sofern GitHub den Zeitplan startet) (und bei jedem Push / manuell über „Run workflow“).
 2. Er übernimmt den neuesten Stand von der Live-Seite, ruft alle Quellen einzeln ab
    (scripts/run-fetchers.mjs) und füllt FRED-verzögerte Reihen mit neueren Treasury-,
    TradingView- und NY-Fed-Werten auf (scripts/freshen-derived.mjs).

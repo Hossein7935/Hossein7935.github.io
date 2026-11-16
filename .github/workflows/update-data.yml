@@ -7,8 +7,8 @@ on:
     types: [macrowatch-update]
   schedule:
     # GitHub führt Zeitpläne nur „best effort“ aus (oft verspätet oder ausgelassen,
-    # besonders zur vollen Stunde). Daher alle 30 Minuten zu ungeraden Minuten.
-    - cron: '7,37 * * * *'
+    # besonders zur vollen Stunde). Daher alle 15 Minuten zu ungeraden Minuten.
+    - cron: '4,19,34,49 * * * *'
   push:
     branches: [main]
     paths-ignore:
