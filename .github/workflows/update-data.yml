@@ -128,8 +128,10 @@ jobs:
           node scripts/fix-paint-chart-dlg.mjs || true
           node scripts/inject-repo-enlarge-fix.mjs || true
           node scripts/strip-page2-dupes.mjs || true
-      - name: Auto-Refresh im Browser einbinden
-        run: node scripts/inject-autorefresh.mjs
+      - name: Auto-Refresh im Browser einbinden + Datum auf Zins-Karten
+        run: |
+          node scripts/fix-rate-card-dates.mjs || true
+          node scripts/inject-autorefresh.mjs
 
       - name: Pages-URL ermitteln
         id: pages
