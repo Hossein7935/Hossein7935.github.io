@@ -24,6 +24,13 @@ const histories = payload.histories || {};
 const errors = [];
 
 // Clear previous inflation so we only keep API values
+// (der letzte gute Stand wird gemerkt und unten wiederhergestellt, falls beide APIs ausfallen)
+const prevInflation = {};
+const prevInflationHist = {};
+for (const id of countries) {
+  if (data[id]?.inflation) prevInflation[id] = data[id].inflation;
+  if (histories[`${id}-inflation`]) prevInflationHist[id] = histories[`${id}-inflation`];
+}
 for (const id of countries) {
   if (data[id]?.inflation) delete data[id].inflation;
   delete histories[`${id}-inflation`];
@@ -99,6 +106,15 @@ for (const id of countries) {
   } catch (e) {
     errors.push(`Inflation ${id}: ${e.message}`);
   }
+}
+
+// Quelle ausgefallen → letzten guten Stand behalten statt leerer Karte
+for (const id of countries) {
+  if (!data[id]?.inflation && prevInflation[id]) {
+    data[id] = data[id] || {};
+    data[id].inflation = prevInflation[id];
+  }
+  if (!histories[`${id}-inflation`] && prevInflationHist[id]) histories[`${id}-inflation`] = prevInflationHist[id];
 }
 
 payload.data = data;

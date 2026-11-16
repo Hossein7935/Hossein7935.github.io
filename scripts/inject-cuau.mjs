@@ -136,10 +136,10 @@ let _cuAuTimer=null;
 function startCuAuAuto(){
   paintCuAu();
   if(_cuAuTimer)clearInterval(_cuAuTimer);
-  _cuAuTimer=setInterval(refreshCuAuFromJson,60000);
+  // kein eigenes 60-s-Polling mehr: autorefresh.js lädt zentral neu, sobald es einen neuen Datenstand gibt
 }
 document.addEventListener('DOMContentLoaded',()=>setTimeout(startCuAuAuto,700));
-document.querySelector('#refresh')?.addEventListener('click',()=>setTimeout(()=>{refreshCuAuFromJson();paintCuAu()},1000));
+document.querySelector('#refresh')?.addEventListener('click',()=>setTimeout(paintCuAu,1500));
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='usaExtraToggle')setTimeout(paintCuAu,250)});
 `;
 

@@ -272,7 +272,7 @@ function paintSofRFwd(){
       bpEl.innerHTML=pts.filter(p=>p.period!=='Heute').map(p=>{
         const bp=Math.round((Number(p.value)-Number(spot.value))*100);
         const sign=bp>0?'+':'';
-        return '<span><b>'+p.period+'</b> '+fmt(p.value)+'% ('+sign+bp+' bp)</span>';
+        return '<span><b>'+p.period+'</b> '+fmt(p.value)+' ('+sign+bp+' bp)</span>';
       }).join('');
     } else bpEl.innerHTML='';
   }

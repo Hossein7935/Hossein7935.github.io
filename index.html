@@ -364,7 +364,6 @@ function bindBigChartHover(body){
   svg.onmouseleave=hide;
 }
 
-
 function historyHTML(country,key){let arr=histories[country+'-'+key]||[];if(key==='inflation'){const range=(document.querySelector('#inflRange')||{}).value||'3y';arr=filterByRange(arr,range)}if(!arr.length)return '<div class="sparkempty">Verlauf nicht verfügbar</div>';const pts=arr.map(x=>({period:String(x.period),value:Number(x.value)})).filter(x=>Number.isFinite(x.value));if(!pts.length)return '<div class="sparkempty">Keine gültigen Werte</div>';if(key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='inflation'||key==='gdp'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit'||key==='sofr3m'||key==='t10y2y'||key==='t10y5y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'||key==='us10yTips'||key==='us5yTips'||key==='sofrIorb'||key==='wresbal'||key==='effr'||key==='sofr'||key==='iorb'||key==='cuAu'){const extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',t10y5y:'10Y − 5Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield',us10yTips:'US10Y − TIPS10Y',us5yTips:'US5Y − TIPS5Y',sofrIorb:'SOFR − IORB',wresbal:'Bankreserven (WRESBAL)',effr:'EFFR',sofr:'SOFR',iorb:'IORB',cuAu:'Kupfer / Gold Ratio',diff:'Differenz',sofrFwd:'SOFR Erwartungskurve',ustCurve:'US Zinsstruktur',fhlbAdv:'FHLB Advances',fhlbAdvQoq:'FHLB Advances QoQ %',fhlbAdvYoy:'FHLB Advances YoY %',effrVol:'Fed Funds Volume',effrVolChg:'Fed Funds Vol Δ%',effr:'EFFR',iorb:'IORB',us1y:'US 1Y',iorbUs1yDual:'IORB + US 1Y',move:'MOVE Index',us2y:'US 2Y',us2ySofrDual:'US 2Y + SOFR',dxy:'DXY'};const label=extraLabels[key]||(defs.find(d=>d[0]===key)||[key,key])[1];const chart=renderLineChart(pts,{w:220,h:58});return `<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="${country}|${key}|${esc(label)}" title="Chart vergrößern">${chart}</div>`}let min=Math.min(0,...pts.map(p=>p.value)),max=Math.max(0,...pts.map(p=>p.value));if(max===min)max=min+1;const range=max-min||1;return `<div class="spark">${pts.slice(-5).map(x=>{const v=x.value,hh=Math.max(2,Math.round(((v-min)/range)*22));return `<div class="barwrap" title="${esc(x.period)}: ${fmt(v)}"><div class="bar ${v<0?'neg':''}" style="height:${hh}px"></div><div class="barlabel">${esc(String(x.period).replace(/^\d{4}-Q/,'Q').slice(0,7))}</div></div>`}).join('')}</div><div class="sparkcaption">Letzte ${Math.min(5,pts.length)} Werte</div>`}
 function render(){const grid=document.querySelector('#grid');grid.innerHTML='';for(const c of countries){const card=document.createElement('section');card.className='country';card.innerHTML=`<div class="ctop"><div class="flag">${c.flag}</div><div><h2>${c.name}</h2><div class="code">${c.id}</div></div></div>${c.id==='USA'?`<div class="usa-flip-toggle"><div class="usa-page-select" id="usaPageSelect"><button type="button" data-page="0">Seite 1</button><button type="button" data-page="1">Seite 2</button><button type="button" data-page="2">Seite 3</button><button type="button" data-page="3">Seite 4</button><button type="button" data-page="4">Seite 5</button><button type="button" data-page="5">Seite 6</button><button type="button" data-page="6">Seite 7</button><button type="button" data-page="7">Repo-Markt</button></div></div>`:''}<div class="metrics">${defs.map(([key,label])=>{if((key==='reservesGdp'||key==='tips5'||key==='tips10')&&c.id!=='USA')return'';const m=valueFor(c.id,key);const value=m?fmt(m.value):'Nicht verfügbar';const date=m?`${esc(m.source)} · ${esc(m.date)}`:'Quelle hat keinen Wert geliefert';const spark=key==='inflation'||key==='gdp'||key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit';return `<div class="metric${spark?' has-chart':''}"><div class="name">${label}</div><div class="value ${m?'':'na'}">${value}</div><div class="date">${date}</div>${spark?historyHTML(c.id,key):`<button class="btn" data-edit="${c.id}|${key}">Manuell eintragen</button>`}</div>`}).join('')}</div><div class="links"><a href="${c.links.inflation}" target="_blank" rel="noopener">Inflation ↗</a><a href="${c.links.rate}" target="_blank" rel="noopener">Leitzins ↗</a><a href="${c.links.bonds}" target="_blank" rel="noopener">Anleihen ↗</a><a href="${c.links.gdp}" target="_blank" rel="noopener">IMF-BIP ↗</a></div>`;
 if(c.id==='USA'){
@@ -456,129 +455,6 @@ async function refresh(){const btn=document.querySelector('#refresh'),status=doc
 function openEdit(token){const[country,key]=token.split('|');editTarget={country,key};const c=countries.find(x=>x.id===country),d=defs.find(x=>x[0]===key),old=valueFor(country,key);document.querySelector('#editTitle').textContent=c.name+': '+d[1];document.querySelector('#editHelp').textContent=d[2];document.querySelector('#editValue').value=old?.value??'';document.querySelector('#editDate').value=old?.date??'';document.querySelector('#edit').showModal()}
 document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefault();if(!editTarget)return;setValue(editTarget.country,editTarget.key,document.querySelector('#editValue').value,document.querySelector('#editDate').value,'Manuell');persist();render();document.querySelector('#edit').close()});document.querySelector('#cancel').addEventListener('click',()=>document.querySelector('#edit').close());document.querySelector('#refresh').addEventListener('click',refresh);document.querySelector('#themeToggle').addEventListener('click',()=>{const t=document.documentElement.dataset.theme==='light'?'dark':'light';document.documentElement.dataset.theme=t;try{localStorage.setItem('macrowatch-theme',t)}catch(e){};document.querySelector('#themeToggle').textContent=t==='light'?'🌙 Dunkles Design':'☀️ Helles Design'});document.querySelector('#inflRange').addEventListener('change',()=>render());document.querySelector('#year').addEventListener('change',()=>refresh());document.querySelector('#chartClose').addEventListener('click',()=>document.querySelector('#chartDlg').close());document.querySelector('#chartRange').addEventListener('click',e=>{const b=e.target.closest('button[data-range]');if(!b||!chartCtx)return;chartCtx.range=b.dataset.range;document.querySelectorAll('#chartRange button').forEach(x=>x.classList.toggle('active',x===b));paintChartDlg()});document.addEventListener('click',e=>{const w=e.target.closest('[data-chart]');if(!w)return;const[country,key,label]=w.dataset.chart.split('|');openChart(country,key,label)});document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.closest('[data-chart]'))e.target.click()});const tip=document.querySelector('#chartTip');document.addEventListener('mousemove',e=>{const hit=e.target.closest('.hit');if(!hit){tip.classList.remove('show');return}tip.textContent=hit.dataset.period+' · '+hit.dataset.value;tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY+12)+'px';tip.classList.add('show')});document.addEventListener('mouseleave',()=>tip.classList.remove('show'));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function setUsaPage(page){
   page=Math.max(0,Math.min(7,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
@@ -608,10 +484,6 @@ function setUsaPage(page){
   if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
   if(page===7)setTimeout(()=>{try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}},50);
 }
-
-
-
-
 
 const REPO_PAGE_CATALOG=[
   {key:'mmfTot',label:'MMF Total ($T)'},
@@ -867,13 +739,6 @@ function paintRepoPage(){
   if(vmeta)vmeta.textContent='BLAU=TRI Volumen · ROT='+vSecLabel+(vga&&vgb?' · GRÜN=Diff':'');
 }
 
-
-
-
-
-
-
-
 function paintDxy(){
   const faceA=document.querySelector('.usa-face-a');
   if(!faceA)return;
@@ -948,7 +813,6 @@ if(!window.__usaRenderPatched){
   };
 }
 let _rateDiffOrder=[];
-
 
 let _rateOverlayOrder=[];
 function renderRateOverlayChart(bluePts,redPts,opts){
@@ -1127,8 +991,6 @@ function paintRateDiff(){
   if(hint)hint.textContent='Berechnet: '+name;
 }
 document.addEventListener('change',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('rate-diff-cb'))paintRateDiff()});
-
-
 
 const SOFR_USA_CHART_CATALOG=[
   {key:'us3m',label:'US 3M',hist:'USA-us3m'},
@@ -1392,8 +1254,6 @@ function paintSofRTenor(){
   }
 }
 
-
-
 function paintSofRFwd(){
   const host=document.getElementById('sofrFwdChart');
   const valEl=document.getElementById('sofrFwdValue');
@@ -1428,7 +1288,7 @@ function paintSofRFwd(){
       bpEl.innerHTML=pts.filter(p=>p.period!=='Heute').map(p=>{
         const bp=Math.round((Number(p.value)-Number(spot.value))*100);
         const sign=bp>0?'+':'';
-        return '<span><b>'+p.period+'</b> '+fmt(p.value)+'% ('+sign+bp+' bp)</span>';
+        return '<span><b>'+p.period+'</b> '+fmt(p.value)+' ('+sign+bp+' bp)</span>';
       }).join('');
     } else bpEl.innerHTML='';
   }
@@ -1487,132 +1347,6 @@ function paintSofRFwd(){
   try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){}
 }
 bindUsaPages();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 let _yieldDiffOrder=[];
 const YIELD7_KEYS=[
@@ -1953,68 +1687,6 @@ function paintYieldPage7(){
   paintYield7Diff();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function paintRateDiff(){
   const labels={effr:'EFFR',sofr:'SOFR',iorb:'IORB'};
   const title=document.getElementById('rateDiffTitle');
@@ -2097,7 +1769,7 @@ function paintSofRFwd(){
       bpEl.innerHTML=pts.filter(p=>p.period!=='Heute').map(p=>{
         const bp=Math.round((Number(p.value)-Number(spot.value))*100);
         const sign=bp>0?'+':'';
-        return '<span><b>'+p.period+'</b> '+fmt(p.value)+'% ('+sign+bp+' bp)</span>';
+        return '<span><b>'+p.period+'</b> '+fmt(p.value)+' ('+sign+bp+' bp)</span>';
       }).join('');
     } else bpEl.innerHTML='';
   }
@@ -2392,7 +2064,7 @@ function paintSofRFwd(){
       bpEl.innerHTML=pts.filter(p=>p.period!=='Heute').map(p=>{
         const bp=Math.round((Number(p.value)-Number(spot.value))*100);
         const sign=bp>0?'+':'';
-        return '<span><b>'+p.period+'</b> '+fmt(p.value)+'% ('+sign+bp+' bp)</span>';
+        return '<span><b>'+p.period+'</b> '+fmt(p.value)+' ('+sign+bp+' bp)</span>';
       }).join('');
     } else bpEl.innerHTML='';
   }
@@ -2505,22 +2177,21 @@ function paintUstCurve(){
   const ten10=nom.find(p=>p.period==='10Y')||nom.at(-1);
   if(valEl)valEl.textContent=fmt(ten10.value);
   if(dateEl){
-    const ts=u.updatedAt?u.updatedAt.replace('T',' ').slice(0,16)+' UTC':(u.date||'');
+    const ts=u.date||(u.updatedAt?u.updatedAt.replace('T',' ').slice(0,16)+' UTC':'');
     dateEl.textContent=(ts?('Stand '+ts+' · '):'')+'Par Yields · 10Y im Fokus';
   }
   host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|ustCurve|US Zinsstruktur" title="Chart vergrößern">'+renderDualTenorChart(nom,tips,{w:360,h:160})+'</div>';
   if(bpEl){
     bpEl.innerHTML=nom.map(p=>{
       const tv=(tips.find(t=>t.period===p.period)||{}).value;
-      const tip=tv!=null?(' · <span style="color:#e74c3c">TIPS '+fmt(tv)+'%</span>'):'';
-      return '<span><b>'+p.period+'</b> '+fmt(p.value)+'%'+tip+'</span>';
+      const tip=tv!=null?(' · <span style="color:#e74c3c">TIPS '+fmt(tv)+'</span>'):'';
+      return '<span><b>'+p.period+'</b> '+fmt(p.value)+tip+'</span>';
     }).join('');
   }
   if(metaEl){
     metaEl.textContent=(u.source||'FRED DGS* + DFII*')+'. '+(u.note||'TIPS nur 5Y/10Y/30Y.')+' Nominal=Par Yield, TIPS=Real Yield.';
   }
 }
-
 
 let _fhlbMode='qoq';
 function paintFhlb(){
@@ -2585,7 +2256,6 @@ function paintFhlb(){
   });
 }
 
-
 function paintEffrVol(){
   let faceE=document.querySelector('.usa-face-e');
   const pageNow=(()=>{try{return Number(localStorage.getItem('macrowatch-usa-page')||0)}catch(e){return 0}})();
@@ -2612,7 +2282,6 @@ function paintEffrVol(){
   if(host){if(!volShow.length)host.innerHTML='<div class="sparkempty">Keine Volumendaten</div>';else host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|effrVol|Fed Funds Volume" title="Chart vergrößern">'+renderLineChart(volShow,{w:360,h:150})+'</div>';}
   if(meta)meta.textContent=(ev.source||'FRED EFFRVOL')+' · '+(ev.points||vol.length)+' Handelstage';
 }
-
 
 function renderIorbUs1yChart(iorb,us1y,opts){
   opts=opts||{};
@@ -2722,8 +2391,6 @@ function paintIorbUs1y(){
   }
   if(metaEl)metaEl.textContent=(meta.source||'FRED IORB + DGS1')+' · '+(meta.iorbPoints||iorb.length)+' / '+(meta.us1yPoints||us1y.length)+' Punkte · Klick = vergrößern mit Crosshair';
 }
-
-
 
 function renderMoveYieldChart(movePts, yieldPts, opts){
   opts=opts||{};
@@ -2976,7 +2643,6 @@ function paintUs2ySofr(){
   }
 }
 
-
 function fmtCuAu(v){return Number(v).toLocaleString('de-DE',{maximumFractionDigits:4,minimumFractionDigits:2})}
 function paintCuAu(){
   const host=document.getElementById('cuAuChartHost');
@@ -3011,11 +2677,12 @@ let _cuAuTimer=null;
 function startCuAuAuto(){
   paintCuAu();
   if(_cuAuTimer)clearInterval(_cuAuTimer);
-  _cuAuTimer=setInterval(refreshCuAuFromJson,60000);
+  // kein eigenes 60-s-Polling mehr: autorefresh.js lädt zentral neu, sobald es einen neuen Datenstand gibt
 }
 document.addEventListener('DOMContentLoaded',()=>setTimeout(startCuAuAuto,700));
-document.querySelector('#refresh')?.addEventListener('click',()=>setTimeout(()=>{refreshCuAuFromJson();paintCuAu()},1000));
+document.querySelector('#refresh')?.addEventListener('click',()=>setTimeout(paintCuAu,1500));
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='usaExtraToggle')setTimeout(paintCuAu,250)});
 
 refresh();
-</script></body></html>
+</script><script src="autorefresh.js?v=fc23804646"></script>
+</body></html>

@@ -1,4 +1,6 @@
 name: Deploy GitHub Pages
+# Veröffentlicht die Seite bei eigenen Code-Änderungen (Push) oder manuell.
+# Die regelmäßigen Daten-Updates veröffentlicht „MacroWatch data update“ selbst.
 on:
   push:
     branches: [main]
@@ -9,17 +11,30 @@ permissions:
   id-token: write
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Setup Pages
+        id: pages
         uses: actions/configure-pages@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Neuesten Datenstand übernehmen (nicht mit älterem Repo-Stand überschreiben)
+        env:
+          PAGES_BASE_URL: ${{ steps.pages.outputs.base_url }}
+        run: |
+          node scripts/sync-live-data.mjs || true
+          node scripts/finalize-data.mjs || true
+          node scripts/inject-autorefresh.mjs || true
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

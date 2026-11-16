@@ -44,7 +44,6 @@ try {
   map3.set(today, us3mVal);
   histories['USA-us3m'] = [...map3.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .slice(-400)
     .map(([period, value]) => ({ period, value }));
 
   data.USA = data.USA || {};
@@ -87,7 +86,8 @@ try {
     };
   }
 
-  histories['USA-sofrUs3mSpread'] = spread.slice(-400);
+  // Nur schreiben, wenn es Punkte gibt – sonst bleibt die bisherige Historie erhalten
+  if (spread.length) histories['USA-sofrUs3mSpread'] = spread.slice(-400);
 
   console.log('US3M', us3mVal, 'pts', histories['USA-us3m'].length);
   console.log('SOFR−US3M spread', data.USA.sofrUs3mSpread?.value, 'pts', histories['USA-sofrUs3mSpread'].length);

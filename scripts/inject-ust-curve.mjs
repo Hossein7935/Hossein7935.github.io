@@ -105,15 +105,15 @@ function paintUstCurve(){
   const ten10=nom.find(p=>p.period==='10Y')||nom.at(-1);
   if(valEl)valEl.textContent=fmt(ten10.value);
   if(dateEl){
-    const ts=u.updatedAt?u.updatedAt.replace('T',' ').slice(0,16)+' UTC':(u.date||'');
+    const ts=u.date||(u.updatedAt?u.updatedAt.replace('T',' ').slice(0,16)+' UTC':'');
     dateEl.textContent=(ts?('Stand '+ts+' · '):'')+'Par Yields · 10Y im Fokus';
   }
   host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|ustCurve|US Zinsstruktur" title="Chart vergrößern">'+renderDualTenorChart(nom,tips,{w:360,h:160})+'</div>';
   if(bpEl){
     bpEl.innerHTML=nom.map(p=>{
       const tv=(tips.find(t=>t.period===p.period)||{}).value;
-      const tip=tv!=null?(' · <span style="color:#e74c3c">TIPS '+fmt(tv)+'%</span>'):'';
-      return '<span><b>'+p.period+'</b> '+fmt(p.value)+'%'+tip+'</span>';
+      const tip=tv!=null?(' · <span style="color:#e74c3c">TIPS '+fmt(tv)+'</span>'):'';
+      return '<span><b>'+p.period+'</b> '+fmt(p.value)+tip+'</span>';
     }).join('');
   }
   if(metaEl){

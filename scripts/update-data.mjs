@@ -373,8 +373,20 @@ async function main(){
     y2:countries.filter(c=>data[c.id].y2).length,
     y10:countries.filter(c=>data[c.id].y10).length,
   };
-  const payload={updatedAt:new Date().toISOString(),data,histories,forecasts,forecastYears,counts,errors};
-  fs.writeFileSync('data.json',JSON.stringify(payload,null,2)+'\n');
+  // Mit dem bisherigen Stand zusammenführen statt ihn zu ersetzen: Fällt eine Quelle
+  // in diesem oder einem späteren Schritt aus, bleibt der letzte gute Wert erhalten
+  // (mit seinem Datum), statt dass der Chart leer wird.
+  let prev={};
+  try{prev=JSON.parse(fs.readFileSync('data.json','utf8'))||{}}catch{prev={}}
+  const mergedData={...(prev.data&&typeof prev.data==='object'?prev.data:{})};
+  for(const c of countries)mergedData[c.id]={...(prev.data?.[c.id]||{}),...data[c.id]};
+  // Die 5-Punkte-Historien hier sind nur Platzhalter; die Chart-Skripte bauen sie später voll auf.
+  const mergedHistories={...(prev.histories&&typeof prev.histories==='object'?prev.histories:{})};
+  for(const [k,v] of Object.entries(histories)){const old=mergedHistories[k];if(!Array.isArray(old)||old.length<=v.length)mergedHistories[k]=v;}
+  const mergedForecasts={...(prev.forecasts||{})};
+  for(const c of countries)mergedForecasts[c.id]={...(prev.forecasts?.[c.id]||{}),...forecasts[c.id]};
+  const payload={...prev,updatedAt:new Date().toISOString(),data:mergedData,histories:mergedHistories,forecasts:mergedForecasts,forecastYears,counts,errors};
+  fs.writeFileSync('data.json',JSON.stringify(payload)+'\n');
   console.log('data.json geschrieben',JSON.stringify(counts));
 }
 main().catch(e=>{console.error('Datenaktualisierung fehlgeschlagen:',e);process.exitCode=1;});

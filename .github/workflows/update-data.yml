@@ -1,20 +1,32 @@
 name: MacroWatch data update
 on:
   workflow_dispatch:
+  # Für einen garantierten Takt kann ein externer Cron-Dienst diesen Workflow
+  # per API starten (siehe README.txt, Abschnitt „Zuverlässiger Takt“).
+  repository_dispatch:
+    types: [macrowatch-update]
   schedule:
-    - cron: '20 * * * *'
+    # GitHub führt Zeitpläne nur „best effort“ aus (oft verspätet oder ausgelassen,
+    # besonders zur vollen Stunde). Daher alle 30 Minuten zu ungeraden Minuten.
+    - cron: '7,37 * * * *'
   push:
-    branches: [main, master]
+    branches: [main]
     paths-ignore:
       - 'data.json'
+      - 'version.json'
 permissions:
   contents: write
+  pages: write
+  id-token: write
 concurrency:
   group: macrowatch-data-update
   cancel-in-progress: false
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      deploy: ${{ steps.decide.outputs.deploy }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -106,85 +118,8 @@ jobs:
         run: node scripts/inject-repo-enlarge-fix.mjs || true
       - name: Strip USA page 2 duplicate charts
         run: node scripts/strip-page2-dupes.mjs || true
-      - name: Check updater syntax
+      - name: Final index fixes (vorher im Commit-Schritt)
         run: |
-          node --check scripts/inject-page8-repo.mjs || true
-          node --check scripts/inject-repo-enlarge-fix.mjs || true
-          node --check scripts/strip-page2-dupes.mjs || true
-          node --check scripts/fetch-ust-tips-page7.mjs || true
-      - name: Fetch official economic data
-        env:
-          TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
-        run: node scripts/update-data.mjs
-      - name: Fill inflation
-        run: node scripts/fetch-inflation.mjs
-      - name: Fill 2Y yields
-        run: node scripts/fetch-y2.mjs
-      - name: Fill 10Y yields
-        run: node scripts/fetch-y10.mjs
-      - name: Country 10Y−2Y spreads (DEU FRA JPN AUS CHN)
-        run: node scripts/fetch-country-t10y2y.mjs
-      - name: Fill US TIPS
-        run: node scripts/fetch-tips.mjs
-      - name: Build 6-month yield charts (2Y/10Y)
-        run: node scripts/fetch-yield-charts.mjs
-      - name: CME Term SOFR 3M + T10Y2Y (free)
-        run: node scripts/fetch-sofr-term.mjs
-      - name: SOFR − US 3M spread (TradingView)
-        run: node scripts/fetch-sofr-muni-spread.mjs
-      - name: BofA CCC High Yield (FRED / TradingView)
-        run: node scripts/fetch-bofa-ccc.mjs
-      - name: US10Y − TIPS10Y spread (FRED T10YIE)
-        run: node scripts/fetch-us10y-tips-spread.mjs
-      - name: US5Y − TIPS5Y spread (FRED T5YIE)
-        run: node scripts/fetch-us5y-tips-spread.mjs
-      - name: US10Y − US5Y spread (FRED DGS10−DGS5)
-        run: node scripts/fetch-us10y5y.mjs
-      - name: SOFR − IORB spread (FRED)
-        run: node scripts/fetch-sofr-iorb.mjs
-      - name: WRESBAL bank reserves (FRED)
-        run: node scripts/fetch-wresbal.mjs
-      - name: EFFR + SOFR + IORB daily (USA page 3)
-        run: node scripts/fetch-effr-sofr-iorb.mjs
-      - name: SOFR forward curve (SR1 + NY Fed, Seite 4)
-        run: node scripts/fetch-sofr-futures.mjs
-      - name: US Treasury + TIPS curve (Seite 4)
-        run: node scripts/fetch-ust-curve.mjs
-      - name: FHLBank Advances (Office of Finance PDFs)
-        run: node scripts/fetch-fhlb-advances.mjs
-      - name: Federal Funds Market Volume (FRED EFFRVOL)
-        run: node scripts/fetch-effr-volume.mjs
-      - name: IORB + US 1Y (FRED + Treasury + TV)
-        run: node scripts/fetch-iorb-us1y.mjs
-      - name: MOVE Index (Yahoo ^MOVE)
-        run: node scripts/fetch-move.mjs
-      - name: DXY US Dollar Index (Yahoo)
-        run: node scripts/fetch-dxy.mjs
-      - name: US 2Y + SOFR dual (FRED)
-        run: node scripts/fetch-us2y-sofr.mjs
-      - name: USA page 7 UST + TIPS (FRED + Treasury + TV)
-        run: node scripts/fetch-ust-tips-page7.mjs
-      - name: OFR Repo + MMF (Seite 8)
-        run: node scripts/fetch-repo-mmf.mjs
-      - name: HH + Business debt growth (Fed Z.1)
-        run: node scripts/fetch-nonfin-debt.mjs
-      - name: Copper/Gold ratio (Yahoo HG=F / GC=F)
-        run: node scripts/fetch-cu-au.mjs
-      - name: Build 3-year policy rate charts
-        run: node scripts/fetch-rate-charts.mjs
-      - name: Build inflation charts (3y)
-        run: node scripts/fetch-inflation-charts.mjs
-      - name: Build 3-year GDP growth charts
-        run: node scripts/fetch-gdp-charts.mjs
-      - name: US bank reserves relative to GDP
-        run: node scripts/fetch-reserves-gdp.mjs
-      - name: Fiscal deficit (IMF)
-        run: node scripts/fetch-deficit.mjs
-      - name: Commit updated data
-        run: |
-          set -e
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           node scripts/fix-js-syntax.mjs || true
           node scripts/inject-fix-usa-nav.mjs || true
           node scripts/inject-page8-repo.mjs || true
@@ -193,18 +128,79 @@ jobs:
           node scripts/fix-paint-chart-dlg.mjs || true
           node scripts/inject-repo-enlarge-fix.mjs || true
           node scripts/strip-page2-dupes.mjs || true
-          git add data.json scripts/ index.html || true
-          if git diff --cached --quiet; then
-            echo "No data changes to commit"
+      - name: Auto-Refresh im Browser einbinden
+        run: node scripts/inject-autorefresh.mjs
+
+      - name: Pages-URL ermitteln
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Neuesten Datenstand übernehmen (Live-Seite vs. Repository)
+        env:
+          PAGES_BASE_URL: ${{ steps.pages.outputs.base_url }}
+        run: node scripts/sync-live-data.mjs
+      - name: Alle Datenquellen abrufen (einzeln abgesichert)
+        env:
+          TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
+        run: node scripts/run-fetchers.mjs
+      - name: Datenstand prüfen + version.json schreiben
+        id: finalize
+        run: node scripts/finalize-data.mjs
+      - name: Deploy nötig?
+        id: decide
+        run: |
+          if [ "${{ steps.finalize.outputs.changed }}" = "true" ] || [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
           else
-            git commit -m "Update MacroWatch data + fixed index JS" || true
-            git pull --no-rebase -X ours origin main || true
-            node scripts/fix-paint-chart-dlg.mjs || true
-            node scripts/inject-repo-enlarge-fix.mjs || true
-            node scripts/inject-page8-repo.mjs || true
-            node scripts/fix-usa-face-visibility.mjs || true
-            node scripts/strip-page2-dupes.mjs || true
-            git add data.json scripts/ index.html || true
-            git commit -m "Merge data update" || true
-            git push origin HEAD:main || git push --force-with-lease origin HEAD:main
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "Keine neuen Daten – kein Deploy nötig"
           fi
+      - name: Seite für GitHub Pages verpacken
+        if: steps.decide.outputs.deploy == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Stand ins Repository sichern
+        # data.json höchstens alle 3 Stunden committen (die Live-Seite wird bei jedem Lauf
+        # aktualisiert); Code-Änderungen an index.html/scripts sofort.
+        continue-on-error: true
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          last=$(git log -1 --format=%ct -- data.json 2>/dev/null || echo 0)
+          age=$(( $(date +%s) - ${last:-0} ))
+          paths="index.html scripts/"
+          if [ "${{ steps.finalize.outputs.changed }}" = "true" ] && { [ "$age" -ge 10800 ] || [ "${{ github.event_name }}" != "schedule" ]; }; then
+            paths="$paths data.json version.json"
+          fi
+          git add $paths
+          if git diff --cached --quiet; then
+            echo "Nichts zu committen (letzter Daten-Commit vor $((age/60)) Min.)"
+            exit 0
+          fi
+          git commit -m "Update MacroWatch data"
+          for i in 1 2 3; do
+            if git pull --no-rebase -X ours --no-edit origin main && git push origin HEAD:main; then
+              echo "Gepusht"; exit 0
+            fi
+            git merge --abort 2>/dev/null || true
+            sleep $((i * 10))
+          done
+          echo "::warning::Push fehlgeschlagen – die Live-Seite ist trotzdem aktuell, der Stand wird beim nächsten Lauf gesichert"
+
+  deploy:
+    needs: update
+    if: needs.update.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
