@@ -32,6 +32,12 @@ Der Taktgeber startet deshalb nach jedem Daten-Lauf nach 20 Minuten Pause (Woche
 Actions › Variables › Variable MACROWATCH_TAKT = off. Neu anstoßen: Actions ›
 „MacroWatch Taktgeber“ › Run workflow.
 
+DATENPRÜFUNG (scripts/check-freshness.mjs → freshness.json)
+Bei jedem Datenlauf fragt das Skript jede Originalquelle (FRED, NY Fed, U.S. Treasury,
+Yahoo, TradingView, OFR, FHLB, SKSI-Repository) selbst nach ihrem neuesten Stand und
+vergleicht ihn mit dem Stand auf der Seite. Ergebnis: in der Statuszeile „Datenprüfung“
+(Klick öffnet die Tabelle) und im Actions-Lauf unter „Summary“.
+
 USA SEITE 1 – QUELLEN DER KARTEN
 - Inflation: aktuelle CPI J/J (BLS über FRED CPIAUCSL); fehlende Vorjahresmonate (Okt. 2025,
   US-Shutdown) werden aus Vor- und Folgemonat interpoliert

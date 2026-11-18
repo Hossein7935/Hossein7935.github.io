@@ -17,6 +17,7 @@
   var STARTUP_DELAY_MS = 4000;
 
   var knownUpdatedAt = null; // Datenstand, der gerade angezeigt wird
+  var fresh = null;          // Ergebnis der Datenprüfung (freshness.json)
   var lastCheck = 0;
   var lastReload = Date.now();
   var timer = null;
@@ -30,6 +31,47 @@
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (j) { return j && j.updatedAt ? j : null; })
       .catch(function () { return null; });
+  }
+
+  function loadFreshness() {
+    return fetch('./freshness.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && j.items) { fresh = j; decorateStatus(); } })
+      .catch(function () {});
+  }
+
+  function esc(t) {
+    return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function openCheckDialog() {
+    if (!fresh) return;
+    var dlg = document.getElementById('mwCheckDlg');
+    if (!dlg) {
+      dlg = document.createElement('dialog');
+      dlg.id = 'mwCheckDlg';
+      dlg.style.cssText = 'max-width:min(980px,96vw);width:96vw;max-height:88vh;overflow:auto;padding:16px';
+      document.body.appendChild(dlg);
+      dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.id === 'mwCheckClose') dlg.close(); });
+    }
+    var icon = { ok: '✅', alt: '⚠️', info: 'ℹ️', fehler: '❌' };
+    var label = { ok: 'aktuell', alt: 'Quelle neuer', info: 'nicht vergleichbar', fehler: 'Quelle nicht erreichbar' };
+    var order = { alt: 0, fehler: 1, ok: 2, info: 3 };
+    var rows = fresh.items.slice().sort(function (a, b) { return (order[a.status] - order[b.status]) || 0; }).map(function (i) {
+      return '<tr style="border-top:1px solid var(--line)"><td style="padding:5px 6px">' + icon[i.status] + '</td><td style="padding:5px 6px;white-space:nowrap">' + esc(i.page) + '</td><td style="padding:5px 6px">' + esc(i.label) +
+        '</td><td style="padding:5px 6px;white-space:nowrap">' + esc(i.pageDate) + '</td><td style="padding:5px 6px;white-space:nowrap">' + esc(i.srcDate) +
+        '</td><td style="padding:5px 6px;font-size:12px;color:var(--muted)">' + esc(label[i.status]) + (i.note ? ' · ' + esc(i.note) : '') + ' · ' + esc(i.source) + '</td></tr>';
+    }).join('');
+    var sm = fresh.summary || {};
+    dlg.innerHTML = '<h3 style="margin:0 0 6px">Datenprüfung · Stand Seite vs. Quelle</h3>' +
+      '<div style="font-size:13px;color:var(--muted);margin-bottom:10px">Geprüft ' + esc(new Date(fresh.checkedAt).toLocaleString('de-DE')) +
+      ' · ✅ ' + (sm.ok || 0) + ' aktuell · ⚠️ ' + (sm.alt || 0) + ' Quelle neuer · ❌ ' + (sm.fehler || 0) + ' nicht erreichbar · ℹ️ ' + (sm.info || 0) + ' Prognose/Quartal' +
+      '<br>Bei jedem Datenlauf fragt das Skript jede Quelle selbst nach ihrem neuesten Stand.</div>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="text-align:left"><th></th><th>Bereich</th><th>Daten</th><th>Stand Seite</th><th>Stand Quelle</th><th>Hinweis</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<div class="actions" style="margin-top:12px;text-align:right"><button type="button" class="btn" id="mwCheckClose">Schließen</button></div>';
+    dlg.showModal();
   }
 
   function waitUntilIdle(btn, maxMs) {
@@ -67,6 +109,19 @@
     var age = knownUpdatedAt ? ageText(knownUpdatedAt) : '';
     el.textContent = ' · ' + (age ? age + ' · ' : '') + 'Auto-Update an';
     el.title = 'Die Seite prüft alle 2 Minuten, ob neue Daten vorliegen, und aktualisiert alle Charts automatisch.';
+    if (fresh && fresh.summary) {
+      var b = status.querySelector('#mwCheckBtn');
+      if (!b) {
+        b = document.createElement('a');
+        b.id = 'mwCheckBtn';
+        b.href = '#';
+        b.style.cssText = 'margin-left:6px;color:var(--accent);white-space:nowrap';
+        b.addEventListener('click', function (e) { e.preventDefault(); openCheckDialog(); });
+        el.after(b);
+      }
+      var sm = fresh.summary;
+      b.textContent = '· Datenprüfung: ✅ ' + (sm.ok || 0) + (sm.alt ? ' · ⚠️ ' + sm.alt : '') + (sm.fehler ? ' · ❌ ' + sm.fehler : '');
+    }
   }
 
   function reloadData() {
@@ -80,6 +135,7 @@
     btn.click(); // gleicher Ablauf wie der Button „Aktualisieren“
     return waitUntilIdle(btn, 90000).then(function () {
       lastReload = Date.now();
+      loadFreshness();
       setTimeout(function () {
         window.scrollTo(0, y);
         var dlg = $('#chartDlg');
@@ -139,5 +195,5 @@
   });
   setInterval(function () { if (!document.hidden) decorateStatus(); }, 60000);
 
-  setTimeout(function () { check(false).then(schedule, schedule); }, STARTUP_DELAY_MS);
+  setTimeout(function () { check(false).then(schedule, schedule); loadFreshness(); }, STARTUP_DELAY_MS);
 })();

@@ -144,6 +144,10 @@ jobs:
         env:
           TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
         run: node scripts/run-fetchers.mjs
+      - name: Datenprüfung – Stand Seite vs. Quelle
+        continue-on-error: true
+        timeout-minutes: 5
+        run: node scripts/check-freshness.mjs
       - name: Datenstand prüfen + version.json schreiben
         id: finalize
         run: node scripts/finalize-data.mjs
@@ -174,9 +178,9 @@ jobs:
           age=$(( $(date +%s) - ${last:-0} ))
           paths="index.html scripts/"
           if [ "${{ steps.finalize.outputs.changed }}" = "true" ] && { [ "$age" -ge 10800 ] || [ "${{ github.event_name }}" != "schedule" ]; }; then
-            paths="$paths data.json version.json"
+            paths="$paths data.json version.json freshness.json"
           fi
-          git add $paths
+          for f in $paths; do [ -e "$f" ] && git add "$f"; done
           if git diff --cached --quiet; then
             echo "Nichts zu committen (letzter Daten-Commit vor $((age/60)) Min.)"
             exit 0

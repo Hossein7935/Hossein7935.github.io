@@ -37,11 +37,14 @@ if (!payload || typeof payload.data !== 'object' || typeof payload.histories !==
   process.exit(1);
 }
 
+const freshness = readJson('freshness.json');
 const content = {
   data: payload.data,
   histories: payload.histories,
   forecasts: payload.forecasts || null,
-  forecastYears: payload.forecastYears || null
+  forecastYears: payload.forecastYears || null,
+  // Ergebnis der Datenprüfung (ohne Zeitstempel) – damit eine geänderte Prüfung auch veröffentlicht wird
+  freshness: freshness && Array.isArray(freshness.items) ? freshness.items.map((i) => [i.label, i.pageDate, i.srcDate, i.status]) : null
 };
 const hash = crypto.createHash('sha256').update(JSON.stringify(stripVolatile(content))).digest('hex').slice(0, 16);
 
