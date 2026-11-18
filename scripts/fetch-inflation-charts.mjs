@@ -55,15 +55,15 @@ function toYoY(indexRows) {
       };
       const a = nb(y - 1, m - 1);
       const c = nb(y - 1, m + 1);
-      if (a && c) base = Math.sqrt(a * c);
+      if (a && c) { base = Math.sqrt(a * c); r.__interp = true; }
     }
     if (!base) continue;
     const yoy = ((r.value / base) - 1) * 100;
-    out.push({ period: r.period.slice(0, 7), value: Math.round(yoy * 100) / 100 });
+    out.push({ period: r.period.slice(0, 7), value: Math.round(yoy * 100) / 100, ...(r.__interp ? { interp: true } : {}) });
   }
   const map = new Map();
-  for (const p of out) map.set(p.period, p.value);
-  return [...map.entries()].map(([period, value]) => ({ period, value }));
+  for (const p of out) map.set(p.period, p);
+  return [...map.values()];
 }
 
 function looksLikeYoY(rows) {
