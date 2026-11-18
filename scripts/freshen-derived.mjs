@@ -206,11 +206,12 @@ if (data.USA.us2ySofr) {
   const last = infl.at(-1);
   if (last && Number.isFinite(Number(last.value))) {
     const cur = data.USA.inflation || {};
-    if (cur.date !== last.period || cur.value !== last.value) {
+    if (cur.date !== last.period || cur.value !== last.value || !!last.interp !== /interpoliert/.test(cur.source || '')) {
       data.USA.inflation = {
         value: last.value,
         date: last.period,
-        source: 'BLS CPI (FRED CPIAUCSL) · Veränderung zum Vorjahresmonat'
+        source: 'BLS CPI (FRED CPIAUCSL) · Veränderung zum Vorjahresmonat' +
+          (last.interp ? ' · Vorjahresmonat fehlt (US-Shutdown 2025) und ist aus Vor-/Folgemonat interpoliert' : '')
       };
       log.push(`inflation USA: ${last.period} = ${last.value}`);
     }
