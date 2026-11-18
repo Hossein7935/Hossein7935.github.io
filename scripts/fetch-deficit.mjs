@@ -24,6 +24,8 @@ try {
   const byCountry = await imfFiscal();
   const nowY = new Date().getFullYear();
   for (const id of COUNTRIES) {
+    // USA: monatliche Treasury-Daten (fetch-usa-page1.mjs) haben Vorrang vor der IMF-Prognose
+    if (id === 'USA' && String(data.USA?.deficit?.source || '').startsWith('US Treasury MTS')) continue;
     const series = byCountry[id];
     if (!series || typeof series !== 'object') {
       errors.push(`Defizit ${id}: keine IMF-Daten`);

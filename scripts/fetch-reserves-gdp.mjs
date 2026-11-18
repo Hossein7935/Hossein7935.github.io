@@ -60,12 +60,33 @@ try {
 
   if (!hist.length) throw new Error('keine Ratio-Punkte');
 
+  // Monatswerte (TOTRESNS) erscheinen mit ~6 Wochen Verzug → danach wöchentlich mit
+  // WRESBAL (Reserveguthaben, Mio. $) / BIP weiterführen, damit die Karte aktuell bleibt
+  try {
+    const weekly = await fredCsv('WRESBAL', '2023-01-01');
+    const lastMonth = hist.at(-1).period; // YYYY-MM
+    for (const w of weekly) {
+      if (w.period.slice(0, 7) <= lastMonth) continue;
+      let g = null;
+      for (const row of gdpSorted) {
+        if (row.period <= w.period) g = row.value;
+        else break;
+      }
+      if (!g) continue;
+      hist.push({ period: w.period, value: Math.round(((w.value / 1000) / g) * 10000) / 100 });
+    }
+  } catch (e) {
+    errors.push(`Reserven/BIP wöchentlich: ${e.message}`);
+  }
+
   const last = hist.at(-1);
   data.USA = data.USA || {};
   data.USA.reservesGdp = {
     value: last.value,
     date: last.period,
-    source: 'FRED · TOTRESNS / GDP (Bank reserves vs nominal GDP)'
+    source: /^\d{4}-\d{2}-\d{2}$/.test(last.period)
+      ? 'FRED · TOTRESNS / GDP monatlich + WRESBAL / GDP wöchentlich'
+      : 'FRED · TOTRESNS / GDP (Bank reserves vs nominal GDP)'
   };
   histories['USA-reservesGdp'] = hist;
 } catch (e) {

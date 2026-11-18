@@ -24,7 +24,7 @@
     { group: 'stress', title: 'Credit Stress · SKSI', hint: 'Synchronisierter Kreditstress-Index (0–100) und seine vier Bausteine. z = Abstand zum Normalniveau 1997–2006.', keys: ['sksi', 'hyOas', 'igOas', 'baaAaa', 'nfci'] }
   ];
 
-  var UNIT_BY_KEY = { nfci: 'index', sksi: 'score' };
+  var UNIT_BY_KEY = { nfci: 'index', sksi: 'score', dxy: 'index', move: 'index' }; // Großansicht ohne „%“
   var REGIME = {
     normal: { de: 'Ruhig', color: 'var(--accent)' },
     watch: { de: 'Erhöht', color: '#f5b041' },

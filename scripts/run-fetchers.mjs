@@ -45,6 +45,7 @@ const STEPS = [
   ['scripts/fetch-gdp-charts.mjs', 'BIP-Charts'],
   ['scripts/fetch-reserves-gdp.mjs', 'Reserven/BIP'],
   ['scripts/fetch-deficit.mjs', 'Defizit (IMF)'],
+  ['scripts/fetch-usa-page1.mjs', 'USA Seite 1: Fed-Zielspanne + Defizit (MTS)'],
   ['scripts/fetch-credit.mjs', 'Credit Vergabe (SLOOS, H.8, SKSI)', 180],
   // must run last: fills FRED-lagged series from Treasury/TradingView/NY Fed
   ['scripts/freshen-derived.mjs', 'Neuere Tage aus Treasury/TV/NY Fed', 60]

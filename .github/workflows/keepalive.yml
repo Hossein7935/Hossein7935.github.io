@@ -1,0 +1,45 @@
+name: MacroWatch Taktgeber
+# GitHub startet geplante Läufe (schedule) für dieses Repository nur etwa alle 8 Stunden.
+# Dieser Workflow startet nach jedem Daten-Lauf nach einer Pause selbst den nächsten,
+# damit die Daten werktags etwa alle 25 Minuten aktualisiert werden (Wochenende: alle 2 h).
+#
+# Abschalten: Settings › Secrets and variables › Actions › Variables ›
+#             neue Variable MACROWATCH_TAKT mit dem Wert off
+on:
+  workflow_run:
+    workflows: ["MacroWatch data update"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      sofort:
+        description: 'Ohne Pause sofort einen Daten-Lauf starten'
+        type: boolean
+        default: true
+permissions:
+  actions: write
+  contents: read
+concurrency:
+  group: macrowatch-takt
+  cancel-in-progress: true
+jobs:
+  next:
+    if: vars.MACROWATCH_TAKT != 'off' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Pause bis zum nächsten Lauf
+        if: github.event_name != 'workflow_dispatch' || !inputs.sofort
+        run: |
+          dow=$(date -u +%u)   # 6 = Samstag, 7 = Sonntag
+          hour=$(date -u +%H)
+          if [ "$dow" = "6" ] || { [ "$dow" = "7" ] && [ "$hour" -lt 21 ]; }; then
+            echo "Wochenende, Märkte geschlossen: 2 Stunden Pause"
+            sleep 7200
+          else
+            echo "Werktag: 20 Minuten Pause"
+            sleep 1200
+          fi
+      - name: Nächsten Daten-Lauf starten
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run update-data.yml --ref main -R "${{ github.repository }}"

@@ -43,8 +43,20 @@ function toYoY(indexRows) {
   for (const r of sorted) {
     const [y, m] = r.period.split('-').map(Number);
     const prevKeys = [...byPeriod.keys()].filter(k => k.startsWith(`${y - 1}-${String(m).padStart(2, '0')}`));
-    if (!prevKeys.length) continue;
-    const base = byPeriod.get(prevKeys[prevKeys.length - 1]);
+    let base = prevKeys.length ? byPeriod.get(prevKeys[prevKeys.length - 1]) : null;
+    if (!base) {
+      // Vorjahresmonat fehlt (z. B. Oktober 2025: wegen des US-Shutdowns nie veröffentlicht)
+      // → geometrisches Mittel aus Vor- und Folgemonat, wie es auch KPMG/EY rechnen
+      const nb = (yy, mm) => {
+        if (mm < 1) { yy -= 1; mm = 12; }
+        if (mm > 12) { yy += 1; mm = 1; }
+        const k = [...byPeriod.keys()].filter(x => x.startsWith(`${yy}-${String(mm).padStart(2, '0')}`));
+        return k.length ? byPeriod.get(k[k.length - 1]) : null;
+      };
+      const a = nb(y - 1, m - 1);
+      const c = nb(y - 1, m + 1);
+      if (a && c) base = Math.sqrt(a * c);
+    }
     if (!base) continue;
     const yoy = ((r.value / base) - 1) * 100;
     out.push({ period: r.period.slice(0, 7), value: Math.round(yoy * 100) / 100 });

@@ -25,6 +25,22 @@ Aktuell ist dort „Deploy from a branch“ mit dem Ordner /docs eingestellt. Di
 Ordner gibt es nicht, deshalb schlägt „pages build and deployment“ bei jedem Commit
 fehl (rote Läufe + E-Mails). Die Seite selbst wird über die Workflows veröffentlicht.
 
+TAKTGEBER (.github/workflows/keepalive.yml)
+GitHub startet den Zeitplan für dieses Repository in der Praxis nur etwa alle 8 Stunden.
+Der Taktgeber startet deshalb nach jedem Daten-Lauf nach 20 Minuten Pause (Wochenende:
+2 Stunden) selbst den nächsten Lauf. Abschalten: Settings › Secrets and variables ›
+Actions › Variables › Variable MACROWATCH_TAKT = off. Neu anstoßen: Actions ›
+„MacroWatch Taktgeber“ › Run workflow.
+
+USA SEITE 1 – QUELLEN DER KARTEN
+- Inflation: aktuelle CPI J/J (BLS über FRED CPIAUCSL); fehlende Vorjahresmonate (Okt. 2025,
+  US-Shutdown) werden aus Vor- und Folgemonat interpoliert
+- Leitzins: Fed-Zielspanne täglich (FRED DFEDTARL/DFEDTARU), Chart monatlich (BIS)
+- 2J/10J: TradingView laufend, Verlauf aus Treasury + TradingView
+- Bankreserven/BIP: TOTRESNS monatlich, danach WRESBAL wöchentlich
+- Haushaltsdefizit: Bundeshaushalt 12 Monate rollierend in % des BIP (Monthly Treasury Statement)
+- Reales BIP-Wachstum: IMF-Prognose für das gewählte Jahr (ändert sich nur mit dem IMF WEO)
+
 ZUVERLÄSSIGER TAKT (optional, empfohlen)
 GitHub startet Zeitpläne nur „best effort“: Ein stündlicher Cron lief in der Praxis
 nur alle 4–8 Stunden. Für einen garantierten Takt startet ein kostenloser externer

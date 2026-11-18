@@ -29,7 +29,8 @@ function paintDxy(){
   const host=document.getElementById('dxyChart');
   const meta=document.getElementById('dxyMeta');
   const last=ser.length?ser.at(-1):null;
-  if(valEl)valEl.textContent=last?fmt(last.value):(dx.value!=null?fmt(dx.value):'—');
+  const _num=v=>Number(v).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(valEl)valEl.textContent=last?_num(last.value):(dx.value!=null?_num(dx.value):'—');
   if(dateEl){
     const ts=dx.updatedAt?dx.updatedAt.replace('T',' ').slice(0,16)+' UTC':'';
     dateEl.textContent=(last?('Stand '+last.period):(dx.date?('Stand '+dx.date):'—'))+(ts?(' · '+ts):'');
@@ -37,14 +38,17 @@ function paintDxy(){
   if(cards){
     const p=dx.pctChange,a=dx.absChange;
     cards.innerHTML=
-      '<span><b>Δ</b> '+(a!=null?((a>=0?'+':'')+fmt(a)):'—')+'</span>'+
-      '<span><b>Δ %</b> '+(p!=null?((p>=0?'+':'')+fmt(p)+' %'):'—')+'</span>'+
+      '<span><b>Δ</b> '+(a!=null?((a>=0?'+':'')+_num(a)):'—')+'</span>'+
+      '<span><b>Δ %</b> '+(p!=null?((p>=0?'+':'')+fmt(p)):'—')+'</span>'+
       '<span><b>Punkte</b> '+(dx.points||ser.length)+(ser[0]?(' ab '+ser[0].period):'')+'</span>';
   }
   if(host){
     if(!ser.length)host.innerHTML='<div class="sparkempty">Keine DXY-Daten</div>';
     else if(typeof renderLineChart==='function'){
-      host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|dxy|DXY" title="Chart vergrößern">'+renderLineChart(ser,{w:360,h:160})+'</div>';
+      const _cut=new Date();_cut.setFullYear(_cut.getFullYear()-3);const _c=_cut.toISOString().slice(0,10);
+      const _pts=ser.filter(p=>String(p.period)>=_c);
+      const _f=window.fmt;window.fmt=_num;
+      try{host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|dxy|DXY" title="Chart vergrößern">'+renderLineChart(_pts.length>1?_pts:ser,{w:360,h:160})+'</div>';}finally{window.fmt=_f}
     }
   }
   if(meta)meta.textContent=(dx.source||'Yahoo DXY')+' · '+(ser.length)+' Tage'+(ser[0]?(' ab '+ser[0].period):'')+' · USD-Korb';

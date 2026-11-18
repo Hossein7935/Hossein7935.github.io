@@ -763,7 +763,8 @@ function paintDxy(){
   const host=document.getElementById('dxyChart');
   const meta=document.getElementById('dxyMeta');
   const last=ser.length?ser.at(-1):null;
-  if(valEl)valEl.textContent=last?fmt(last.value):(dx.value!=null?fmt(dx.value):'—');
+  const _num=v=>Number(v).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(valEl)valEl.textContent=last?_num(last.value):(dx.value!=null?_num(dx.value):'—');
   if(dateEl){
     const ts=dx.updatedAt?dx.updatedAt.replace('T',' ').slice(0,16)+' UTC':'';
     dateEl.textContent=(last?('Stand '+last.period):(dx.date?('Stand '+dx.date):'—'))+(ts?(' · '+ts):'');
@@ -771,14 +772,17 @@ function paintDxy(){
   if(cards){
     const p=dx.pctChange,a=dx.absChange;
     cards.innerHTML=
-      '<span><b>Δ</b> '+(a!=null?((a>=0?'+':'')+fmt(a)):'—')+'</span>'+
-      '<span><b>Δ %</b> '+(p!=null?((p>=0?'+':'')+fmt(p)+' %'):'—')+'</span>'+
+      '<span><b>Δ</b> '+(a!=null?((a>=0?'+':'')+_num(a)):'—')+'</span>'+
+      '<span><b>Δ %</b> '+(p!=null?((p>=0?'+':'')+fmt(p)):'—')+'</span>'+
       '<span><b>Punkte</b> '+(dx.points||ser.length)+(ser[0]?(' ab '+ser[0].period):'')+'</span>';
   }
   if(host){
     if(!ser.length)host.innerHTML='<div class="sparkempty">Keine DXY-Daten</div>';
     else if(typeof renderLineChart==='function'){
-      host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|dxy|DXY" title="Chart vergrößern">'+renderLineChart(ser,{w:360,h:160})+'</div>';
+      const _cut=new Date();_cut.setFullYear(_cut.getFullYear()-3);const _c=_cut.toISOString().slice(0,10);
+      const _pts=ser.filter(p=>String(p.period)>=_c);
+      const _f=window.fmt;window.fmt=_num;
+      try{host.innerHTML='<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|dxy|DXY" title="Chart vergrößern">'+renderLineChart(_pts.length>1?_pts:ser,{w:360,h:160})+'</div>';}finally{window.fmt=_f}
     }
   }
   if(meta)meta.textContent=(dx.source||'Yahoo DXY')+' · '+(ser.length)+' Tage'+(ser[0]?(' ab '+ser[0].period):'')+' · USD-Korb';
@@ -2480,6 +2484,7 @@ function setMoveShowYieldAvg(on){
   try{typeof paintMove==='function'&&paintMove()}catch(e){}
 }
 function paintMove(){
+  const _num=v=>Number(v).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
   const faceF=document.querySelector('.usa-face-f')||document.querySelector('.usa-face-a');
   if(!faceF)return;
   if(!document.getElementById('movePanel')){
@@ -2519,7 +2524,7 @@ function paintMove(){
   const host=document.getElementById('moveChart');
   const meta=document.getElementById('moveMeta');
   const last=show.length?show.at(-1):null;
-  if(valEl)valEl.textContent=last?fmt(last.value):(mv.value!=null?fmt(mv.value):'—');
+  if(valEl)valEl.textContent=last?_num(last.value):(mv.value!=null?_num(mv.value):'—');
   if(dateEl){
     const ts=mv.updatedAt?mv.updatedAt.replace('T',' ').slice(0,16)+' UTC':'';
     dateEl.textContent=(last?('Stand '+last.period):(mv.date?('Stand '+mv.date):'—'))+(ts?(' · '+ts):'')+' · bp ann.';
@@ -2533,9 +2538,9 @@ function paintMove(){
     const p=mv.pctChange,a=mv.absChange;
     const yLast=yAvg.length?yAvg.at(-1):null;
     cards.innerHTML=
-      '<span style="color:#4a9eed"><b>MOVE</b> '+(last?fmt(last.value):'—')+' bp</span>'+
-      '<span><b>Δ</b> '+(a!=null?((a>=0?'+':'')+fmt(a)):'—')+'</span>'+
-      '<span><b>Δ %</b> '+(p!=null?((p>=0?'+':'')+fmt(p)+' %'):'—')+'</span>'+
+      '<span style="color:#4a9eed"><b>MOVE</b> '+(last?_num(last.value):'—')+' bp</span>'+
+      '<span><b>Δ</b> '+(a!=null?((a>=0?'+':'')+_num(a)):'—')+'</span>'+
+      '<span><b>Δ %</b> '+(p!=null?((p>=0?'+':'')+fmt(p)):'—')+'</span>'+
       (showAvg?('<span style="color:#e74c3c"><b>Ø Yld</b> '+(yLast?fmt(yLast.value)+' %':'—')+'</span>'):'')+
       '<span><b>Punkte</b> '+show.length+(show.length&&show[0]?' ab '+show[0].period:'')+'</span>';
   }
@@ -2684,5 +2689,5 @@ document.querySelector('#refresh')?.addEventListener('click',()=>setTimeout(pain
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='usaExtraToggle')setTimeout(paintCuAu,250)});
 
 refresh();
-</script><script src="credit.js?v=0e762f06d1"></script><script src="autorefresh.js?v=fc23804646"></script>
+</script><script src="credit.js?v=3d6ef6289c"></script><script src="autorefresh.js?v=fc23804646"></script>
 </body></html>

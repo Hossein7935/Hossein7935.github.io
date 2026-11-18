@@ -115,6 +115,7 @@ if (html.includes('function paintMove')) {
   if (end < 0) end = html.indexOf('\nfunction ', start + 20);
 
   const newFn = `function paintMove(){
+  const _num=v=>Number(v).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
   const faceF=document.querySelector('.usa-face-f')||document.querySelector('.usa-face-a');
   if(!faceF)return;
   if(!document.getElementById('movePanel')){
@@ -154,7 +155,7 @@ if (html.includes('function paintMove')) {
   const host=document.getElementById('moveChart');
   const meta=document.getElementById('moveMeta');
   const last=show.length?show.at(-1):null;
-  if(valEl)valEl.textContent=last?fmt(last.value):(mv.value!=null?fmt(mv.value):'—');
+  if(valEl)valEl.textContent=last?_num(last.value):(mv.value!=null?_num(mv.value):'—');
   if(dateEl){
     const ts=mv.updatedAt?mv.updatedAt.replace('T',' ').slice(0,16)+' UTC':'';
     dateEl.textContent=(last?('Stand '+last.period):(mv.date?('Stand '+mv.date):'—'))+(ts?(' · '+ts):'')+' · bp ann.';
@@ -168,9 +169,9 @@ if (html.includes('function paintMove')) {
     const p=mv.pctChange,a=mv.absChange;
     const yLast=yAvg.length?yAvg.at(-1):null;
     cards.innerHTML=
-      '<span style="color:#4a9eed"><b>MOVE</b> '+(last?fmt(last.value):'—')+' bp</span>'+
-      '<span><b>Δ</b> '+(a!=null?((a>=0?'+':'')+fmt(a)):'—')+'</span>'+
-      '<span><b>Δ %</b> '+(p!=null?((p>=0?'+':'')+fmt(p)+' %'):'—')+'</span>'+
+      '<span style="color:#4a9eed"><b>MOVE</b> '+(last?_num(last.value):'—')+' bp</span>'+
+      '<span><b>Δ</b> '+(a!=null?((a>=0?'+':'')+_num(a)):'—')+'</span>'+
+      '<span><b>Δ %</b> '+(p!=null?((p>=0?'+':'')+fmt(p)):'—')+'</span>'+
       (showAvg?('<span style="color:#e74c3c"><b>Ø Yld</b> '+(yLast?fmt(yLast.value)+' %':'—')+'</span>'):'')+
       '<span><b>Punkte</b> '+show.length+(show.length&&show[0]?' ab '+show[0].period:'')+'</span>';
   }

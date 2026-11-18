@@ -200,6 +200,42 @@ if (data.USA.us2ySofr) {
   }
 }
 
+// --- USA Seite 1: Inflation-Karte = aktuelle CPI (statt IMF-Jahresprognose) -------------
+{
+  const infl = (histories['USA-inflation'] || []).filter((p) => /^\d{4}-\d{2}$/.test(String(p.period)));
+  const last = infl.at(-1);
+  if (last && Number.isFinite(Number(last.value))) {
+    const cur = data.USA.inflation || {};
+    if (cur.date !== last.period || cur.value !== last.value) {
+      data.USA.inflation = {
+        value: last.value,
+        date: last.period,
+        source: 'BLS CPI (FRED CPIAUCSL) · Veränderung zum Vorjahresmonat'
+      };
+      log.push(`inflation USA: ${last.period} = ${last.value}`);
+    }
+  }
+}
+
+// --- USA Seite 1: Verlauf für 2J/10J aus Treasury + TradingView (letzte 3 Jahre) ---------
+for (const [key, base] of [['y2', 'USA-us2y'], ['y10', 'USA-us10y']]) {
+  const src = (histories[base] || []).filter((p) => isDay(p.period) && Number.isFinite(Number(p.value)));
+  if (src.length < 20) continue;
+  const cut = new Date();
+  cut.setUTCFullYear(cut.getUTCFullYear() - 3);
+  const c = cut.toISOString().slice(0, 10);
+  const pts = src.filter((p) => p.period >= c).map((p) => ({ period: p.period, value: round(Number(p.value), 3) }));
+  // Kartenwert (TradingView, heute) als letzten Punkt übernehmen
+  const card = data.USA[key];
+  if (card && isDay(card.date) && Number.isFinite(Number(card.value))) {
+    const i = pts.findIndex((p) => p.period === card.date);
+    if (i >= 0) pts[i] = { period: card.date, value: round(Number(card.value), 3) };
+    else if (!pts.length || card.date > pts.at(-1).period) pts.push({ period: card.date, value: round(Number(card.value), 3) });
+  }
+  histories[`USA-${key}`] = pts;
+  log.push(`USA-${key}: ${pts.length} Punkte bis ${pts.at(-1)?.period}`);
+}
+
 payload.histories = histories;
 payload.data = data;
 fs.writeFileSync('data.json', JSON.stringify(payload));
