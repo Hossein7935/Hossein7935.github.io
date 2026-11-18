@@ -1,0 +1,632 @@
+{
+ "checkedAt": "2026-11-18T23:22:10.072Z",
+ "today": "2026-11-18",
+ "summary": {
+  "ok": 56,
+  "info": 12,
+  "alt": 1
+ },
+ "items": [
+  {
+   "page": "USA · Seite 1",
+   "label": "Inflation (CPI J/J)",
+   "pageDate": "2026-10",
+   "srcDate": "2026-10-01",
+   "source": "FRED CPIAUCSL",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 1",
+   "label": "Leitzins (Fed-Zielspanne)",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "FRED DFEDTARU",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 1",
+   "label": "Staatsanleihen 2 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:US02Y",
+   "status": "ok",
+   "note": "Seite 4.804 · TradingView 4.804"
+  },
+  {
+   "page": "USA · Seite 1",
+   "label": "Staatsanleihen 10 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:US10Y",
+   "status": "ok",
+   "note": "Seite 5.070 · TradingView 5.070"
+  },
+  {
+   "page": "USA · Seite 1",
+   "label": "Zinskurve 10Y − 2Y",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "Treasury + TradingView",
+   "status": "ok",
+   "note": "laufend (TradingView)"
+  },
+  {
+   "page": "USA · Seite 1",
+   "label": "TIPS Realzins 5 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "U.S. Treasury Real Yield",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 1",
+   "label": "TIPS Realzins 10 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "U.S. Treasury Real Yield",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 1",
+   "label": "Bankreserven / BIP",
+   "pageDate": "2026-11-11",
+   "srcDate": "2026-11-11",
+   "source": "FRED WRESBAL",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 1",
+   "label": "Haushaltsdefizit (MTS)",
+   "pageDate": "2026-10",
+   "srcDate": "2026-10-01",
+   "source": "FRED MTSDS133FMS",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 1",
+   "label": "Reales BIP (Chart)",
+   "pageDate": "2026-07",
+   "srcDate": "2026-07-01",
+   "source": "FRED A191RL1Q225SBEA",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 1",
+   "label": "Reales BIP (Karte)",
+   "pageDate": "IMF WEO · 2026",
+   "srcDate": "—",
+   "source": "IMF-Prognose für das gewählte Jahr",
+   "status": "info",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 1",
+   "label": "DXY",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "Yahoo DX-Y.NYB",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 2",
+   "label": "Bankreserven WRESBAL",
+   "pageDate": "2026-11-11",
+   "srcDate": "2026-11-11",
+   "source": "FRED WRESBAL",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 2",
+   "label": "BofA CCC High Yield",
+   "pageDate": "2026-11-17",
+   "srcDate": "2026-11-17",
+   "source": "FRED BAMLH0A3HYCEY",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 2",
+   "label": "Kupfer / Gold",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "Yahoo HG=F",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 2",
+   "label": "Schulden Haushalte / Unternehmen",
+   "pageDate": "2026-04-01",
+   "srcDate": "—",
+   "source": "Fed Z.1, quartalsweise",
+   "status": "info",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 3",
+   "label": "EFFR",
+   "pageDate": "2026-11-17",
+   "srcDate": "2026-11-17",
+   "source": "NY Fed",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 3",
+   "label": "SOFR",
+   "pageDate": "2026-11-17",
+   "srcDate": "2026-11-17",
+   "source": "NY Fed",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 3",
+   "label": "IORB",
+   "pageDate": "2026-11-19",
+   "srcDate": "2026-11-19",
+   "source": "FRED IORB",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 3",
+   "label": "US 2Y (Dual-Chart)",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "Treasury + TradingView",
+   "status": "ok",
+   "note": "laufend (TradingView)"
+  },
+  {
+   "page": "USA · Seite 4",
+   "label": "Zinsstruktur nominal",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "Treasury + TradingView",
+   "status": "ok",
+   "note": "laufend (TradingView)"
+  },
+  {
+   "page": "USA · Seite 4",
+   "label": "Zinsstruktur TIPS 10Y",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "U.S. Treasury Real Yield",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 4",
+   "label": "SOFR-Futures",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "Yahoo SR3=F",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 4",
+   "label": "SOFR 30-Tage-Ø",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "NY Fed SOFRAI",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 5",
+   "label": "FHLB Advances",
+   "pageDate": "2026-09-30",
+   "srcDate": "2026-09-30",
+   "source": "FHLBanks Office of Finance",
+   "status": "ok",
+   "note": "2026Q4 noch nicht erschienen"
+  },
+  {
+   "page": "USA · Seite 5",
+   "label": "Fed Funds Volumen",
+   "pageDate": "2026-11-17",
+   "srcDate": "2026-11-17",
+   "source": "NY Fed",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 6",
+   "label": "US 1Y",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "Treasury + TradingView",
+   "status": "ok",
+   "note": "laufend (TradingView)"
+  },
+  {
+   "page": "USA · Seite 6",
+   "label": "MOVE Index",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "Yahoo ^MOVE",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Seite 7",
+   "label": "US 3M … 30Y",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "Treasury + TradingView",
+   "status": "ok",
+   "note": "laufend (TradingView)"
+  },
+  {
+   "page": "USA · Seite 7",
+   "label": "TIPS 5Y / 10Y",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "U.S. Treasury Real Yield",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Repo-Markt",
+   "label": "MMF Vermögen / Repo",
+   "pageDate": "2026-10-31",
+   "srcDate": "2026-10-31",
+   "source": "OFR",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Repo-Markt",
+   "label": "Repo TRI Volumen / Satz",
+   "pageDate": "2026-11-16",
+   "srcDate": "2026-11-16",
+   "source": "OFR",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Repo-Markt",
+   "label": "Repo DVP Volumen / Satz",
+   "pageDate": "2026-11-17",
+   "srcDate": "2026-11-17",
+   "source": "OFR",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Kreditstandards C&I · große/mittlere Firmen",
+   "pageDate": "2026-10-01",
+   "srcDate": "2026-10-01",
+   "source": "FRED DRTSCILM",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Kreditstandards C&I · kleine Firmen",
+   "pageDate": "2026-10-01",
+   "srcDate": "2026-10-01",
+   "source": "FRED DRTSCIS",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Kreditstandards Kreditkarten",
+   "pageDate": "2026-10-01",
+   "srcDate": "2026-10-01",
+   "source": "FRED DRTSCLCC",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Kreditlinien · max. Größe gekürzt (große Firmen)",
+   "pageDate": "2026-10-01",
+   "srcDate": "2026-10-01",
+   "source": "FRED SUBLPDCILTMNQ",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Kreditlinien · max. Größe gekürzt (kleine Firmen)",
+   "pageDate": "2026-10-01",
+   "srcDate": "2026-10-01",
+   "source": "FRED SUBLPDCISTMNQ",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Kreditnachfrage C&I · große/mittlere Firmen",
+   "pageDate": "2026-10-01",
+   "srcDate": "2026-10-01",
+   "source": "FRED DRSDCILM",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Kreditnachfrage C&I · kleine Firmen",
+   "pageDate": "2026-10-01",
+   "srcDate": "2026-10-01",
+   "source": "FRED DRSDCIS",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Kreditanfragen",
+   "pageDate": "2026-10-01",
+   "srcDate": "2026-10-01",
+   "source": "FRED SUBLPDCIAINQ",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Bankkredite (H.8)",
+   "pageDate": "2026-11-04",
+   "srcDate": "2026-11-04",
+   "source": "FRED TOTBKCR",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Unternehmenskredite (H.8)",
+   "pageDate": "2026-11-04",
+   "srcDate": "2026-11-04",
+   "source": "FRED TOTCI",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "High-Yield-OAS",
+   "pageDate": "2026-11-17",
+   "srcDate": "2026-11-17",
+   "source": "FRED BAMLH0A0HYM2",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Investment-Grade-OAS",
+   "pageDate": "2026-11-17",
+   "srcDate": "2026-11-17",
+   "source": "FRED BAMLC0A0CM",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "Ausfallprämie Baa − Aaa",
+   "pageDate": "2026-11-17",
+   "srcDate": "2026-11-17",
+   "source": "FRED DBAA",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "NFCI",
+   "pageDate": "2026-11-13",
+   "srcDate": "2026-11-13",
+   "source": "FRED NFCI",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "SKSI",
+   "pageDate": "2026-11-06",
+   "srcDate": "2026-11-06",
+   "source": "Repository sksi-credit-stress-index",
+   "status": "ok",
+   "note": ""
+  },
+  {
+   "page": "USA · Credit Vergabe",
+   "label": "SKSI vs. neuester NFCI",
+   "pageDate": "2026-11-06",
+   "srcDate": "2026-11-13",
+   "source": "FRED NFCI (Rechenbasis des SKSI)",
+   "status": "alt",
+   "note": ""
+  },
+  {
+   "page": "DEU",
+   "label": "Staatsanleihen 2 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:DE02Y",
+   "status": "ok",
+   "note": "Seite 3.142 · TradingView 3.142"
+  },
+  {
+   "page": "DEU",
+   "label": "Staatsanleihen 10 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:DE10Y",
+   "status": "ok",
+   "note": "Seite 3.372 · TradingView 3.372"
+  },
+  {
+   "page": "DEU",
+   "label": "Leitzins",
+   "pageDate": "2026-11-18",
+   "srcDate": "—",
+   "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
+   "status": "info",
+   "note": ""
+  },
+  {
+   "page": "DEU",
+   "label": "Inflation / Defizit / BIP",
+   "pageDate": "IMF WEO · 2026",
+   "srcDate": "—",
+   "source": "IMF-Jahreswerte",
+   "status": "info",
+   "note": ""
+  },
+  {
+   "page": "FRA",
+   "label": "Staatsanleihen 2 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:FR02Y",
+   "status": "ok",
+   "note": "Seite 3.611 · TradingView 3.611"
+  },
+  {
+   "page": "FRA",
+   "label": "Staatsanleihen 10 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:FR10Y",
+   "status": "ok",
+   "note": "Seite 4.868 · TradingView 4.868"
+  },
+  {
+   "page": "FRA",
+   "label": "Leitzins",
+   "pageDate": "2026-11-18",
+   "srcDate": "—",
+   "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
+   "status": "info",
+   "note": ""
+  },
+  {
+   "page": "FRA",
+   "label": "Inflation / Defizit / BIP",
+   "pageDate": "IMF WEO · 2026",
+   "srcDate": "—",
+   "source": "IMF-Jahreswerte",
+   "status": "info",
+   "note": ""
+  },
+  {
+   "page": "JPN",
+   "label": "Staatsanleihen 2 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:JP02Y",
+   "status": "ok",
+   "note": "Seite 1.865 · TradingView 1.865"
+  },
+  {
+   "page": "JPN",
+   "label": "Staatsanleihen 10 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:JP10Y",
+   "status": "ok",
+   "note": "Seite 2.864 · TradingView 2.864"
+  },
+  {
+   "page": "JPN",
+   "label": "Leitzins",
+   "pageDate": "2026-11-10",
+   "srcDate": "—",
+   "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
+   "status": "info",
+   "note": ""
+  },
+  {
+   "page": "JPN",
+   "label": "Inflation / Defizit / BIP",
+   "pageDate": "IMF WEO · 2026",
+   "srcDate": "—",
+   "source": "IMF-Jahreswerte",
+   "status": "info",
+   "note": ""
+  },
+  {
+   "page": "CHN",
+   "label": "Staatsanleihen 2 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:CN02Y",
+   "status": "ok",
+   "note": "Seite 1.275 · TradingView 1.275"
+  },
+  {
+   "page": "CHN",
+   "label": "Staatsanleihen 10 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:CN10Y",
+   "status": "ok",
+   "note": "Seite 1.626 · TradingView 1.626"
+  },
+  {
+   "page": "CHN",
+   "label": "Leitzins",
+   "pageDate": "2026-11-10",
+   "srcDate": "—",
+   "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
+   "status": "info",
+   "note": ""
+  },
+  {
+   "page": "CHN",
+   "label": "Inflation / Defizit / BIP",
+   "pageDate": "IMF WEO · 2026",
+   "srcDate": "—",
+   "source": "IMF-Jahreswerte",
+   "status": "info",
+   "note": ""
+  },
+  {
+   "page": "AUS",
+   "label": "Staatsanleihen 2 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:AU02Y",
+   "status": "ok",
+   "note": "Seite 4.895 · TradingView 4.895"
+  },
+  {
+   "page": "AUS",
+   "label": "Staatsanleihen 10 Jahre",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
+   "source": "TradingView TVC:AU10Y",
+   "status": "ok",
+   "note": "Seite 5.084 · TradingView 5.084"
+  },
+  {
+   "page": "AUS",
+   "label": "Leitzins",
+   "pageDate": "2026-11-05",
+   "srcDate": "—",
+   "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
+   "status": "info",
+   "note": ""
+  },
+  {
+   "page": "AUS",
+   "label": "Inflation / Defizit / BIP",
+   "pageDate": "IMF WEO · 2026",
+   "srcDate": "—",
+   "source": "IMF-Jahreswerte",
+   "status": "info",
+   "note": ""
+  }
+ ]
+}
