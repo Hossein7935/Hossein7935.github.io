@@ -1,5 +1,5 @@
 {
- "checkedAt": "2026-11-19T09:00:14.475Z",
+ "checkedAt": "2026-11-19T09:24:33.404Z",
  "today": "2026-11-19",
  "summary": {
   "ok": 57,
@@ -40,7 +40,7 @@
    "srcDate": "2026-11-19",
    "source": "TradingView TVC:US10Y",
    "status": "ok",
-   "note": "Seite 5.078 · TradingView 5.076"
+   "note": "Seite 5.082 · TradingView 5.080"
   },
   {
    "page": "USA · Seite 1",
@@ -454,7 +454,7 @@
    "srcDate": "2026-11-19",
    "source": "TradingView TVC:DE02Y",
    "status": "ok",
-   "note": "Seite 3.124 · TradingView 3.124"
+   "note": "Seite 3.135 · TradingView 3.133"
   },
   {
    "page": "DEU",
@@ -463,7 +463,7 @@
    "srcDate": "2026-11-19",
    "source": "TradingView TVC:DE10Y",
    "status": "ok",
-   "note": "Seite 3.367 · TradingView 3.368"
+   "note": "Seite 3.378 · TradingView 3.378"
   },
   {
    "page": "DEU",
@@ -490,7 +490,7 @@
    "srcDate": "2026-11-19",
    "source": "TradingView TVC:FR02Y",
    "status": "ok",
-   "note": "Seite 3.615 · TradingView 3.616"
+   "note": "Seite 3.627 · TradingView 3.627"
   },
   {
    "page": "FRA",
@@ -499,7 +499,7 @@
    "srcDate": "2026-11-19",
    "source": "TradingView TVC:FR10Y",
    "status": "ok",
-   "note": "Seite 4.867 · TradingView 4.868"
+   "note": "Seite 4.879 · TradingView 4.879"
   },
   {
    "page": "FRA",
@@ -526,7 +526,7 @@
    "srcDate": "2026-11-19",
    "source": "TradingView TVC:JP02Y",
    "status": "ok",
-   "note": "Seite 1.848 · TradingView 1.848"
+   "note": "Seite 1.864 · TradingView 1.864"
   },
   {
    "page": "JPN",
@@ -540,7 +540,7 @@
   {
    "page": "JPN",
    "label": "Leitzins",
-   "pageDate": "2026-11-10",
+   "pageDate": "2026-11-17",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
@@ -576,7 +576,7 @@
   {
    "page": "CHN",
    "label": "Leitzins",
-   "pageDate": "2026-11-10",
+   "pageDate": "2026-11-17",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
@@ -598,7 +598,7 @@
    "srcDate": "2026-11-19",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.740 · TradingView 4.740"
+   "note": "Seite 4.744 · TradingView 4.744"
   },
   {
    "page": "AUS",
@@ -607,12 +607,12 @@
    "srcDate": "2026-11-19",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.976 · TradingView 4.976"
+   "note": "Seite 4.980 · TradingView 4.979"
   },
   {
    "page": "AUS",
    "label": "Leitzins",
-   "pageDate": "2026-11-05",
+   "pageDate": "2026-11-12",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
