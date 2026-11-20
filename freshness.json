@@ -1,6 +1,6 @@
 {
- "checkedAt": "2026-11-19T18:38:07.659Z",
- "today": "2026-11-19",
+ "checkedAt": "2026-11-20T00:46:18.989Z",
+ "today": "2026-11-20",
  "summary": {
   "ok": 57,
   "info": 12
@@ -27,26 +27,26 @@
   {
    "page": "USA · Seite 1",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:US02Y",
    "status": "ok",
-   "note": "Seite 4.783 · TradingView 4.783"
+   "note": "Seite 4.747 · TradingView 4.747"
   },
   {
    "page": "USA · Seite 1",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:US10Y",
    "status": "ok",
-   "note": "Seite 5.060 · TradingView 5.058"
+   "note": "Seite 5.024 · TradingView 5.024"
   },
   {
    "page": "USA · Seite 1",
    "label": "Zinskurve 10Y − 2Y",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "Treasury + TradingView",
    "status": "ok",
    "note": "laufend (TradingView)"
@@ -54,8 +54,8 @@
   {
    "page": "USA · Seite 1",
    "label": "TIPS Realzins 5 Jahre",
-   "pageDate": "2026-11-18",
-   "srcDate": "2026-11-18",
+   "pageDate": "2026-11-19",
+   "srcDate": "2026-11-19",
    "source": "U.S. Treasury Real Yield",
    "status": "ok",
    "note": ""
@@ -63,8 +63,8 @@
   {
    "page": "USA · Seite 1",
    "label": "TIPS Realzins 10 Jahre",
-   "pageDate": "2026-11-18",
-   "srcDate": "2026-11-18",
+   "pageDate": "2026-11-19",
+   "srcDate": "2026-11-19",
    "source": "U.S. Treasury Real Yield",
    "status": "ok",
    "note": ""
@@ -72,8 +72,8 @@
   {
    "page": "USA · Seite 1",
    "label": "Bankreserven / BIP",
-   "pageDate": "2026-11-11",
-   "srcDate": "2026-11-11",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
    "source": "FRED WRESBAL",
    "status": "ok",
    "note": ""
@@ -117,8 +117,8 @@
   {
    "page": "USA · Seite 2",
    "label": "Bankreserven WRESBAL",
-   "pageDate": "2026-11-11",
-   "srcDate": "2026-11-11",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
    "source": "FRED WRESBAL",
    "status": "ok",
    "note": ""
@@ -135,8 +135,8 @@
   {
    "page": "USA · Seite 2",
    "label": "Kupfer / Gold",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "Yahoo HG=F",
    "status": "ok",
    "note": ""
@@ -171,8 +171,8 @@
   {
    "page": "USA · Seite 3",
    "label": "IORB",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "FRED IORB",
    "status": "ok",
    "note": ""
@@ -180,8 +180,8 @@
   {
    "page": "USA · Seite 3",
    "label": "US 2Y (Dual-Chart)",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "Treasury + TradingView",
    "status": "ok",
    "note": "laufend (TradingView)"
@@ -189,8 +189,8 @@
   {
    "page": "USA · Seite 4",
    "label": "Zinsstruktur nominal",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "Treasury + TradingView",
    "status": "ok",
    "note": "laufend (TradingView)"
@@ -198,8 +198,8 @@
   {
    "page": "USA · Seite 4",
    "label": "Zinsstruktur TIPS 10Y",
-   "pageDate": "2026-11-18",
-   "srcDate": "2026-11-18",
+   "pageDate": "2026-11-19",
+   "srcDate": "2026-11-19",
    "source": "U.S. Treasury Real Yield",
    "status": "ok",
    "note": ""
@@ -207,8 +207,8 @@
   {
    "page": "USA · Seite 4",
    "label": "SOFR-Futures",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "Yahoo SR3=F",
    "status": "ok",
    "note": ""
@@ -243,8 +243,8 @@
   {
    "page": "USA · Seite 6",
    "label": "US 1Y",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "Treasury + TradingView",
    "status": "ok",
    "note": "laufend (TradingView)"
@@ -261,8 +261,8 @@
   {
    "page": "USA · Seite 7",
    "label": "US 3M … 30Y",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "Treasury + TradingView",
    "status": "ok",
    "note": "laufend (TradingView)"
@@ -270,8 +270,8 @@
   {
    "page": "USA · Seite 7",
    "label": "TIPS 5Y / 10Y",
-   "pageDate": "2026-11-18",
-   "srcDate": "2026-11-18",
+   "pageDate": "2026-11-19",
+   "srcDate": "2026-11-19",
    "source": "U.S. Treasury Real Yield",
    "status": "ok",
    "note": ""
@@ -288,8 +288,8 @@
   {
    "page": "USA · Repo-Markt",
    "label": "Repo TRI Volumen / Satz",
-   "pageDate": "2026-11-16",
-   "srcDate": "2026-11-16",
+   "pageDate": "2026-11-17",
+   "srcDate": "2026-11-17",
    "source": "OFR",
    "status": "ok",
    "note": ""
@@ -297,8 +297,8 @@
   {
    "page": "USA · Repo-Markt",
    "label": "Repo DVP Volumen / Satz",
-   "pageDate": "2026-11-17",
-   "srcDate": "2026-11-17",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
    "source": "OFR",
    "status": "ok",
    "note": ""
@@ -450,8 +450,8 @@
   {
    "page": "DEU",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:DE02Y",
    "status": "ok",
    "note": "Seite 3.158 · TradingView 3.158"
@@ -459,8 +459,8 @@
   {
    "page": "DEU",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:DE10Y",
    "status": "ok",
    "note": "Seite 3.397 · TradingView 3.397"
@@ -468,7 +468,7 @@
   {
    "page": "DEU",
    "label": "Leitzins",
-   "pageDate": "2026-11-19",
+   "pageDate": "2026-11-20",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
@@ -477,7 +477,7 @@
   {
    "page": "DEU",
    "label": "Inflation / Defizit / BIP",
-   "pageDate": "IMF WEO · 2026",
+   "pageDate": "2025",
    "srcDate": "—",
    "source": "IMF-Jahreswerte",
    "status": "info",
@@ -486,17 +486,17 @@
   {
    "page": "FRA",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:FR02Y",
    "status": "ok",
-   "note": "Seite 3.639 · TradingView 3.640"
+   "note": "Seite 3.631 · TradingView 3.631"
   },
   {
    "page": "FRA",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:FR10Y",
    "status": "ok",
    "note": "Seite 4.932 · TradingView 4.932"
@@ -504,7 +504,7 @@
   {
    "page": "FRA",
    "label": "Leitzins",
-   "pageDate": "2026-11-19",
+   "pageDate": "2026-11-20",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
@@ -513,7 +513,7 @@
   {
    "page": "FRA",
    "label": "Inflation / Defizit / BIP",
-   "pageDate": "IMF WEO · 2026",
+   "pageDate": "2025",
    "srcDate": "—",
    "source": "IMF-Jahreswerte",
    "status": "info",
@@ -522,20 +522,20 @@
   {
    "page": "JPN",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:JP02Y",
    "status": "ok",
-   "note": "Seite 1.849 · TradingView 1.849"
+   "note": "Seite 1.827 · TradingView 1.827"
   },
   {
    "page": "JPN",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:JP10Y",
    "status": "ok",
-   "note": "Seite 2.843 · TradingView 2.843"
+   "note": "Seite 2.802 · TradingView 2.802"
   },
   {
    "page": "JPN",
@@ -549,7 +549,7 @@
   {
    "page": "JPN",
    "label": "Inflation / Defizit / BIP",
-   "pageDate": "IMF WEO · 2026",
+   "pageDate": "2025",
    "srcDate": "—",
    "source": "IMF-Jahreswerte",
    "status": "info",
@@ -558,20 +558,20 @@
   {
    "page": "CHN",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:CN02Y",
    "status": "ok",
-   "note": "Seite 1.275 · TradingView 1.275"
+   "note": "Seite 1.255 · TradingView 1.255"
   },
   {
    "page": "CHN",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:CN10Y",
    "status": "ok",
-   "note": "Seite 1.616 · TradingView 1.616"
+   "note": "Seite 1.609 · TradingView 1.609"
   },
   {
    "page": "CHN",
@@ -585,7 +585,7 @@
   {
    "page": "CHN",
    "label": "Inflation / Defizit / BIP",
-   "pageDate": "IMF WEO · 2026",
+   "pageDate": "2025",
    "srcDate": "—",
    "source": "IMF-Jahreswerte",
    "status": "info",
@@ -594,20 +594,20 @@
   {
    "page": "AUS",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.739 · TradingView 4.739"
+   "note": "Seite 4.698 · TradingView 4.695"
   },
   {
    "page": "AUS",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.996 · TradingView 4.996"
+   "note": "Seite 4.962 · TradingView 4.962"
   },
   {
    "page": "AUS",
@@ -621,7 +621,7 @@
   {
    "page": "AUS",
    "label": "Inflation / Defizit / BIP",
-   "pageDate": "IMF WEO · 2026",
+   "pageDate": "2025",
    "srcDate": "—",
    "source": "IMF-Jahreswerte",
    "status": "info",
