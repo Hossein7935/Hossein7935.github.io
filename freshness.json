@@ -1,5 +1,5 @@
 {
- "checkedAt": "2026-11-21T12:33:49.160Z",
+ "checkedAt": "2026-11-21T14:37:27.966Z",
  "today": "2026-11-21",
  "summary": {
   "ok": 57,
@@ -18,8 +18,8 @@
   {
    "page": "USA · Seite 1",
    "label": "Leitzins (Fed-Zielspanne)",
-   "pageDate": "2026-11-20",
-   "srcDate": "2026-11-20",
+   "pageDate": "2026-11-21",
+   "srcDate": "2026-11-21",
    "source": "FRED DFEDTARU",
    "status": "ok",
    "note": ""
