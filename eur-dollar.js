@@ -1,7 +1,7 @@
 /*
  * MacroWatch – USA-Seite „EUR/Dollar“ (Seite 9)
- * Cross-Currency Basis Monitor
- * → CME XEURBI wenn da, sonst SOFR−€STR-Proxy in %-Punkten (ohne ×100)
+ * 1) Basis-Monitor (SOFR−€STR Proxy / CME XEURBI)
+ * 2) FX-Optionen: 25Δ Risk-Reversal Proxy
  */
 (function () {
   'use strict';
@@ -40,63 +40,38 @@
     return face;
   }
 
-  function paint() {
-    var face = ensureFace();
-    if (!face) return;
-
-    var pts = (typeof histories !== 'undefined' && histories['USA-xeurbi']) || [];
-    var meta = (typeof data !== 'undefined' && data.USA && data.USA.xeurbi) || {};
+  function cardHtml(opts) {
+    var key = opts.key;
+    var pts = (typeof histories !== 'undefined' && histories['USA-' + key]) || [];
+    var meta = (typeof data !== 'undefined' && data.USA && data.USA[key]) || {};
     var last = pts.length ? pts[pts.length - 1] : null;
-    var isProxy = !meta.source || String(meta.source).indexOf('Proxy') >= 0 || String(meta.source).indexOf('SOFR') >= 0;
-
     var val = '—';
     if (last) {
-      val =
-        (Number(last.value) >= 0 ? '+' : '') +
-        Number(last.value).toFixed(2) +
-        (isProxy ? ' %' : ' bp');
+      var n = Number(last.value);
+      val = (n >= 0 ? '+' : '') + n.toFixed(opts.digits != null ? opts.digits : 2) + (opts.suffix || '');
     }
-
-    var title = isProxy
-      ? 'EUR/USD Basis-Monitor · Proxy (SOFR − €STR, %-Punkte)'
-      : 'CME XEURBI · EUR/USD Cross-Currency Basis';
-
     var dateLine = last
-      ? 'Stand ' +
-        last.period +
-        ' · ' +
-        (meta.source || '') +
-        ' · ' +
-        pts.length +
-        ' Punkte'
+      ? 'Stand ' + last.period + ' · ' + (meta.source || '') + ' · ' + pts.length + ' Punkte'
       : 'Keine Daten';
-
     var chartHtml;
     if (!pts.length) {
-      chartHtml =
-        '<div class="sparkempty">Noch keine Daten — nächster Datenabruf.</div>';
+      chartHtml = '<div class="sparkempty">Noch keine Daten</div>';
     } else if (typeof renderLineChart === 'function') {
       chartHtml =
-        '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|xeurbi|' +
-        title +
+        '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|' +
+        key +
+        '|' +
+        opts.title +
         '" title="Chart vergrößern">' +
-        renderLineChart(pts, { w: Math.min(640, 360), h: 140 }) +
+        renderLineChart(pts, { w: Math.min(640, 360), h: 130 }) +
         '</div>';
     } else {
       chartHtml = '<div class="sparkempty">' + pts.length + ' Punkte</div>';
     }
-
-    var note =
-      meta.note ||
-      (isProxy
-        ? 'Proxy aus SOFR − €STR in Prozentpunkten (ohne ×100). ' +
-          'Nicht der offizielle CME XEURBI-Index; CME überschreibt, sobald verfügbar.'
-        : 'Offizieller CME EUR/USD Cross-Currency Basis Index.');
-
-    face.innerHTML =
+    return (
       '<div class="metric has-chart" style="grid-column:1/-1">' +
       '<div class="name">' +
-      title +
+      opts.title +
       '</div>' +
       '<div class="value">' +
       val +
@@ -106,9 +81,45 @@
       '</div>' +
       chartHtml +
       '<div class="sofr-fwd-meta">' +
-      note +
+      (meta.note || opts.fallbackNote || '') +
       '</div>' +
-      '</div>';
+      '</div>'
+    );
+  }
+
+  function paint() {
+    var face = ensureFace();
+    if (!face) return;
+
+    var basisMeta = (typeof data !== 'undefined' && data.USA && data.USA.xeurbi) || {};
+    var isProxy =
+      !basisMeta.source ||
+      String(basisMeta.source).indexOf('Proxy') >= 0 ||
+      String(basisMeta.source).indexOf('SOFR') >= 0;
+
+    var html = '';
+    html += cardHtml({
+      key: 'xeurbi',
+      title: isProxy
+        ? 'EUR/USD Basis-Monitor · Proxy (SOFR − €STR, %-Punkte)'
+        : 'CME XEURBI · EUR/USD Cross-Currency Basis',
+      digits: 2,
+      suffix: isProxy ? ' %' : ' bp',
+      fallbackNote:
+        'Proxy SOFR−€STR in %-Punkten. CME XEURBI überschreibt, sobald verfügbar.'
+    });
+
+    html += cardHtml({
+      key: 'rr25',
+      title: 'FX-Optionen · 25Δ Risk Reversal (Proxy)',
+      digits: 2,
+      suffix: ' vol',
+      fallbackNote:
+        '25Δ RR-Proxy aus realisierter Up-/Down-Vol (EURUSD, 21 Tage). ' +
+        'Negativ ≈ Put-Skew / Abwärtsrisiko teurer. Keine OTC-Broker-Quotes.'
+    });
+
+    face.innerHTML = html;
   }
 
   function showPage() {
