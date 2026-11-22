@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-/** USA page nav sticky + bindUsaPages + setUsaPage 0..7 (brace-safe replace) */
+/** USA page nav sticky + bindUsaPages + setUsaPage 0..9 (Credit=8, EUR/Dollar=9) */
 let html = fs.readFileSync('index.html', 'utf8');
 
 function dedupeDecl(html, decl) {
@@ -47,17 +47,18 @@ if (!html.includes('/* usa-nav-sticky */')) {
 }
 
 const setUsaPageFn = `function setUsaPage(page){
-  page=Math.max(0,Math.min(7,Number(page)||0));
+  page=Math.max(0,Math.min(9,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
   try{
     if(page===4){typeof paintFhlb==='function'&&paintFhlb();typeof paintEffrVol==='function'&&paintEffrVol();}
     if(page===5){typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove();}
     if(page===6){typeof paintYieldPage7==='function'&&paintYieldPage7();}
     if(page===7){typeof paintRepoPage==='function'&&paintRepoPage();}
+    if(page===9){typeof paintXeurbi==='function'&&paintXeurbi();}
   }catch(e){}
   document.querySelectorAll('.country').forEach(card=>{
     if(!card.querySelector('.usa-face-a'))return;
-    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h'];
+    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h','.usa-face-i','.usa-face-j'];
     faces.forEach((sel,i)=>{
       const el=card.querySelector(sel);
       if(el)el.classList.toggle('hidden',page!==i);
@@ -73,6 +74,7 @@ const setUsaPageFn = `function setUsaPage(page){
   if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
   if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
   if(page===7)setTimeout(()=>{try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}},50);
+  if(page===9)setTimeout(()=>{try{typeof paintXeurbi==='function'&&paintXeurbi();typeof ensureUsaFaceJ==='function'&&ensureUsaFaceJ()}catch(e){}},50);
 }`;
 
 const r1 = replaceFunction(html, 'setUsaPage', setUsaPageFn);
@@ -95,7 +97,7 @@ const hardened = `function bindUsaPages(){
   }
   let start=0;
   try{start=Number(localStorage.getItem('macrowatch-usa-page')||'0')}catch(e){start=0}
-  if(!Number.isFinite(start)||start<0||start>7)start=0;
+  if(!Number.isFinite(start)||start<0||start>9)start=0;
   setUsaPage(start);
 }`;
 
@@ -120,4 +122,4 @@ html = dedupeDecl(html, 'let _rateDiffOrder=[];');
 html = dedupeDecl(html, 'let _yieldDiffOrder=[];');
 
 fs.writeFileSync('index.html', html);
-console.log('done', html.length, 'REPO kept', html.includes('const REPO_PAGE_CATALOG') || html.includes('function paintRepoPage'), 'page===7', html.includes('page===7'));
+console.log('done', html.length, 'maxPage=9', 'page===9', html.includes('page===9'));
