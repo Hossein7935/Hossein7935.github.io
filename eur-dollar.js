@@ -1,9 +1,6 @@
 /*
  * MacroWatch – USA-Seite „EUR/Dollar“ (Seite 9)
- * Charts:
- *  - EUR/USD (EZB) – lange Historie
- *  - XEURBI (CME) – wenn vorhanden
- *  - SOFR−€STR (bp) – Kontext
+ * Nur Cross-Currency Basis: CME XEURBI (bp)
  */
 (function () {
   'use strict';
@@ -21,70 +18,6 @@
       b.textContent = LABEL;
       sel.appendChild(b);
     });
-  }
-
-  function chartSvg(key, label, h) {
-    var pts = (typeof histories !== 'undefined' && histories['USA-' + key]) || [];
-    if (!pts.length) {
-      return '<div class="sparkempty">Keine Daten für ' + label + '</div>';
-    }
-    if (typeof renderLineChart === 'function') {
-      return (
-        '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|' +
-        key +
-        '|' +
-        label +
-        '" title="Chart vergrößern">' +
-        renderLineChart(pts, { w: Math.min(640, 360), h: h || 110 }) +
-        '</div>'
-      );
-    }
-    return '<div class="sparkempty">' + pts.length + ' Punkte</div>';
-  }
-
-  function card(title, key, metaKey, unit) {
-    var pts = (typeof histories !== 'undefined' && histories['USA-' + key]) || [];
-    var meta =
-      (typeof data !== 'undefined' && data.USA && data.USA[metaKey || key]) || {};
-    var last = pts.length ? pts[pts.length - 1] : null;
-    var val = '—';
-    if (last) {
-      if (unit === 'bp') {
-        val =
-          (Number(last.value) >= 0 ? '+' : '') +
-          Number(last.value).toFixed(2) +
-          ' bp';
-      } else {
-        val = Number(last.value).toFixed(4);
-      }
-    }
-    var date =
-      last && last.period
-        ? 'Stand ' +
-          last.period +
-          ' · ' +
-          (meta.source || '') +
-          ' · ' +
-          pts.length +
-          ' Punkte'
-        : meta.note || 'Keine Daten';
-    return (
-      '<div class="metric has-chart" style="grid-column:1/-1">' +
-      '<div class="name">' +
-      title +
-      '</div>' +
-      '<div class="value">' +
-      val +
-      '</div>' +
-      '<div class="date">' +
-      date +
-      '</div>' +
-      chartSvg(key, title, 120) +
-      '<div class="sofr-fwd-meta">' +
-      (meta.note || '') +
-      '</div>' +
-      '</div>'
-    );
   }
 
   function ensureFace() {
@@ -109,26 +42,63 @@
   function paint() {
     var face = ensureFace();
     if (!face) return;
-    var html = '';
-    html += card(
-      'EUR/USD · EZB-Referenzkurs',
-      'eurusd',
-      'eurusd',
-      'fx'
-    );
-    html += card(
-      'CME XEURBI · Cross-Currency Basis',
-      'xeurbi',
-      'xeurbi',
-      'bp'
-    );
-    html += card(
-      'SOFR − €STR · Finanzierungsspread',
-      'sofrEstr',
-      'sofrEstr',
-      'bp'
-    );
-    face.innerHTML = html;
+
+    var pts = (typeof histories !== 'undefined' && histories['USA-xeurbi']) || [];
+    var meta = (typeof data !== 'undefined' && data.USA && data.USA.xeurbi) || {};
+    var last = pts.length ? pts[pts.length - 1] : null;
+
+    var val = '—';
+    if (last) {
+      val =
+        (Number(last.value) >= 0 ? '+' : '') +
+        Number(last.value).toFixed(2) +
+        ' bp';
+    }
+
+    var dateLine = last
+      ? 'Stand ' +
+        last.period +
+        ' · ' +
+        (meta.source || 'CME XEURBI') +
+        ' · ' +
+        pts.length +
+        ' Punkte'
+      : 'Noch keine XEURBI-Daten — CME Cross-Currency Basis Index (kostenpflichtig/gesperrt)';
+
+    var chartHtml;
+    if (!pts.length) {
+      chartHtml =
+        '<div class="sparkempty" style="padding:12px 4px;line-height:1.45">' +
+        '<b>CME XEURBI · EUR/USD Cross-Currency Basis Index</b><br>' +
+        'Misst die Abweichung von Covered Interest Parity in <b>Basispunkten</b> ' +
+        '(aus €STR-, SOFR- und EUR/USD-Futures).<br><br>' +
+        'Offizielle Historie liegt bei CME DataMine. Der kostenlose Server-Abruf ist derzeit blockiert (403/401). ' +
+        'Sobald Werte ankommen, erscheint hier der Chart automatisch.' +
+        '</div>';
+    } else if (typeof renderLineChart === 'function') {
+      chartHtml =
+        '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|xeurbi|XEURBI" title="Chart vergrößern">' +
+        renderLineChart(pts, { w: Math.min(640, 360), h: 140 }) +
+        '</div>';
+    } else {
+      chartHtml = '<div class="sparkempty">' + pts.length + ' Punkte</div>';
+    }
+
+    face.innerHTML =
+      '<div class="metric has-chart" style="grid-column:1/-1">' +
+      '<div class="name">CME XEURBI · EUR/USD Cross-Currency Basis</div>' +
+      '<div class="value">' +
+      val +
+      '</div>' +
+      '<div class="date">' +
+      dateLine +
+      '</div>' +
+      chartHtml +
+      '<div class="sofr-fwd-meta">' +
+      (meta.note ||
+        'Nur Cross-Currency Basis (bp) · kein EZB-Kassakurs · kein SOFR−€STR-Spread') +
+      '</div>' +
+      '</div>';
   }
 
   function showPage() {
