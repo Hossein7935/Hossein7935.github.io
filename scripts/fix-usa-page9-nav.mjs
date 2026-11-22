@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-/** Last-step fix: USA setUsaPage/bindUsaPages must allow page 9 (EUR/Dollar). */
+/** Last-step fix: USA setUsaPage/bindUsaPages allow page 9 + link eur-dollar.js */
 let html = fs.readFileSync('index.html', 'utf8');
 
 function replaceFunction(html, name, newSrc) {
@@ -43,7 +43,6 @@ const setUsaPageFn = `function setUsaPage(page){
       const el=card.querySelector(sel);
       if(el)el.classList.toggle('hidden',page!==i);
     });
-    // page 8/9 faces may be created later — ensure j visible when selected
     if(page===9){
       let fj=card.querySelector('.usa-face-j');
       if(!fj&&typeof ensureUsaFaceJ==='function'){try{ensureUsaFaceJ()}catch(e){} fj=card.querySelector('.usa-face-j');}
@@ -100,5 +99,16 @@ if (!html.includes('data-page="9"') && html.includes('>Repo-Markt</button>')) {
   );
 }
 
+if (!html.includes('eur-dollar.js')) {
+  if (html.includes('credit.js')) {
+    html = html.replace(
+      /(<script src="credit\.js[^"]*"><\/script>)/,
+      '$1<script src="eur-dollar.js?v=1"></script>'
+    );
+    html = html.replace(/(<script src="eur-dollar\.js\?v=1"><\/script>){2,}/g, '$1');
+    console.log('linked eur-dollar.js');
+  }
+}
+
 fs.writeFileSync('index.html', html);
-console.log('fix-usa-page9-nav done', html.includes('Math.min(9,'), html.includes('page===9'));
+console.log('fix-usa-page9-nav done', html.includes('Math.min(9,'), html.includes('page===9'), html.includes('eur-dollar.js'));

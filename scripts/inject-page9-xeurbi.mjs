@@ -2,9 +2,8 @@ import fs from 'node:fs';
 
 /**
  * USA page 9: EUR/Dollar · CME XEURBI
- * Only adds paint helpers + button. Does NOT rewrite setUsaPage
- * (that is handled by inject-fix-usa-nav.mjs with max=9).
- * Page 8 / face-i remains Credit Vergabe (credit.js).
+ * Only adds paint helpers + button + links eur-dollar.js.
+ * Runtime open is handled by eur-dollar.js (Credit pattern).
  */
 let html = fs.readFileSync('index.html', 'utf8');
 
@@ -31,11 +30,9 @@ function replaceFunction(html, name, newSrc) {
   return { html: html.slice(0, start) + newSrc + html.slice(end + 1), ok: true };
 }
 
-// Remove EUR/Dollar wrongly on page 8
 html = html.replace(/<button type="button" data-page="8">\s*EUR\/Dollar\s*<\/button>/gi, '');
 html = html.replace(/<button type="button" data-page="8">\s*EURUSD\s*<\/button>/gi, '');
 
-// Ensure page 9 button
 if (!html.includes('data-page="9"')) {
   if (html.includes('>Repo-Markt</button>')) {
     html = html.replace(
@@ -77,7 +74,7 @@ const ensureFn = `function ensureUsaFaceJ(){
         '<div class="value" id="xeurbiValue">—</div>'+
         '<div class="date" id="xeurbiDate">CME · Basispunkte</div>'+
         '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|xeurbi|XEURBI" title="Chart vergrößern" id="xeurbiChart"></div>'+
-        '<div class="sofr-fwd-meta" id="xeurbiMeta">XEURBI in bp · Vergrößern · 6M/1J/3J</div>'+
+        '<div class="sofr-fwd-meta" id="xeurbiMeta">XEURBI in bp · Seite öffnet auch ohne Daten</div>'+
       '</div>';
   }
   return face;
@@ -97,9 +94,9 @@ const paintFn = `function paintXeurbi(){
   const host=document.getElementById('xeurbiChart');
   const metaEl=document.getElementById('xeurbiMeta');
   if(valEl)valEl.textContent=last?((Number(last.value)>=0?'+':'')+Number(last.value).toFixed(2)+' bp'):'—';
-  if(dateEl)dateEl.textContent=last?('Stand '+last.period+' · '+(meta.source||'CME XEURBI')+' · '+pts.length+' Punkte'):(meta.note||'Keine Daten');
+  if(dateEl)dateEl.textContent=last?('Stand '+last.period+' · '+(meta.source||'CME XEURBI')+' · '+pts.length+' Punkte'):'Noch keine CME-Daten — Seite ist aktiv';
   if(host){
-    if(!pts.length)host.innerHTML='<div class="sparkempty">Keine XEURBI-Daten — CME-Abruf prüfen</div>';
+    if(!pts.length)host.innerHTML='<div class="sparkempty">Keine XEURBI-Historie bisher. Seite funktioniert; Daten kommen über den CME-Fetch.</div>';
     else if(typeof renderLineChart==='function'){
       host.innerHTML=renderLineChart(pts,{w:Math.min(640,(host.clientWidth||360)),h:120});
       host.setAttribute('data-chart','USA|xeurbi|XEURBI');
@@ -111,32 +108,37 @@ const paintFn = `function paintXeurbi(){
 if (html.includes('function ensureUsaFaceJ')) {
   const r = replaceFunction(html, 'ensureUsaFaceJ', ensureFn);
   html = r.html;
-  console.log('ensureUsaFaceJ', r.ok);
 } else if (html.includes('function paintRepoPage')) {
   html = html.replace('function paintRepoPage', ensureFn + '\n' + paintFn + '\nfunction paintRepoPage');
-  console.log('injected ensure+paint before paintRepoPage');
 } else {
   html = html.replace('</script>', ensureFn + '\n' + paintFn + '\n</script>');
-  console.log('injected at script end');
 }
 
 if (html.includes('function paintXeurbi')) {
   const r = replaceFunction(html, 'paintXeurbi', paintFn);
   html = r.html;
-  console.log('paintXeurbi', r.ok);
-} else if (!html.includes(paintFn.slice(0, 30))) {
-  html = html.replace('function ensureUsaFaceJ', paintFn + '\nfunction ensureUsaFaceJ');
-  // order wrong - fix: ensure before paint
-  const r1 = replaceFunction(html, 'paintXeurbi', paintFn);
-  html = r1.html;
 }
 
-// Safety: never leave max page at 7 if our button exists
 if (html.includes('data-page="9"') && html.includes('Math.min(7,')) {
   html = html.replace(/Math\.min\(7,/g, 'Math.min(9,');
   html = html.replace(/start>7\)/g, 'start>9)');
-  console.log('raised Math.min 7→9');
+}
+
+if (!html.includes('eur-dollar.js')) {
+  if (html.includes('credit.js')) {
+    html = html.replace(
+      /(<script src="credit\.js[^"]*"><\/script>)/,
+      '$1<script src="eur-dollar.js?v=1"></script>'
+    );
+    html = html.replace(/(<script src="eur-dollar\.js\?v=1"><\/script>){2,}/g, '$1');
+    console.log('linked eur-dollar.js');
+  } else if (html.includes('autorefresh.js')) {
+    html = html.replace(
+      /(<script src="autorefresh\.js[^"]*"><\/script>)/,
+      '<script src="eur-dollar.js?v=1"></script>$1'
+    );
+  }
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done page9 xeurbi (no setUsaPage rewrite)');
+console.log('done page9 xeurbi');
