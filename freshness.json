@@ -1,5 +1,5 @@
 {
- "checkedAt": "2026-11-22T13:36:21.766Z",
+ "checkedAt": "2026-11-22T16:42:28.179Z",
  "today": "2026-11-22",
  "summary": {
   "info": 13,
@@ -10,7 +10,7 @@
   {
    "page": "USA · Seite 1",
    "label": "Inflation (CPI J/J)",
-   "pageDate": "2024",
+   "pageDate": "IMF WEO · 2026",
    "srcDate": "2026-10-01",
    "source": "FRED CPIAUCSL",
    "status": "info",
@@ -478,7 +478,7 @@
   {
    "page": "DEU",
    "label": "Inflation / Defizit / BIP",
-   "pageDate": "2025",
+   "pageDate": "IMF WEO · 2026",
    "srcDate": "—",
    "source": "IMF-Jahreswerte",
    "status": "info",
@@ -514,7 +514,7 @@
   {
    "page": "FRA",
    "label": "Inflation / Defizit / BIP",
-   "pageDate": "2025",
+   "pageDate": "IMF WEO · 2026",
    "srcDate": "—",
    "source": "IMF-Jahreswerte",
    "status": "info",
@@ -550,7 +550,7 @@
   {
    "page": "JPN",
    "label": "Inflation / Defizit / BIP",
-   "pageDate": "2025",
+   "pageDate": "IMF WEO · 2026",
    "srcDate": "—",
    "source": "IMF-Jahreswerte",
    "status": "info",
@@ -586,7 +586,7 @@
   {
    "page": "CHN",
    "label": "Inflation / Defizit / BIP",
-   "pageDate": "2025",
+   "pageDate": "IMF WEO · 2026",
    "srcDate": "—",
    "source": "IMF-Jahreswerte",
    "status": "info",
@@ -622,7 +622,7 @@
   {
    "page": "AUS",
    "label": "Inflation / Defizit / BIP",
-   "pageDate": "2025",
+   "pageDate": "IMF WEO · 2026",
    "srcDate": "—",
    "source": "IMF-Jahreswerte",
    "status": "info",

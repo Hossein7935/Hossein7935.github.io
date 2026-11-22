@@ -365,7 +365,7 @@ function bindBigChartHover(body){
 }
 
 function historyHTML(country,key){let arr=histories[country+'-'+key]||[];if(key==='inflation'){const range=(document.querySelector('#inflRange')||{}).value||'3y';arr=filterByRange(arr,range)}if(!arr.length)return '<div class="sparkempty">Verlauf nicht verfügbar</div>';const pts=arr.map(x=>({period:String(x.period),value:Number(x.value)})).filter(x=>Number.isFinite(x.value));if(!pts.length)return '<div class="sparkempty">Keine gültigen Werte</div>';if(key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='inflation'||key==='gdp'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit'||key==='sofr3m'||key==='t10y2y'||key==='t10y5y'||key==='hhDebt'||key==='bizDebt'||key==='sofrUs3mSpread'||key==='bofaCcc'||key==='us10yTips'||key==='us5yTips'||key==='sofrIorb'||key==='wresbal'||key==='effr'||key==='sofr'||key==='iorb'||key==='cuAu'){const extraLabels={sofr3m:'CME Term SOFR 3M',t10y2y:'10Y − 2Y Spread',t10y5y:'10Y − 5Y Spread',hhDebt:'Households Debt Growth',bizDebt:'Business Debt Growth',sofrUs3mSpread:'SOFR − US 3M Spread',bofaCcc:'BofA CCC Yield',us10yTips:'US10Y − TIPS10Y',us5yTips:'US5Y − TIPS5Y',sofrIorb:'SOFR − IORB',wresbal:'Bankreserven (WRESBAL)',effr:'EFFR',sofr:'SOFR',iorb:'IORB',cuAu:'Kupfer / Gold Ratio',diff:'Differenz',sofrFwd:'SOFR Erwartungskurve',ustCurve:'US Zinsstruktur',fhlbAdv:'FHLB Advances',fhlbAdvQoq:'FHLB Advances QoQ %',fhlbAdvYoy:'FHLB Advances YoY %',effrVol:'Fed Funds Volume',effrVolChg:'Fed Funds Vol Δ%',effr:'EFFR',iorb:'IORB',us1y:'US 1Y',iorbUs1yDual:'IORB + US 1Y',move:'MOVE Index',us2y:'US 2Y',us2ySofrDual:'US 2Y + SOFR',dxy:'DXY'};const label=extraLabels[key]||(defs.find(d=>d[0]===key)||[key,key])[1];const chart=renderLineChart(pts,{w:220,h:58});return `<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="${country}|${key}|${esc(label)}" title="Chart vergrößern">${chart}</div>`}let min=Math.min(0,...pts.map(p=>p.value)),max=Math.max(0,...pts.map(p=>p.value));if(max===min)max=min+1;const range=max-min||1;return `<div class="spark">${pts.slice(-5).map(x=>{const v=x.value,hh=Math.max(2,Math.round(((v-min)/range)*22));return `<div class="barwrap" title="${esc(x.period)}: ${fmt(v)}"><div class="bar ${v<0?'neg':''}" style="height:${hh}px"></div><div class="barlabel">${esc(String(x.period).replace(/^\d{4}-Q/,'Q').slice(0,7))}</div></div>`}).join('')}</div><div class="sparkcaption">Letzte ${Math.min(5,pts.length)} Werte</div>`}
-function render(){const grid=document.querySelector('#grid');grid.innerHTML='';for(const c of countries){const card=document.createElement('section');card.className='country';card.innerHTML=`<div class="ctop"><div class="flag">${c.flag}</div><div><h2>${c.name}</h2><div class="code">${c.id}</div></div></div>${c.id==='USA'?`<div class="usa-flip-toggle"><div class="usa-page-select" id="usaPageSelect"><button type="button" data-page="0">Seite 1</button><button type="button" data-page="1">Seite 2</button><button type="button" data-page="2">Seite 3</button><button type="button" data-page="3">Seite 4</button><button type="button" data-page="4">Seite 5</button><button type="button" data-page="5">Seite 6</button><button type="button" data-page="6">Seite 7</button><button type="button" data-page="7">Repo-Markt</button><button type="button" data-page="8">EUR/Dollar</button></div></div>`:''}<div class="metrics">${defs.map(([key,label])=>{if((key==='reservesGdp'||key==='tips5'||key==='tips10')&&c.id!=='USA')return'';const m=valueFor(c.id,key);const value=m?fmt(m.value):'Nicht verfügbar';const date=m?`${esc(m.source)} · ${esc(m.date)}`:'Quelle hat keinen Wert geliefert';const spark=key==='inflation'||key==='gdp'||key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit';return `<div class="metric${spark?' has-chart':''}"><div class="name">${label}</div><div class="value ${m?'':'na'}">${value}</div><div class="date">${date}</div>${spark?historyHTML(c.id,key):`<button class="btn" data-edit="${c.id}|${key}">Manuell eintragen</button>`}</div>`}).join('')}</div><div class="links"><a href="${c.links.inflation}" target="_blank" rel="noopener">Inflation ↗</a><a href="${c.links.rate}" target="_blank" rel="noopener">Leitzins ↗</a><a href="${c.links.bonds}" target="_blank" rel="noopener">Anleihen ↗</a><a href="${c.links.gdp}" target="_blank" rel="noopener">IMF-BIP ↗</a></div>`;
+function render(){const grid=document.querySelector('#grid');grid.innerHTML='';for(const c of countries){const card=document.createElement('section');card.className='country';card.innerHTML=`<div class="ctop"><div class="flag">${c.flag}</div><div><h2>${c.name}</h2><div class="code">${c.id}</div></div></div>${c.id==='USA'?`<div class="usa-flip-toggle"><div class="usa-page-select" id="usaPageSelect"><button type="button" data-page="0">Seite 1</button><button type="button" data-page="1">Seite 2</button><button type="button" data-page="2">Seite 3</button><button type="button" data-page="3">Seite 4</button><button type="button" data-page="4">Seite 5</button><button type="button" data-page="5">Seite 6</button><button type="button" data-page="6">Seite 7</button><button type="button" data-page="7">Repo-Markt</button><button type="button" data-page="9">EUR/Dollar</button></div></div>`:''}<div class="metrics">${defs.map(([key,label])=>{if((key==='reservesGdp'||key==='tips5'||key==='tips10')&&c.id!=='USA')return'';const m=valueFor(c.id,key);const value=m?fmt(m.value):'Nicht verfügbar';const date=m?`${esc(m.source)} · ${esc(m.date)}`:'Quelle hat keinen Wert geliefert';const spark=key==='inflation'||key==='gdp'||key==='y2'||key==='y10'||key==='t10y2y'||key==='rate'||key==='tips5'||key==='tips10'||key==='reservesGdp'||key==='deficit';return `<div class="metric${spark?' has-chart':''}"><div class="name">${label}</div><div class="value ${m?'':'na'}">${value}</div><div class="date">${date}</div>${spark?historyHTML(c.id,key):`<button class="btn" data-edit="${c.id}|${key}">Manuell eintragen</button>`}</div>`}).join('')}</div><div class="links"><a href="${c.links.inflation}" target="_blank" rel="noopener">Inflation ↗</a><a href="${c.links.rate}" target="_blank" rel="noopener">Leitzins ↗</a><a href="${c.links.bonds}" target="_blank" rel="noopener">Anleihen ↗</a><a href="${c.links.gdp}" target="_blank" rel="noopener">IMF-BIP ↗</a></div>`;
 if(c.id==='USA'){
   const faceA=card.querySelector('.metrics');
   if(faceA){
@@ -612,16 +612,18 @@ function bindRepoSelect(id, lsKey){
   el.addEventListener('change',()=>setRepoLS(lsKey,el.value,true));
 }
 
-function ensureUsaFaceI(){
-  const card=document.querySelector('.country .usa-face-a')?document.querySelector('.country'):document.querySelector('[data-country="USA"]')||document.querySelector('.country');
+function ensureUsaFaceJ(){
+  const faceA=document.querySelector('.country .usa-face-a');
+  if(!faceA)return null;
+  const card=faceA.closest('.country');
   if(!card)return null;
-  let face=card.querySelector('.usa-face-i');
+  let face=card.querySelector('.usa-face-j');
   if(!face){
     face=document.createElement('div');
-    face.className='metrics usa-face usa-face-i hidden';
-    face.setAttribute('data-usa-face','8');
-    const h=card.querySelector('.usa-face-h');
-    if(h&&h.parentNode)h.after(face);
+    face.className='metrics usa-face usa-face-j hidden';
+    face.setAttribute('data-usa-face','9');
+    const after=card.querySelector('.usa-face-i')||card.querySelector('.usa-face-h')||card.querySelector('.usa-face-g');
+    if(after&&after.parentNode)after.after(face);
     else{
       const toggle=card.querySelector('.usa-flip-toggle');
       if(toggle&&toggle.parentNode)toggle.before(face);
@@ -636,19 +638,20 @@ function ensureUsaFaceI(){
         '<div class="value" id="xeurbiValue">—</div>'+
         '<div class="date" id="xeurbiDate">CME · Basispunkte</div>'+
         '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|xeurbi|XEURBI" title="Chart vergrößern" id="xeurbiChart"></div>'+
-        '<div class="sofr-fwd-meta" id="xeurbiMeta">XEURBI in bp · gleiche Chart-Funktionen wie andere Serien (Vergrößern, 6M/1J/3J)</div>'+
+        '<div class="sofr-fwd-meta" id="xeurbiMeta">XEURBI in bp · Vergrößern · 6M/1J/3J wie andere Charts</div>'+
       '</div>';
   }
   return face;
 }
 function paintXeurbi(){
-  const face=ensureUsaFaceI();
+  const face=ensureUsaFaceJ();
   if(!face)return;
-  const pageNow=(()=>{try{return Number(localStorage.getItem('macrowatch-usa-page')||0)}catch(e){return 0}})();
-  if(pageNow===8)face.classList.remove('hidden');
+  let pageNow=0;
+  try{pageNow=Number(localStorage.getItem('macrowatch-usa-page')||0)}catch(e){}
+  if(pageNow===9)face.classList.remove('hidden');
   const pts=(typeof histories!=='undefined'&&histories['USA-xeurbi'])||[];
   const meta=(typeof data!=='undefined'&&data.USA&&data.USA.xeurbi)||{};
-  const last=pts.length?pts.at(-1):null;
+  const last=pts.length?pts[pts.length-1]:null;
   const valEl=document.getElementById('xeurbiValue');
   const dateEl=document.getElementById('xeurbiDate');
   const host=document.getElementById('xeurbiChart');
@@ -658,11 +661,11 @@ function paintXeurbi(){
   if(host){
     if(!pts.length)host.innerHTML='<div class="sparkempty">Keine XEURBI-Daten — CME-Abruf prüfen</div>';
     else if(typeof renderLineChart==='function'){
-      host.innerHTML=renderLineChart(pts,{w:Math.min(640, (host.clientWidth||360)), h:120});
+      host.innerHTML=renderLineChart(pts,{w:Math.min(640,(host.clientWidth||360)),h:120});
       host.setAttribute('data-chart','USA|xeurbi|XEURBI');
     }
   }
-  if(metaEl)metaEl.textContent=meta.note||('Historie ab '+(pts[0]&&pts[0].period||'—')+' · Index-Start CME: 2024-07-27');
+  if(metaEl)metaEl.textContent=meta.note||('Historie ab '+(pts[0]&&pts[0].period||'—')+' · CME Index-Start: 2024-07-27');
 }
 
 function paintRepoPage(){
@@ -858,7 +861,7 @@ function bindUsaPages(){
   }
   let start=0;
   try{start=Number(localStorage.getItem('macrowatch-usa-page')||'0')}catch(e){start=0}
-  if(!Number.isFinite(start)||start<0||start>8)start=0;
+  if(!Number.isFinite(start)||start<0||start>9)start=0;
   setUsaPage(start);
 }
 if(!window.__usaRenderPatched){
