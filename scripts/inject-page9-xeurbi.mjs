@@ -1,8 +1,10 @@
 import fs from 'node:fs';
 
 /**
- * USA page 9 (index 9): EUR/Dollar · CME XEURBI
- * Does NOT touch page 8 / face-i (Credit Vergabe lives there via credit.js).
+ * USA page 9: EUR/Dollar · CME XEURBI
+ * Only adds paint helpers + button. Does NOT rewrite setUsaPage
+ * (that is handled by inject-fix-usa-nav.mjs with max=9).
+ * Page 8 / face-i remains Credit Vergabe (credit.js).
  */
 let html = fs.readFileSync('index.html', 'utf8');
 
@@ -29,41 +31,27 @@ function replaceFunction(html, name, newSrc) {
   return { html: html.slice(0, start) + newSrc + html.slice(end + 1), ok: true };
 }
 
-// Remove wrong EUR/Dollar button on page 8 if present (page 8 = Credit)
-html = html.replace(
-  /<button type="button" data-page="8">\s*EUR\/Dollar\s*<\/button>/gi,
-  ''
-);
-html = html.replace(
-  /<button type="button" data-page="8">\s*EURUSD\s*<\/button>/gi,
-  ''
-);
+// Remove EUR/Dollar wrongly on page 8
+html = html.replace(/<button type="button" data-page="8">\s*EUR\/Dollar\s*<\/button>/gi, '');
+html = html.replace(/<button type="button" data-page="8">\s*EURUSD\s*<\/button>/gi, '');
 
-// Ensure page 9 button exists (Credit is page 8 via credit.js)
+// Ensure page 9 button
 if (!html.includes('data-page="9"')) {
-  // Prefer after Repo-Markt; credit.js may add Credit after load
   if (html.includes('>Repo-Markt</button>')) {
     html = html.replace(
       '>Repo-Markt</button>',
       '>Repo-Markt</button><button type="button" data-page="9">EUR/Dollar</button>'
     );
-    console.log('button EUR/Dollar page 9 after Repo-Markt');
-  } else if (html.includes('data-page="7"')) {
-    html = html.replace(
-      /(data-page="7"[^>]*>[^<]*<\/button>)/,
-      '$1<button type="button" data-page="9">EUR/Dollar</button>'
-    );
+    console.log('added EUR/Dollar button page 9');
   }
 } else {
-  // normalize label
   html = html.replace(
     /(<button type="button" data-page="9">)([^<]*)(<\/button>)/,
     '$1EUR/Dollar$3'
   );
 }
 
-const paintSrc = `
-function ensureUsaFaceJ(){
+const ensureFn = `function ensureUsaFaceJ(){
   const faceA=document.querySelector('.country .usa-face-a');
   if(!faceA)return null;
   const card=faceA.closest('.country');
@@ -89,12 +77,13 @@ function ensureUsaFaceJ(){
         '<div class="value" id="xeurbiValue">—</div>'+
         '<div class="date" id="xeurbiDate">CME · Basispunkte</div>'+
         '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|xeurbi|XEURBI" title="Chart vergrößern" id="xeurbiChart"></div>'+
-        '<div class="sofr-fwd-meta" id="xeurbiMeta">XEURBI in bp · Vergrößern · 6M/1J/3J wie andere Charts</div>'+
+        '<div class="sofr-fwd-meta" id="xeurbiMeta">XEURBI in bp · Vergrößern · 6M/1J/3J</div>'+
       '</div>';
   }
   return face;
-}
-function paintXeurbi(){
+}`;
+
+const paintFn = `function paintXeurbi(){
   const face=ensureUsaFaceJ();
   if(!face)return;
   let pageNow=0;
@@ -117,94 +106,37 @@ function paintXeurbi(){
     }
   }
   if(metaEl)metaEl.textContent=meta.note||('Historie ab '+(pts[0]&&pts[0].period||'—')+' · CME Index-Start: 2024-07-27');
-}
-`;
+}`;
 
-// Refresh paint helpers
-if (html.includes('function paintXeurbi')) {
-  let r = replaceFunction(html, 'ensureUsaFaceJ', '');
-  // strip old ensureUsaFaceI if it was for xeurbi on face-i
-  if (html.includes('function ensureUsaFaceI') && html.includes('xeurbiChart')) {
-    // only remove if it's the xeurbi one - leave alone if not
-  }
-  const r1 = replaceFunction(html, 'paintXeurbi', paintSrc.match(/function paintXeurbi\(\)\{[\s\S]*?\n\}/)[0]);
-  html = r1.html;
-  if (!html.includes('function ensureUsaFaceJ')) {
-    html = html.replace('function paintXeurbi', paintSrc.match(/function ensureUsaFaceJ\(\)\{[\s\S]*?\n\}/)[0] + '\nfunction paintXeurbi');
-  } else {
-    const r0 = replaceFunction(html, 'ensureUsaFaceJ', paintSrc.match(/function ensureUsaFaceJ\(\)\{[\s\S]*?\n\}/)[0]);
-    html = r0.html;
-  }
-  console.log('paintXeurbi refreshed');
+if (html.includes('function ensureUsaFaceJ')) {
+  const r = replaceFunction(html, 'ensureUsaFaceJ', ensureFn);
+  html = r.html;
+  console.log('ensureUsaFaceJ', r.ok);
+} else if (html.includes('function paintRepoPage')) {
+  html = html.replace('function paintRepoPage', ensureFn + '\n' + paintFn + '\nfunction paintRepoPage');
+  console.log('injected ensure+paint before paintRepoPage');
 } else {
-  const marker = 'function paintRepoPage';
-  if (html.includes(marker)) html = html.replace(marker, paintSrc + '\n' + marker);
-  else html = html.replace('</script>', paintSrc + '\n</script>');
-  console.log('paintXeurbi injected');
+  html = html.replace('</script>', ensureFn + '\n' + paintFn + '\n</script>');
+  console.log('injected at script end');
 }
 
-// Patch setUsaPage: max page >= 9, call paintXeurbi on 9, never steal face-i from Credit
-const setMatch = html.match(/function setUsaPage\(page\)\{[\s\S]*?\n\}/);
-if (setMatch) {
-  let src = setMatch[0];
-  // expand max clamp
-  src = src.replace(/Math\.min\(\s*[78]\s*,/g, 'Math.min(9,');
-  src = src.replace(/start>7/g, 'start>9');
-  src = src.replace(/start>8/g, 'start>9');
-  // faces array include j
-  if (!src.includes(".usa-face-j")) {
-    src = src.replace(
-      /\['\.usa-face-a'[\s\S]*?\.usa-face-h'\]/,
-      "['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h','.usa-face-i','.usa-face-j']"
-    );
-    src = src.replace(
-      /\['\.usa-face-a'[\s\S]*?\.usa-face-i'\]/,
-      "['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h','.usa-face-i','.usa-face-j']"
-    );
-  }
-  if (!src.includes('paintXeurbi') || !src.includes('page===9')) {
-    if (src.includes('if(page===8)')) {
-      src = src.replace(
-        /if\(page===8\)\{[^}]*\}/g,
-        (m) => m + "\n    if(page===9){typeof paintXeurbi==='function'&&paintXeurbi();}"
-      );
-    } else if (src.includes('if(page===7)')) {
-      src = src.replace(
-        /if\(page===7\)\{[^}]*\}/,
-        (m) => m + "\n    if(page===9){typeof paintXeurbi==='function'&&paintXeurbi();}"
-      );
-    }
-    // setTimeout branch
-    if (!src.includes('page===9)setTimeout')) {
-      src = src.replace(
-        /if\(page===7\)setTimeout\([^;]+;/, 
-        (m) => m + "\n  if(page===9)setTimeout(()=>{try{typeof paintXeurbi==='function'&&paintXeurbi();typeof ensureUsaFaceJ==='function'&&ensureUsaFaceJ()}catch(e){}},50);"
-      );
-    }
-  }
-  const r = replaceFunction(html, 'setUsaPage', src);
+if (html.includes('function paintXeurbi')) {
+  const r = replaceFunction(html, 'paintXeurbi', paintFn);
   html = r.html;
-  console.log('setUsaPage patched', r.ok);
+  console.log('paintXeurbi', r.ok);
+} else if (!html.includes(paintFn.slice(0, 30))) {
+  html = html.replace('function ensureUsaFaceJ', paintFn + '\nfunction ensureUsaFaceJ');
+  // order wrong - fix: ensure before paint
+  const r1 = replaceFunction(html, 'paintXeurbi', paintFn);
+  html = r1.html;
 }
 
-// bindUsaPages max 9
-const bindMatch = html.match(/function bindUsaPages\(\)\{[\s\S]*?\n\}/);
-if (bindMatch) {
-  let src = bindMatch[0];
-  src = src.replace(/start>7/g, 'start>9');
-  src = src.replace(/start>8/g, 'start>9');
-  src = src.replace(/Math\.min\(\s*[78]\s*,/g, 'Math.min(9,');
-  const r = replaceFunction(html, 'bindUsaPages', src);
-  html = r.html;
-  console.log('bindUsaPages patched', r.ok);
+// Safety: never leave max page at 7 if our button exists
+if (html.includes('data-page="9"') && html.includes('Math.min(7,')) {
+  html = html.replace(/Math\.min\(7,/g, 'Math.min(9,');
+  html = html.replace(/start>7\)/g, 'start>9)');
+  console.log('raised Math.min 7→9');
 }
-
-// Remove old xeurbi UI mistakenly on face-i (Credit owns face-i)
-// Only if face-i template in HTML contains xeurbi - rare static case
-html = html.replace(
-  /<div class="usa-face-i[^>]*>[\s\S]*?xeurbi[\s\S]*?<\/div>/gi,
-  '<div class="metrics usa-face usa-face-i hidden" data-usa-face="8"></div>'
-);
 
 fs.writeFileSync('index.html', html);
-console.log('done: Credit stays page 8; XEURBI on page 9 EUR/Dollar');
+console.log('done page9 xeurbi (no setUsaPage rewrite)');
