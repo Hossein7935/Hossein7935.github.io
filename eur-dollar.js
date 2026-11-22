@@ -1,7 +1,7 @@
 /*
  * MacroWatch – USA-Seite „EUR/Dollar“ (Seite 9)
- * Cross-Currency Basis Monitor (bp)
- * → CME XEURBI wenn da, sonst SOFR−€STR-Proxy mit langer Historie
+ * Cross-Currency Basis Monitor
+ * → CME XEURBI wenn da, sonst SOFR−€STR-Proxy in %-Punkten (ohne ×100)
  */
 (function () {
   'use strict';
@@ -53,12 +53,12 @@
     if (last) {
       val =
         (Number(last.value) >= 0 ? '+' : '') +
-        Number(last.value).toFixed(1) +
-        ' bp';
+        Number(last.value).toFixed(2) +
+        (isProxy ? ' %' : ' bp');
     }
 
     var title = isProxy
-      ? 'EUR/USD Basis-Monitor · Proxy (SOFR − €STR)'
+      ? 'EUR/USD Basis-Monitor · Proxy (SOFR − €STR, %-Punkte)'
       : 'CME XEURBI · EUR/USD Cross-Currency Basis';
 
     var dateLine = last
@@ -89,9 +89,9 @@
     var note =
       meta.note ||
       (isProxy
-        ? 'Proxy aus öffentlich verfügbaren Overnight-Sätzen (SOFR − €STR) in bp. ' +
-          'Das ist nicht der offizielle CME XEURBI-Index; CME-Werte ersetzen den Proxy, sobald der Abruf klappt.'
-        : 'Offizieller CME EUR/USD Cross-Currency Basis Index (bp).');
+        ? 'Proxy aus SOFR − €STR in Prozentpunkten (ohne ×100). ' +
+          'Nicht der offizielle CME XEURBI-Index; CME überschreibt, sobald verfügbar.'
+        : 'Offizieller CME EUR/USD Cross-Currency Basis Index.');
 
     face.innerHTML =
       '<div class="metric has-chart" style="grid-column:1/-1">' +

@@ -5,11 +5,11 @@ import fs from 'node:fs';
  *
  * Offizielles CME XEURBI ist oft gesperrt (403/401).
  * Deshalb:
- *  1) Öffentlicher Proxy: (SOFR − €STR) × 100 in bp  → lange Historie (FRED)
+ *  1) Öffentlicher Proxy: (SOFR − €STR) in Prozentpunkten  → lange Historie (FRED)
  *  2) CME XEURBI wenn erreichbar → überschreibt/ergänzt als USA-xeurbiOfficial
  *  3) Anzeige-Serie USA-xeurbi = CME wenn Punkte, sonst Proxy
  *
- * Der Proxy ist die USD–EUR Overnight-Zinsdifferenz in bp und
+ * Der Proxy ist die USD–EUR Overnight-Zinsdifferenz in %-Punkten und
  * NICHT identisch mit dem CME Cross-Currency Basis Index,
  * korreliert aber mit Dollar-Funding-Stress und füllt die Chart.
  */
@@ -28,7 +28,7 @@ function mergeSeries(...lists) {
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([period, value]) => ({
       period,
-      value: Math.round(value * 100) / 100
+      value: Math.round(value * 10000) / 10000
     }));
 }
 
@@ -123,7 +123,7 @@ const errors = Array.isArray(payload.errors)
   : [];
 const asOf = new Date().toISOString();
 
-// 1) Public proxy: SOFR − €STR in bp
+// 1) Public proxy: SOFR − €STR in Prozentpunkten (kein ×100)
 let proxy = [];
 try {
   const [sofr, estr] = await Promise.all([
@@ -135,7 +135,8 @@ try {
     if (!eMap.has(p.period)) continue;
     proxy.push({
       period: p.period,
-      value: Math.round((p.value - eMap.get(p.period)) * 10000) / 100
+      // Prozentpunkte (nicht bp): SOFR − €STR
+      value: Math.round((p.value - eMap.get(p.period)) * 10000) / 10000
     });
   }
   if (proxy.length < 50) throw new Error('Proxy zu kurz');
@@ -148,12 +149,12 @@ try {
     firstDate: proxy[0].period,
     updatedAt: asOf,
     source: 'FRED SOFR − ECBESTRVOLWGTTRMDMNRT',
-    unit: 'bp',
-    note: 'Proxy: Overnight-Zinsspread USD−EUR in bp (nicht identisch mit CME XEURBI)'
+    unit: '%',
+    note: 'Proxy: Overnight-Zinsspread USD−EUR in Prozentpunkten (nicht identisch mit CME XEURBI)'
   };
   console.log('Proxy', proxy.length, proxy[0].period, '→', last.period, last.value);
 } catch (e) {
-  errors.push(`USA xccyProxy: ${e.message}`);
+  errors.push(`USA x freccyProxy: ${e.message}`);
   console.error('Proxy', e.message);
   proxy = histories['USA-xccyProxy'] || [];
 }
@@ -191,10 +192,10 @@ if (display.length) {
     sourceUrl: usingCme
       ? 'https://www.cmegroup.com/market-data/cme-group-benchmark-administration/eur-usd-cross-currency-basis-index.html'
       : 'https://fred.stlouisfed.org/series/SOFR',
-    unit: 'bp',
+    unit: usingCme ? 'bp' : '%',
     note: usingCme
-      ? 'Offizieller CME EUR/USD Cross-Currency Basis Index (bp)'
-      : 'Proxy aus SOFR−€STR in bp. Nicht der CME-Index; dient als öffentlich verfügbare Historie bis CME erreichbar ist.'
+      ? 'Offizieller CME EUR/USD Cross-Currency Basis Index'
+      : 'Proxy aus SOFR−€STR in %-Punkten. Nicht der CME-Index; dient als öffentlich verfügbare Historie bis CME erreichbar ist.'
   };
   console.log('Display', display.length, last.period, last.value, usingCme ? 'CME' : 'Proxy');
 } else {
