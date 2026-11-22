@@ -1,25 +1,26 @@
 {
- "checkedAt": "2026-11-22T08:42:51.133Z",
+ "checkedAt": "2026-11-22T13:36:21.766Z",
  "today": "2026-11-22",
  "summary": {
-  "ok": 57,
-  "info": 12
+  "info": 13,
+  "ok": 52,
+  "alt": 4
  },
  "items": [
   {
    "page": "USA · Seite 1",
    "label": "Inflation (CPI J/J)",
-   "pageDate": "2026-10",
+   "pageDate": "2024",
    "srcDate": "2026-10-01",
    "source": "FRED CPIAUCSL",
-   "status": "ok",
+   "status": "info",
    "note": ""
   },
   {
    "page": "USA · Seite 1",
    "label": "Leitzins (Fed-Zielspanne)",
-   "pageDate": "2026-11-21",
-   "srcDate": "2026-11-21",
+   "pageDate": "2026-11-22",
+   "srcDate": "2026-11-22",
    "source": "FRED DFEDTARU",
    "status": "ok",
    "note": ""
@@ -54,19 +55,19 @@
   {
    "page": "USA · Seite 1",
    "label": "TIPS Realzins 5 Jahre",
-   "pageDate": "2026-11-20",
+   "pageDate": "2026-11-19",
    "srcDate": "2026-11-20",
    "source": "U.S. Treasury Real Yield",
-   "status": "ok",
+   "status": "alt",
    "note": ""
   },
   {
    "page": "USA · Seite 1",
    "label": "TIPS Realzins 10 Jahre",
-   "pageDate": "2026-11-20",
+   "pageDate": "2026-11-19",
    "srcDate": "2026-11-20",
    "source": "U.S. Treasury Real Yield",
-   "status": "ok",
+   "status": "alt",
    "note": ""
   },
   {
@@ -189,19 +190,19 @@
   {
    "page": "USA · Seite 4",
    "label": "Zinsstruktur nominal",
-   "pageDate": "2026-11-22",
+   "pageDate": "2026-11-19",
    "srcDate": "2026-11-20",
    "source": "Treasury + TradingView",
-   "status": "ok",
+   "status": "alt",
    "note": "laufend (TradingView)"
   },
   {
    "page": "USA · Seite 4",
    "label": "Zinsstruktur TIPS 10Y",
-   "pageDate": "2026-11-20",
+   "pageDate": "2026-11-19",
    "srcDate": "2026-11-20",
    "source": "U.S. Treasury Real Yield",
-   "status": "ok",
+   "status": "alt",
    "note": ""
   },
   {
