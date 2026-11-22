@@ -120,7 +120,7 @@ jobs:
         run: node scripts/inject-repo-enlarge-fix.mjs || true
       - name: Strip USA page 2 duplicate charts
         run: node scripts/strip-page2-dupes.mjs || true
-      - name: Final index fixes (vorher im Commit-Schritt)
+      - name: Final index fixes (vorher im Commit-Pfad)
         run: |
           node scripts/fix-js-syntax.mjs || true
           node scripts/inject-fix-usa-nav.mjs || true
@@ -131,10 +131,13 @@ jobs:
           node scripts/fix-paint-chart-dlg.mjs || true
           node scripts/inject-repo-enlarge-fix.mjs || true
           node scripts/strip-page2-dupes.mjs || true
+          node scripts/fix-usa-page9-nav.mjs || true
       - name: Auto-Refresh im Browser einbinden + Datum auf Zins-Karten
         run: |
           node scripts/fix-rate-card-dates.mjs || true
           node scripts/inject-autorefresh.mjs
+      - name: Fix USA page 9 nav after all injects
+        run: node scripts/fix-usa-page9-nav.mjs || true
 
       - name: Pages-URL ermitteln
         id: pages
