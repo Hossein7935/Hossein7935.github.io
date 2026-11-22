@@ -46,6 +46,7 @@ const STEPS = [
   ['scripts/fetch-reserves-gdp.mjs', 'Reserven/BIP'],
   ['scripts/fetch-deficit.mjs', 'Defizit (IMF)'],
   ['scripts/fetch-xeurbi.mjs', 'CME XEURBI (EUR/Dollar Basis)'],
+  ['scripts/fetch-us-de-curve.mjs', 'USA/DE Zinskurve (EUR/Dollar)'],
   ['scripts/fetch-usa-page1.mjs', 'USA Seite 1: Fed-Zielspanne + Defizit (MTS)'],
   ['scripts/fetch-credit.mjs', 'Credit Vergabe (SLOOS, H.8, SKSI)', 180],
   // must run last — builds derived series from the histories above
@@ -114,14 +115,12 @@ for (const [script, label, timeoutS = DEFAULT_TIMEOUT_S] of STEPS) {
   }
 
   if (status !== 'ok') {
-    // restore the state from before this script
     fs.writeFileSync(FILE, before.raw);
     warn(`${label}: ${status} – vorheriger Stand wiederhergestellt`);
     summary.push([label, status, secs]);
     continue;
   }
 
-  // never let a script wipe an existing history
   const restored = [];
   const oldH = before.json.histories || {};
   const newH = after.json.histories || {};
@@ -133,7 +132,6 @@ for (const [script, label, timeoutS = DEFAULT_TIMEOUT_S] of STEPS) {
       restored.push(`${key} (${oldVal.length}→${Array.isArray(nv) ? nv.length : 0})`);
     }
   }
-  // same for the card values (data.<Land>.<Kennzahl>)
   const oldD = before.json.data || {};
   const newD = after.json.data || (after.json.data = {});
   for (const [country, fields] of Object.entries(oldD)) {
