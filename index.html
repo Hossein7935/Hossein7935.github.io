@@ -611,7 +611,6 @@ function bindRepoSelect(id, lsKey){
   el.value=getRepoLS(lsKey);
   el.addEventListener('change',()=>setRepoLS(lsKey,el.value,true));
 }
-
 function ensureUsaFaceJ(){
   const faceA=document.querySelector('.country .usa-face-a');
   if(!faceA)return null;
@@ -638,7 +637,7 @@ function ensureUsaFaceJ(){
         '<div class="value" id="xeurbiValue">—</div>'+
         '<div class="date" id="xeurbiDate">CME · Basispunkte</div>'+
         '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|xeurbi|XEURBI" title="Chart vergrößern" id="xeurbiChart"></div>'+
-        '<div class="sofr-fwd-meta" id="xeurbiMeta">XEURBI in bp · Vergrößern · 6M/1J/3J wie andere Charts</div>'+
+        '<div class="sofr-fwd-meta" id="xeurbiMeta">XEURBI in bp · Vergrößern · 6M/1J/3J</div>'+
       '</div>';
   }
   return face;
@@ -667,7 +666,6 @@ function paintXeurbi(){
   }
   if(metaEl)metaEl.textContent=meta.note||('Historie ab '+(pts[0]&&pts[0].period||'—')+' · CME Index-Start: 2024-07-27');
 }
-
 function paintRepoPage(){
   const face=ensureRepoPage();
   if(!face)return;
