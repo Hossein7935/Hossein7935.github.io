@@ -1,5 +1,5 @@
 {
- "checkedAt": "2026-11-22T21:56:14.597Z",
+ "checkedAt": "2026-11-22T22:20:47.068Z",
  "today": "2026-11-22",
  "summary": {
   "info": 13,
@@ -109,8 +109,8 @@
   {
    "page": "USA · Seite 1",
    "label": "DXY",
-   "pageDate": "2026-11-20",
-   "srcDate": "2026-11-20",
+   "pageDate": "2026-11-22",
+   "srcDate": "2026-11-22",
    "source": "Yahoo DX-Y.NYB",
    "status": "ok",
    "note": ""
@@ -599,7 +599,7 @@
    "srcDate": "2026-11-20",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.683 · TradingView 4.683"
+   "note": "Seite 4.691 · TradingView 4.691"
   },
   {
    "page": "AUS",
@@ -608,7 +608,7 @@
    "srcDate": "2026-11-20",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.908 · TradingView 4.908"
+   "note": "Seite 4.919 · TradingView 4.919"
   },
   {
    "page": "AUS",
