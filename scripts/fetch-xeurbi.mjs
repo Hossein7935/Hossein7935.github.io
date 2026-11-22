@@ -1,9 +1,17 @@
 import fs from 'node:fs';
 
 /**
- * Nur CME XEURBI (EUR/USD Cross-Currency Basis Index, bp).
- * Kein EZB-Kassakurs, kein SOFR−€STR als Ersatzserie.
- * Merge: bestehende Historie bleibt, neue CME-Punkte werden ergänzt.
+ * EUR/USD Cross-Currency Basis Monitor
+ *
+ * Offizielles CME XEURBI ist oft gesperrt (403/401).
+ * Deshalb:
+ *  1) Öffentlicher Proxy: (SOFR − €STR) × 100 in bp  → lange Historie (FRED)
+ *  2) CME XEURBI wenn erreichbar → überschreibt/ergänzt als USA-xeurbiOfficial
+ *  3) Anzeige-Serie USA-xeurbi = CME wenn Punkte, sonst Proxy
+ *
+ * Der Proxy ist die USD–EUR Overnight-Zinsdifferenz in bp und
+ * NICHT identisch mit dem CME Cross-Currency Basis Index,
+ * korreliert aber mit Dollar-Funding-Stress und füllt die Chart.
  */
 
 const UA = 'MacroWatch/1.9 (+https://hossein7935.github.io/)';
@@ -20,8 +28,29 @@ function mergeSeries(...lists) {
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([period, value]) => ({
       period,
-      value: Math.round(value * 10000) / 10000
+      value: Math.round(value * 100) / 100
     }));
+}
+
+async function fredCsv(id, start = '2018-01-01') {
+  const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=${start}`;
+  const r = await fetch(url, {
+    headers: { 'User-Agent': UA, Accept: 'text/csv' },
+    signal: AbortSignal.timeout(90000),
+    cache: 'no-store'
+  });
+  if (!r.ok) throw new Error(`${id} HTTP ${r.status}`);
+  const text = await r.text();
+  if (text.trim().startsWith('<')) throw new Error(`${id}: HTML`);
+  const out = [];
+  for (const line of text.trim().split(/\r?\n/).slice(1)) {
+    const [d, v] = line.split(',');
+    if (!d || v == null || v === '' || v === '.') continue;
+    const n = Number(v);
+    if (Number.isFinite(n)) out.push({ period: d.trim().slice(0, 10), value: n });
+  }
+  if (!out.length) throw new Error(`${id}: leer`);
+  return out;
 }
 
 async function tryCmeXeurbi() {
@@ -90,53 +119,86 @@ const histories = payload.histories || {};
 const data = payload.data || {};
 data.USA = data.USA || {};
 const errors = Array.isArray(payload.errors)
-  ? payload.errors.filter((e) => !String(e).startsWith('USA XEURBI'))
+  ? payload.errors.filter((e) => !String(e).startsWith('USA XEURBI') && !String(e).startsWith('USA xccy'))
   : [];
 const asOf = new Date().toISOString();
 
-// Drop unused ECB FX / SOFR-ESTR display series from USA meta (keep histories if present)
-delete data.USA.eurusd;
-delete data.USA.sofrEstr;
+// 1) Public proxy: SOFR − €STR in bp
+let proxy = [];
+try {
+  const [sofr, estr] = await Promise.all([
+    fredCsv('SOFR', '2018-04-01'),
+    fredCsv('ECBESTRVOLWGTTRMDMNRT', '2019-10-01')
+  ]);
+  const eMap = new Map(estr.map((p) => [p.period, p.value]));
+  for (const p of sofr) {
+    if (!eMap.has(p.period)) continue;
+    proxy.push({
+      period: p.period,
+      value: Math.round((p.value - eMap.get(p.period)) * 10000) / 100
+    });
+  }
+  if (proxy.length < 50) throw new Error('Proxy zu kurz');
+  histories['USA-xccyProxy'] = proxy;
+  const last = proxy.at(-1);
+  data.USA.xccyProxy = {
+    value: last.value,
+    date: last.period,
+    points: proxy.length,
+    firstDate: proxy[0].period,
+    updatedAt: asOf,
+    source: 'FRED SOFR − ECBESTRVOLWGTTRMDMNRT',
+    unit: 'bp',
+    note: 'Proxy: Overnight-Zinsspread USD−EUR in bp (nicht identisch mit CME XEURBI)'
+  };
+  console.log('Proxy', proxy.length, proxy[0].period, '→', last.period, last.value);
+} catch (e) {
+  errors.push(`USA xccyProxy: ${e.message}`);
+  console.error('Proxy', e.message);
+  proxy = histories['USA-xccyProxy'] || [];
+}
 
+// 2) CME official when available
+let cme = [];
 try {
   const fresh = await tryCmeXeurbi();
-  const prev = histories['USA-xeurbi'] || [];
-  const series = mergeSeries(prev, fresh);
-  if (series.length) {
-    histories['USA-xeurbi'] = series;
-    const last = series.at(-1);
-    data.USA.xeurbi = {
-      value: last.value,
-      date: last.period,
-      points: series.length,
-      firstDate: series[0].period,
-      updatedAt: asOf,
-      source: fresh.length ? 'CME XEURBI (merged)' : 'CME XEURBI (cached)',
-      sourceUrl:
-        'https://www.cmegroup.com/market-data/cme-group-benchmark-administration/eur-usd-cross-currency-basis-index.html',
-      unit: 'bp',
-      note: 'CME EUR/USD Cross-Currency Basis Index (bp) · nur echte XEURBI-Werte'
-    };
-    console.log('XEURBI', series.length, series[0].period, '→', last.period, last.value, 'fresh', fresh.length);
+  cme = mergeSeries(histories['USA-xeurbiOfficial'] || [], fresh);
+  if (cme.length) {
+    histories['USA-xeurbiOfficial'] = cme;
+    console.log('CME official', cme.length, 'fresh', fresh.length);
   } else {
-    data.USA.xeurbi = {
-      value: null,
-      date: null,
-      points: 0,
-      updatedAt: asOf,
-      source: 'CME XEURBI',
-      sourceUrl:
-        'https://www.cmegroup.com/market-data/cme-group-benchmark-administration/eur-usd-cross-currency-basis-index.html',
-      unit: 'bp',
-      note:
-        'Noch keine Punkte: CME API/DataMine blockiert kostenlosen Abruf. Kein EZB-Kassakurs als Ersatz.'
-    };
-    console.warn('XEURBI: 0 Punkte (CME nicht erreichbar)');
-    errors.push('USA XEURBI: CME Abruf lieferte keine Punkte');
+    console.warn('CME: keine Punkte');
   }
 } catch (e) {
-  errors.push(`USA XEURBI: ${e.message}`);
-  console.error('XEURBI', e.message);
+  console.warn('CME', e.message);
+}
+
+// 3) Display series: prefer CME official, else proxy
+const display = cme.length ? cme : proxy;
+if (display.length) {
+  histories['USA-xeurbi'] = display;
+  const last = display.at(-1);
+  const usingCme = cme.length > 0;
+  data.USA.xeurbi = {
+    value: last.value,
+    date: last.period,
+    points: display.length,
+    firstDate: display[0].period,
+    updatedAt: asOf,
+    source: usingCme
+      ? 'CME XEURBI'
+      : 'Proxy SOFR−€STR (FRED) — CME XEURBI gesperrt',
+    sourceUrl: usingCme
+      ? 'https://www.cmegroup.com/market-data/cme-group-benchmark-administration/eur-usd-cross-currency-basis-index.html'
+      : 'https://fred.stlouisfed.org/series/SOFR',
+    unit: 'bp',
+    note: usingCme
+      ? 'Offizieller CME EUR/USD Cross-Currency Basis Index (bp)'
+      : 'Proxy aus SOFR−€STR in bp. Nicht der CME-Index; dient als öffentlich verfügbare Historie bis CME erreichbar ist.'
+  };
+  console.log('Display', display.length, last.period, last.value, usingCme ? 'CME' : 'Proxy');
+} else {
+  errors.push('USA XEURBI: weder CME noch Proxy');
 }
 
 payload.histories = histories;
@@ -144,4 +206,4 @@ payload.data = data;
 payload.errors = errors;
 payload.updatedAt = asOf;
 fs.writeFileSync('data.json', JSON.stringify(payload));
-console.log('done xeurbi-only');
+console.log('done xeurbi monitor');
