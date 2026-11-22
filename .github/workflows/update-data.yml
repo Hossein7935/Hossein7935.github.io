@@ -110,6 +110,8 @@ jobs:
         run: node scripts/inject-sofr-enlarge-fix.mjs || true
       - name: Re-apply page 8 Repo-Markt
         run: node scripts/inject-page8-repo.mjs || true
+      - name: Inject USA page 9 EUR/Dollar XEURBI
+        run: node scripts/inject-page9-xeurbi.mjs || true
       - name: Fix USA template again after page8
         run: node scripts/fix-usa-template.mjs || true
       - name: Fix USA face visibility (empty pages)
@@ -123,6 +125,7 @@ jobs:
           node scripts/fix-js-syntax.mjs || true
           node scripts/inject-fix-usa-nav.mjs || true
           node scripts/inject-page8-repo.mjs || true
+          node scripts/inject-page9-xeurbi.mjs || true
           node scripts/fix-usa-template.mjs || true
           node scripts/fix-usa-face-visibility.mjs || true
           node scripts/fix-paint-chart-dlg.mjs || true

@@ -45,36 +45,43 @@ const STEPS = [
   ['scripts/fetch-gdp-charts.mjs', 'BIP-Charts'],
   ['scripts/fetch-reserves-gdp.mjs', 'Reserven/BIP'],
   ['scripts/fetch-deficit.mjs', 'Defizit (IMF)'],
+  ['scripts/fetch-xeurbi.mjs', 'CME XEURBI (EUR/Dollar Basis)'],
   ['scripts/fetch-usa-page1.mjs', 'USA Seite 1: Fed-Zielspanne + Defizit (MTS)'],
   ['scripts/fetch-credit.mjs', 'Credit Vergabe (SLOOS, H.8, SKSI)', 180],
-  // must run last: fills FRED-lagged series from Treasury/TradingView/NY Fed
-  ['scripts/freshen-derived.mjs', 'Neuere Tage aus Treasury/TV/NY Fed', 60]
+  // must run last — builds derived series from the histories above
+  ['scripts/fetch-yield-charts.mjs', 'Yield-Charts (abgeleitet)']
 ];
 
-const DEFAULT_TIMEOUT_S = 120;
-// keys that scripts delete on purpose (legacy fields)
-const INTENTIONALLY_REMOVED = new Set(['nonfinDebt']);
 const FILE = 'data.json';
+const DEFAULT_TIMEOUT_S = 120;
+const INTENTIONALLY_REMOVED = new Set();
 const gha = !!process.env.GITHUB_ACTIONS;
+
+function group(title) {
+  if (gha) console.log(`::group::${title}`);
+  else console.log(`\n=== ${title} ===`);
+}
+function endGroup() {
+  if (gha) console.log('::endgroup::');
+}
+function warn(msg) {
+  if (gha) console.log(`::warning::${msg}`);
+  else console.warn(msg);
+}
 
 function readValid() {
   try {
     const raw = fs.readFileSync(FILE, 'utf8');
-    const j = JSON.parse(raw);
-    if (!j || typeof j !== 'object' || typeof j.data !== 'object' || typeof j.histories !== 'object') return null;
-    return { raw, json: j };
+    const json = JSON.parse(raw);
+    if (!json || typeof json !== 'object') return null;
+    return { raw, json };
   } catch {
     return null;
   }
 }
 
-function group(name) { if (gha) console.log(`::group::${name}`); else console.log(`\n=== ${name}`); }
-function endGroup() { if (gha) console.log('::endgroup::'); }
-function warn(msg) { console.log(gha ? `::warning::${msg}` : `WARN ${msg}`); }
-
-const start = readValid();
-if (!start) {
-  console.error('data.json fehlt oder ist ungültig – Abbruch');
+if (!readValid()) {
+  console.error('data.json fehlt oder ist ungültig — Abbruch');
   process.exit(1);
 }
 
