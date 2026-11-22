@@ -1,13 +1,21 @@
 import fs from 'node:fs';
 
 /**
- * USA EUR/Dollar page data
- * 1) ECB EUR/USD reference rate → USA-eurusd (long free history)
- * 2) CME XEURBI when reachable → USA-xeurbi (merge, never wipe)
- * 3) SOFR − €STR (bp) → USA-sofrEstr as funding-basis context
+ * EUR/Dollar page data
+ *
+ * XEURBI (official):
+ *   CME Cross Currency API
+ *   GET https://markets.api.cmegroup.com/xccy/v1/history?productCodes=XEURBI
+ *   Auth required → set GitHub secret CME_XCCY_TOKEN (Bearer) or CME_API_KEY
+ *
+ * Fallbacks always free:
+ *   ECB EUR/USD → USA-eurusd
+ *   SOFR − €STR (bp) → USA-sofrEstr
  */
 
 const UA = 'MacroWatch/1.9 (+https://hossein7935.github.io/)';
+const CME_HISTORY =
+  'https://markets.api.cmegroup.com/xccy/v1/history?productCodes=XEURBI&startDate=2024-07-01';
 
 function mergeSeries(...lists) {
   const map = new Map();
@@ -25,9 +33,9 @@ function mergeSeries(...lists) {
     }));
 }
 
-async function getText(url, accept = '*/*') {
+async function getText(url, accept = '*/*', extraHeaders = {}) {
   const r = await fetch(url, {
-    headers: { 'User-Agent': UA, Accept: accept, Referer: 'https://www.cmegroup.com/' },
+    headers: { 'User-Agent': UA, Accept: accept, ...extraHeaders },
     signal: AbortSignal.timeout(90000),
     cache: 'no-store'
   });
@@ -42,8 +50,6 @@ async function fetchEcbEurUsd() {
   const out = [];
   for (const line of text.trim().split(/\r?\n/).slice(1)) {
     const parts = line.split(',');
-    // KEY,...,TIME_PERIOD,OBS_VALUE,...
-    // find TIME_PERIOD (YYYY-MM-DD) and OBS_VALUE
     let period = null;
     let value = null;
     for (let i = 0; i < parts.length; i++) {
@@ -61,8 +67,10 @@ async function fetchEcbEurUsd() {
 }
 
 async function fredCsv(id, start = '2018-01-01') {
-  const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=${start}`;
-  const text = await getText(url, 'text/csv');
+  const text = await getText(
+    `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=${start}`,
+    'text/csv'
+  );
   if (text.trim().startsWith('<')) throw new Error(`${id}: HTML`);
   const out = [];
   for (const line of text.trim().split(/\r?\n/).slice(1)) {
@@ -75,9 +83,60 @@ async function fredCsv(id, start = '2018-01-01') {
   return out;
 }
 
-async function tryCmeXeurbi() {
+function authHeaders() {
+  const token =
+    process.env.CME_XCCY_TOKEN ||
+    process.env.CME_API_KEY ||
+    process.env.CME_BEARER_TOKEN ||
+    '';
+  if (!token) return null;
+  // Support raw token or already "Bearer …"
+  const auth = token.toLowerCase().startsWith('bearer ') ? token : `Bearer ${token}`;
+  return {
+    Authorization: auth,
+    Accept: 'application/json',
+    'User-Agent': UA
+  };
+}
+
+/** Official CME Cross Currency API */
+async function fetchCmeXccyApi() {
+  const headers = authHeaders();
+  if (!headers) {
+    console.warn(
+      'XEURBI: kein CME_XCCY_TOKEN / CME_API_KEY — offizielle API übersprungen (401 ohne Auth)'
+    );
+    return { pts: [], status: 'no_credentials' };
+  }
+  const r = await fetch(CME_HISTORY, {
+    headers,
+    signal: AbortSignal.timeout(60000),
+    cache: 'no-store'
+  });
+  if (!r.ok) {
+    const t = await r.text().catch(() => '');
+    console.warn('CME xccy API', r.status, t.slice(0, 200));
+    return { pts: [], status: `http_${r.status}` };
+  }
+  const j = await r.json();
+  const rows = Array.isArray(j) ? j : j.data || j.history || j.results || j.items || [];
   const pts = [];
-  // Product slate → XEU / cross-currency
+  for (const row of rows) {
+    const period = String(
+      row.tradeDate || row.date || row.effectiveDate || row.refDate || row.businessDate || ''
+    ).slice(0, 10);
+    const n = Number(
+      row.indexValue ?? row.value ?? row.xeurbi ?? row.rate ?? row.index
+    );
+    if (period && Number.isFinite(n)) pts.push({ period, value: n });
+  }
+  console.log('CME xccy API points', pts.length, pts.at(-1));
+  return { pts, status: pts.length ? 'ok' : 'empty' };
+}
+
+/** Best-effort public HTML/JSON (usually blocked) */
+async function fetchCmePublic() {
+  const pts = [];
   try {
     const r = await fetch('https://www.cmegroup.com/CmeWS/mvc/ProductSlate/V2/List', {
       headers: {
@@ -85,56 +144,43 @@ async function tryCmeXeurbi() {
         Accept: 'application/json',
         Referer: 'https://www.cmegroup.com/'
       },
-      signal: AbortSignal.timeout(45000),
+      signal: AbortSignal.timeout(30000),
       cache: 'no-store'
     });
-    if (r.ok) {
-      const j = await r.json();
-      for (const p of j.products || []) {
-        const blob = [p.name, p.clearing, p.globex, p.cpc]
-          .map((x) => String(x || '').toLowerCase())
-          .join(' ');
-        if (
-          blob.includes('cross-currency') ||
-          blob.includes('cross currency') ||
-          /\bxeu\b/.test(blob) ||
-          blob.includes('xeurbi')
-        ) {
-          for (const path of [
-            `https://www.cmegroup.com/CmeWS/mvc/Settlements/Futures/Settlements/${p.id}/G`,
-            `https://www.cmegroup.com/CmeWS/mvc/Quotes/Future/${p.id}/G`
-          ]) {
-            try {
-              const rr = await fetch(path, {
-                headers: {
-                  'User-Agent': UA,
-                  Accept: 'application/json',
-                  Referer: 'https://www.cmegroup.com/'
-                },
-                signal: AbortSignal.timeout(30000),
-                cache: 'no-store'
-              });
-              if (!rr.ok) continue;
-              const jj = await rr.json();
-              const rows = jj.settlements || jj.quotes || [];
-              for (const row of rows) {
-                const period = String(
-                  row.tradeDate || row.businessDate || row.updated || ''
-                ).slice(0, 10);
-                const n = Number(
-                  row.settle || row.settlement || row.last || row.priorSettle || row.close
-                );
-                if (period && Number.isFinite(n)) pts.push({ period, value: n });
-              }
-            } catch (e) {
-              console.warn('CME row', e.message);
-            }
+    if (!r.ok) return pts;
+    const j = await r.json();
+    for (const p of j.products || []) {
+      const blob = [p.name, p.clearing, p.globex, p.cpc]
+        .map((x) => String(x || '').toLowerCase())
+        .join(' ');
+      if (!blob.includes('cross-currency') && !/\bxeu\b/.test(blob) && !blob.includes('xeurbi'))
+        continue;
+      for (const path of [
+        `https://www.cmegroup.com/CmeWS/mvc/Settlements/Futures/Settlements/${p.id}/G`,
+        `https://www.cmegroup.com/CmeWS/mvc/Quotes/Future/${p.id}/G`
+      ]) {
+        try {
+          const rr = await fetch(path, {
+            headers: {
+              'User-Agent': UA,
+              Accept: 'application/json',
+              Referer: 'https://www.cmegroup.com/'
+            },
+            signal: AbortSignal.timeout(20000),
+            cache: 'no-store'
+          });
+          if (!rr.ok) continue;
+          const jj = await rr.json();
+          for (const row of jj.settlements || jj.quotes || []) {
+            const period = String(row.tradeDate || row.updated || '').slice(0, 10);
+            const n = Number(row.settle || row.last || row.priorSettle);
+            if (period && Number.isFinite(n)) pts.push({ period, value: n });
           }
-        }
+        } catch {}
       }
     }
   } catch (e) {
-    console.warn('CME slate', e.message);
+    console.warn('CME public', e.message);
   }
   return pts;
 }
@@ -144,7 +190,9 @@ const histories = payload.histories || {};
 const data = payload.data || {};
 data.USA = data.USA || {};
 const errors = Array.isArray(payload.errors)
-  ? payload.errors.filter((e) => !String(e).startsWith('USA XEURBI') && !String(e).startsWith('USA EURUSD'))
+  ? payload.errors.filter(
+      (e) => !String(e).startsWith('USA XEURBI') && !String(e).startsWith('USA EURUSD')
+    )
   : [];
 const asOf = new Date().toISOString();
 
@@ -160,21 +208,23 @@ try {
     firstDate: eurusd[0].period,
     updatedAt: asOf,
     source: 'ECB EXR D.USD.EUR.SP00.A',
-    sourceUrl: 'https://data.ecb.europa.eu/',
     unit: 'USD je EUR',
-    note: 'EZB-Referenzkurs USD/EUR · lange Historie · kostenlos'
+    note: 'EZB-Referenzkurs USD/EUR · kostenlos · lange Historie'
   };
-  console.log('EURUSD', eurusd.length, eurusd[0].period, '→', last.period, last.value);
+  console.log('EURUSD', eurusd.length, last.period, last.value);
 } catch (e) {
   errors.push(`USA EURUSD: ${e.message}`);
   console.error('EURUSD', e.message);
 }
 
-// 2) CME XEURBI merge
+// 2) Official XEURBI
+let xStatus = 'unknown';
 try {
-  const fresh = await tryCmeXeurbi();
+  const api = await fetchCmeXccyApi();
+  xStatus = api.status;
+  const pub = await fetchCmePublic();
   const prev = histories['USA-xeurbi'] || [];
-  const series = mergeSeries(prev, fresh);
+  const series = mergeSeries(prev, api.pts, pub);
   if (series.length) {
     histories['USA-xeurbi'] = series;
     const last = series.at(-1);
@@ -184,23 +234,37 @@ try {
       points: series.length,
       firstDate: series[0].period,
       updatedAt: asOf,
-      source: fresh.length ? 'CME XEURBI (merged)' : 'CME XEURBI (cached)',
+      source: 'CME XEURBI',
       sourceUrl:
         'https://www.cmegroup.com/market-data/cme-group-benchmark-administration/eur-usd-cross-currency-basis-index.html',
       unit: 'bp',
+      apiStatus: xStatus,
       note:
-        'XEURBI = CME EUR/USD Cross-Currency Basis Index (bp). Offizielle Langhistorie: CME DataMine. Hier: merge aus CME-Abruf + gespeicherter Historie.'
+        xStatus === 'ok'
+          ? 'Offizielle CME Cross-Currency API · gemerged'
+          : 'Gespeicherte/teilweise CME-Daten · volle API braucht CME_XCCY_TOKEN'
     };
-    console.log('XEURBI', series.length, series[0].period, '→', last.period, last.value, 'fresh', fresh.length);
+    console.log('XEURBI', series.length, last.period, last.value, 'status', xStatus);
   } else {
-    console.warn('XEURBI: noch keine Punkte (CME blockiert/leer)');
+    data.USA.xeurbi = {
+      value: null,
+      date: null,
+      points: 0,
+      updatedAt: asOf,
+      source: 'CME XEURBI',
+      apiStatus: xStatus,
+      unit: 'bp',
+      note:
+        'Kein XEURBI-Punkt. Offizielle API: https://markets.api.cmegroup.com/xccy/v1/history (Auth). GitHub Secret CME_XCCY_TOKEN setzen. Öffentliche CME-Seiten sind blockiert (401/403). DataMine ist die lizenzierte Alternative.'
+    };
+    console.warn('XEURBI empty', xStatus);
   }
 } catch (e) {
   errors.push(`USA XEURBI: ${e.message}`);
   console.error('XEURBI', e.message);
 }
 
-// 3) SOFR − €STR in bp (context, not official XEURBI)
+// 3) SOFR − €STR context
 try {
   const [sofr, estr] = await Promise.all([
     fredCsv('SOFR', '2021-01-01'),
@@ -210,7 +274,6 @@ try {
   const spread = [];
   for (const p of sofr) {
     if (!eMap.has(p.period)) continue;
-    // bp = (SOFR − ESTR) * 100
     spread.push({
       period: p.period,
       value: Math.round((p.value - eMap.get(p.period)) * 10000) / 100
@@ -225,10 +288,9 @@ try {
       points: spread.length,
       firstDate: spread[0].period,
       updatedAt: asOf,
-      source: 'FRED SOFR − ECBESTRVOLWGTTRMDMNRT',
+      source: 'FRED SOFR − €STR',
       unit: 'bp',
-      note:
-        'SOFR−€STR in bp · Kontext zur EUR/USD-Finanzierung, nicht identisch mit CME XEURBI'
+      note: 'SOFR−€STR in bp · Kontext, nicht identisch mit XEURBI'
     };
     console.log('SOFR-ESTR', spread.length, last.period, last.value);
   }
@@ -241,4 +303,4 @@ payload.data = data;
 payload.errors = errors;
 payload.updatedAt = asOf;
 fs.writeFileSync('data.json', JSON.stringify(payload));
-console.log('done xeurbi/eurusd');
+console.log('done xeurbi status=', xStatus);
