@@ -99,13 +99,12 @@ if (!html.includes('data-page="9"') && html.includes('>Repo-Markt</button>')) {
   );
 }
 
-// Always use latest eur-dollar.js
-html = html.replace(/eur-dollar\.js\?v=\d+/g, 'eur-dollar.js?v=2');
+html = html.replace(/eur-dollar\.js\?v=\d+/g, 'eur-dollar.js?v=3');
 if (!html.includes('eur-dollar.js')) {
   if (html.includes('credit.js')) {
     html = html.replace(
       /(<script src="credit\.js[^"]*"><\/script>)/,
-      '$1<script src="eur-dollar.js?v=2"></script>'
+      '$1<script src="eur-dollar.js?v=3"></script>'
     );
     console.log('linked eur-dollar.js');
   }
