@@ -1,1 +1,31 @@
-PLACEHOLDER
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MacroWatch – Lade…</title>
+</head>
+<body>
+<p style="font-family:system-ui;padding:2rem">MacroWatch wird geladen…</p>
+<script>
+(async function () {
+  try {
+    var base = 'https://cdn.jsdelivr.net/gh/Hossein7935/Hossein7935.github.io@main';
+    var html = await (await fetch(base + '/index.html?v=' + Date.now())).text();
+    if (!html || html.length < 1000) throw new Error('index zu kurz');
+    var fixed = html.replace(/(src|href)=["'](?!https?:|\/\/|data:|#)([^"']+)["']/g, function (_, attr, url) {
+      return attr + '="' + base + '/' + url.replace(/^\.\//, '') + '"';
+    });
+    document.open();
+    document.write(fixed);
+    document.close();
+  } catch (e) {
+    document.body.innerHTML =
+      '<p style="font-family:system-ui;padding:2rem">Ladefehler: ' +
+      (e && e.message ? e.message : e) +
+      '</p><p style="padding:0 2rem"><a href="https://github.com/Hossein7935/Hossein7935.github.io">GitHub Repository</a></p>';
+  }
+})();
+</script>
+</body>
+</html>
