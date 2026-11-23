@@ -9,6 +9,7 @@
   var LABEL = 'EUR/Dollar';
   var LS_PAGE = 'macrowatch-usa-page';
   var curveState = { idx: -1 };
+  var diffSelection = [];
 
   function ensureButtons() {
     document.querySelectorAll('#usaPageSelect, .usa-page-select').forEach(function (sel) {
@@ -354,6 +355,31 @@
     );
   }
 
+
+  function diffPanelHtml(date) {
+    var a = diffSelection[0], b = diffSelection[1];
+    function label(p) {
+      return p ? (p.country + ' ' + p.tenor + ': ' + p.value.toFixed(3) + ' %') : 'Noch nicht ausgewählt';
+    }
+    var result = '';
+    if (a && b) {
+      var diff = a.value - b.value;
+      result = '<div style="margin-top:6px;font-weight:700">Differenz (1. Wert − 2. Wert): ' +
+        (diff >= 0 ? '+' : '') + diff.toFixed(3) + ' Prozentpunkte · ' +
+        (diff * 100).toFixed(1) + ' bp</div>';
+    } else if (a) {
+      result = '<div style="margin-top:6px">Jetzt den zweiten Zinspunkt auswählen.</div>';
+    } else {
+      result = '<div style="margin-top:6px">Zwei Punkte am selben Datum anklicken – USA/DE oder innerhalb eines Landes.</div>';
+    }
+    return '<div class="usde-diff-panel" style="margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--metric);font-size:12px">' +
+      '<b>Spread-Rechner · ' + date + '</b>' +
+      '<div style="margin-top:5px">1. ' + label(a) + '</div>' +
+      '<div>2. ' + label(b) + '</div>' + result +
+      '<button type="button" class="usde-diff-reset" style="margin-top:8px;padding:5px 9px;border:1px solid var(--control-line);border-radius:7px;background:var(--control);color:var(--text)">Zurücksetzen</button>' +
+      '</div>';
+  }
+
   function timeAxisHtml(pack, idx) {
     var n = pack.dates.length;
     if (!n) return '';
@@ -403,10 +429,12 @@
     var big = root.getAttribute('data-big') === '1';
     var svg = dualCurveSvg(cur.usa, cur.de, {
       w: big ? 720 : 640,
-      h: big ? 300 : 200
+      h: big ? 300 : 200,
+      date: pack.dates[i]
     });
     root.innerHTML =
       svg +
+      diffPanelHtml(pack.dates[i]) +
       timeAxisHtml(pack, i) +
       (big ? '<div class="chart-tip-inline" id="chartDlgTip"></div>' : '');
 
@@ -608,6 +636,36 @@
       },
       true
     );
+  }
+
+
+  if (!window.__usDeDiffBound) {
+    window.__usDeDiffBound = true;
+    document.addEventListener('click', function (e) {
+      var reset = e.target && e.target.closest && e.target.closest('.usde-diff-reset');
+      if (reset) {
+        diffSelection = [];
+        var root = reset.closest('.usde-curve-root');
+        if (root) renderCurveBlock(root, curveState.idx);
+        e.preventDefault(); e.stopPropagation(); return;
+      }
+      var point = e.target && e.target.closest && e.target.closest('.usde-curve-svg .hit');
+      if (!point) return;
+      var root = point.closest('.usde-curve-root');
+      if (!root) return;
+      var chosen = {
+        date: point.getAttribute('data-date') || '',
+        country: point.getAttribute('data-country') || '',
+        tenor: point.getAttribute('data-tenor') || '',
+        value: Number(point.getAttribute('data-value'))
+      };
+      if (!Number.isFinite(chosen.value)) return;
+      if (!diffSelection.length || diffSelection.length >= 2) diffSelection = [chosen];
+      else if (diffSelection[0].date === chosen.date) diffSelection.push(chosen);
+      else diffSelection = [chosen];
+      renderCurveBlock(root, curveState.idx);
+      e.preventDefault(); e.stopPropagation();
+    }, true);
   }
 
   function boot() {
