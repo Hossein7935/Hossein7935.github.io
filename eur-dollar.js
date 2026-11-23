@@ -1,12 +1,6 @@
 /*
  * MacroWatch – USA-Seite „EUR/Dollar“ (Seite 9)
- * Charts:
- *  1) DXY (Historie)
- *  2) EUR/USD (Historie)
- *  3) US vs DE Zinskurve 3M–30Y (blau / rot)
- *  4) Basis-Monitor SOFR−€STR / XEURBI
- *  5) 25Δ Risk Reversal Proxy
- * Daten: data.json, Update per GitHub Actions (wie Seite 4)
+ * Charts inkl. US/DE-Kurve: Klick = vergrößern, Maus = Crosshair/Werte
  */
 (function () {
   'use strict';
@@ -106,8 +100,18 @@
     );
   }
 
-  /** Dual yield curve SVG: X = tenors, Y = %, blue USA, red DE */
-  function dualCurveSvg(usaPts, dePts) {
+  function getCurveSeries() {
+    var meta = metaUSA('usDeCurve');
+    var usa = meta.usa || series('USA-usDeCurveUsa');
+    var de = meta.de || series('USA-usDeCurveDe');
+    return { usa: usa || [], de: de || [], meta: meta };
+  }
+
+  /** Dual yield curve with hit targets for hover + enlarge */
+  function dualCurveSvg(usaPts, dePts, opts) {
+    opts = opts || {};
+    var W = opts.w || 640;
+    var H = opts.h || 200;
     var order = ['3M', '1Y', '2Y', '5Y', '10Y', '30Y'];
     var uMap = {};
     var dMap = {};
@@ -138,12 +142,10 @@
     ymin -= pad;
     ymax += pad;
 
-    var W = 640;
-    var H = 200;
     var L = 42;
     var R = 12;
-    var T = 14;
-    var B = 28;
+    var T = 16;
+    var B = 30;
     var iw = W - L - R;
     var ih = H - T - B;
 
@@ -169,15 +171,51 @@
       return d.trim();
     }
 
-    var ticks = '';
+    var hits = '';
     for (var i = 0; i < labels.length; i++) {
+      if (uVals[i] != null && Number.isFinite(uVals[i])) {
+        hits +=
+          '<circle class="hit" cx="' +
+          xAt(i).toFixed(1) +
+          '" cy="' +
+          yAt(uVals[i]).toFixed(1) +
+          '" r="4" fill="#3b82f6" data-period="' +
+          labels[i] +
+          ' USA" data-value="' +
+          Number(uVals[i]).toFixed(3) +
+          '%"><title>' +
+          labels[i] +
+          ' USA ' +
+          Number(uVals[i]).toFixed(3) +
+          '%</title></circle>';
+      }
+      if (dVals[i] != null && Number.isFinite(dVals[i])) {
+        hits +=
+          '<circle class="hit" cx="' +
+          xAt(i).toFixed(1) +
+          '" cy="' +
+          yAt(dVals[i]).toFixed(1) +
+          '" r="4" fill="#ef4444" data-period="' +
+          labels[i] +
+          ' DE" data-value="' +
+          Number(dVals[i]).toFixed(3) +
+          '%"><title>' +
+          labels[i] +
+          ' DE ' +
+          Number(dVals[i]).toFixed(3) +
+          '%</title></circle>';
+      }
+    }
+
+    var ticks = '';
+    for (var j = 0; j < labels.length; j++) {
       ticks +=
         '<text x="' +
-        xAt(i).toFixed(1) +
+        xAt(j).toFixed(1) +
         '" y="' +
         (H - 8) +
         '" text-anchor="middle" font-size="11" fill="#9aa4b2">' +
-        labels[i] +
+        labels[j] +
         '</text>';
     }
     var yLabels = '';
@@ -190,7 +228,7 @@
         '" y="' +
         (yy + 3).toFixed(1) +
         '" text-anchor="end" font-size="10" fill="#9aa4b2">' +
-        v.toFixed(1) +
+        v.toFixed(2) +
         '</text>';
       yLabels +=
         '<line x1="' +
@@ -205,13 +243,13 @@
     }
 
     return (
-      '<svg viewBox="0 0 ' +
+      '<svg class="chart-hover" viewBox="0 0 ' +
       W +
       ' ' +
       H +
       '" width="100%" height="' +
       H +
-      '" role="img" aria-label="US DE Zinskurve">' +
+      '" style="max-width:100%;height:auto;cursor:crosshair" role="img" aria-label="US DE Zinskurve">' +
       yLabels +
       '<path d="' +
       path(uVals) +
@@ -219,30 +257,29 @@
       '<path d="' +
       path(dVals) +
       '" fill="none" stroke="#ef4444" stroke-width="2.5"/>' +
+      hits +
       ticks +
       '<text x="' +
       (L + 4) +
       '" y="' +
-      (T + 12) +
+      (T + 10) +
       '" font-size="11" fill="#3b82f6">USA</text>' +
       '<text x="' +
       (L + 44) +
       '" y="' +
-      (T + 12) +
+      (T + 10) +
       '" font-size="11" fill="#ef4444">DE</text>' +
       '</svg>'
     );
   }
 
   function curveCard() {
-    var meta = metaUSA('usDeCurve');
-    var usa = meta.usa || series('USA-usDeCurveUsa');
-    var de = meta.de || series('USA-usDeCurveDe');
-    var svg = dualCurveSvg(usa, de);
+    var c = getCurveSeries();
+    var svg = dualCurveSvg(c.usa, c.de, { w: 640, h: 200 });
     var dateLine =
-      (meta.date ? 'Stand ' + meta.date : '—') +
-      (meta.source ? ' · ' + meta.source : '') +
-      ' · blau USA · rot DE';
+      (c.meta.date ? 'Stand ' + c.meta.date : '—') +
+      (c.meta.source ? ' · ' + c.meta.source : '') +
+      ' · blau USA · rot DE · Klick = vergrößern';
     return (
       '<div class="metric has-chart" style="grid-column:1/-1">' +
       '<div class="name">Zinskurve USA vs Deutschland (3M · 1Y · 2Y · 5Y · 10Y · 30Y)</div>' +
@@ -250,12 +287,12 @@
       '<div class="date">' +
       dateLine +
       '</div>' +
-      '<div class="yield-chart-wrap">' +
+      '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|usDeCurve|Zinskurve USA vs DE" title="Chart vergrößern · Maus für Werte">' +
       svg +
       '</div>' +
       '<div class="sofr-fwd-meta">' +
-      (meta.note ||
-        'X = Laufzeit, Y = Zinssatz %. USA (blau) aus FRED, DE (rot) aus TradingView. Wird mit dem Daten-Workflow aktualisiert.') +
+      (c.meta.note ||
+        'X = Laufzeit, Y = Zinssatz %. Maus über Punkte = Rendite. Klick öffnet große Ansicht mit Crosshair.') +
       '</div>' +
       '</div>'
     );
@@ -267,32 +304,26 @@
 
     var html = '';
 
-    // DXY
     html += lineCard({
       histKey: 'USA-dxy',
       dlgKey: 'dxy',
       title: 'DXY · US Dollar Index',
       digits: 2,
-      suffix: '',
-      source: (metaUSA('dxy').source || 'Yahoo DX-Y.NYB'),
-      note: 'Historischer Dollar-Index, Update über bestehenden DXY-Fetcher (Workflow).'
+      source: metaUSA('dxy').source || 'Yahoo DX-Y.NYB',
+      note: 'Historischer Dollar-Index.'
     });
 
-    // EURUSD
     html += lineCard({
       histKey: 'USA-eurusd',
       dlgKey: 'eurusd',
       title: 'EUR/USD',
       digits: 4,
-      suffix: '',
-      source: (metaUSA('eurusd').source || 'Marktdaten'),
-      note: 'EUR/USD mit Historie, Update über Daten-Workflow.'
+      source: metaUSA('eurusd').source || 'Marktdaten',
+      note: 'EUR/USD mit Historie.'
     });
 
-    // US vs DE curve
     html += curveCard();
 
-    // Basis monitor
     var basisMeta = metaUSA('xeurbi');
     var isProxy =
       !basisMeta.source ||
@@ -308,12 +339,9 @@
       suffix: isProxy ? ' %' : ' bp',
       signed: true,
       source: basisMeta.source || '',
-      note:
-        basisMeta.note ||
-        'Proxy SOFR−€STR; CME XEURBI überschreibt, sobald verfügbar.'
+      note: basisMeta.note || ''
     });
 
-    // RR25
     var rrMeta = metaUSA('rr25');
     html += lineCard({
       histKey: 'USA-rr25',
@@ -323,12 +351,44 @@
       suffix: ' vol',
       signed: true,
       source: rrMeta.source || '',
-      note:
-        rrMeta.note ||
-        'Proxy aus realisierter Up-/Down-Vol (kein OTC-Broker-RR).'
+      note: rrMeta.note || ''
     });
 
     face.innerHTML = html;
+  }
+
+  /** Enlarge dialog for US/DE curve + hover like other charts */
+  function patchPaintChartDlg() {
+    if (typeof paintChartDlg !== 'function' || paintChartDlg.__usDeCurve) return;
+    var orig = paintChartDlg;
+    var wrapped = function () {
+      if (typeof chartCtx !== 'undefined' && chartCtx && chartCtx.key === 'usDeCurve') {
+        var rangeBar = document.querySelector('#chartRange');
+        if (rangeBar) rangeBar.style.display = 'none';
+        var body = document.querySelector('#chartBody');
+        var metaEl = document.querySelector('#chartMeta');
+        if (!body) return;
+        var c = getCurveSeries();
+        if (!c.usa.length && !c.de.length) {
+          body.innerHTML = '<div class="sparkempty">Keine Daten</div>';
+          if (metaEl) metaEl.textContent = '';
+          return;
+        }
+        body.innerHTML =
+          dualCurveSvg(c.usa, c.de, { w: 720, h: 340 }) +
+          '<div class="chart-tip-inline" id="chartDlgTip"></div>';
+        if (typeof bindBigChartHover === 'function') bindBigChartHover(body);
+        if (metaEl) {
+          metaEl.textContent =
+            'USA blau · DE rot · Maus = Rendite pro Laufzeit · Stand ' +
+            (c.meta.date || '—');
+        }
+        return;
+      }
+      return orig.apply(this, arguments);
+    };
+    wrapped.__usDeCurve = true;
+    paintChartDlg = wrapped; // eslint-disable-line no-global-assign
   }
 
   function showPage() {
@@ -350,15 +410,15 @@
 
   if (typeof setUsaPage === 'function' && !setUsaPage.__eurDollar) {
     var origSet = setUsaPage;
-    var wrapped = function (page) {
+    var wrappedSet = function (page) {
       ensureButtons();
       if (Number(page) === PAGE) return showPage();
       var f = document.querySelector('.usa-face-j');
       if (f) f.classList.add('hidden');
       return origSet.apply(this, arguments);
     };
-    wrapped.__eurDollar = true;
-    setUsaPage = wrapped; // eslint-disable-line no-global-assign
+    wrappedSet.__eurDollar = true;
+    setUsaPage = wrappedSet; // eslint-disable-line no-global-assign
   }
 
   if (!window.__eurDollarClickBound) {
@@ -381,6 +441,7 @@
   }
 
   function boot() {
+    patchPaintChartDlg();
     ensureButtons();
     var start = 0;
     try {
@@ -388,6 +449,7 @@
     } catch (e) {}
     if (start === PAGE) showPage();
     setTimeout(function () {
+      patchPaintChartDlg();
       ensureButtons();
       try {
         if (Number(localStorage.getItem(LS_PAGE)) === PAGE) showPage();
