@@ -456,27 +456,22 @@ function openEdit(token){const[country,key]=token.split('|');editTarget={country
 document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefault();if(!editTarget)return;setValue(editTarget.country,editTarget.key,document.querySelector('#editValue').value,document.querySelector('#editDate').value,'Manuell');persist();render();document.querySelector('#edit').close()});document.querySelector('#cancel').addEventListener('click',()=>document.querySelector('#edit').close());document.querySelector('#refresh').addEventListener('click',refresh);document.querySelector('#themeToggle').addEventListener('click',()=>{const t=document.documentElement.dataset.theme==='light'?'dark':'light';document.documentElement.dataset.theme=t;try{localStorage.setItem('macrowatch-theme',t)}catch(e){};document.querySelector('#themeToggle').textContent=t==='light'?'🌙 Dunkles Design':'☀️ Helles Design'});document.querySelector('#inflRange').addEventListener('change',()=>render());document.querySelector('#year').addEventListener('change',()=>refresh());document.querySelector('#chartClose').addEventListener('click',()=>document.querySelector('#chartDlg').close());document.querySelector('#chartRange').addEventListener('click',e=>{const b=e.target.closest('button[data-range]');if(!b||!chartCtx)return;chartCtx.range=b.dataset.range;document.querySelectorAll('#chartRange button').forEach(x=>x.classList.toggle('active',x===b));paintChartDlg()});document.addEventListener('click',e=>{const w=e.target.closest('[data-chart]');if(!w)return;const[country,key,label]=w.dataset.chart.split('|');openChart(country,key,label)});document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.closest('[data-chart]'))e.target.click()});const tip=document.querySelector('#chartTip');document.addEventListener('mousemove',e=>{const hit=e.target.closest('.hit');if(!hit){tip.classList.remove('show');return}tip.textContent=hit.dataset.period+' · '+hit.dataset.value;tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY+12)+'px';tip.classList.add('show')});document.addEventListener('mouseleave',()=>tip.classList.remove('show'));
 
 function setUsaPage(page){
-  page=Math.max(0,Math.min(9,Number(page)||0));
+  page=Math.max(0,Math.min(7,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
+  // Create dynamic faces before toggling visibility
   try{
     if(page===4){typeof paintFhlb==='function'&&paintFhlb();typeof paintEffrVol==='function'&&paintEffrVol();}
     if(page===5){typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove();}
     if(page===6){typeof paintYieldPage7==='function'&&paintYieldPage7();}
     if(page===7){typeof paintRepoPage==='function'&&paintRepoPage();}
-    if(page===9){typeof ensureUsaFaceJ==='function'&&ensureUsaFaceJ();typeof paintXeurbi==='function'&&paintXeurbi();}
   }catch(e){}
   document.querySelectorAll('.country').forEach(card=>{
     if(!card.querySelector('.usa-face-a'))return;
-    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h','.usa-face-i','.usa-face-j'];
+    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h'];
     faces.forEach((sel,i)=>{
       const el=card.querySelector(sel);
       if(el)el.classList.toggle('hidden',page!==i);
     });
-    if(page===9){
-      let fj=card.querySelector('.usa-face-j');
-      if(!fj&&typeof ensureUsaFaceJ==='function'){try{ensureUsaFaceJ()}catch(e){} fj=card.querySelector('.usa-face-j');}
-      if(fj)fj.classList.remove('hidden');
-    }
     const sel=card.querySelector('#usaPageSelect');
     if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));
   });
@@ -488,9 +483,6 @@ function setUsaPage(page){
   if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
   if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
   if(page===7)setTimeout(()=>{try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}},50);
-  if(page===9)setTimeout(()=>{try{typeof ensureUsaFaceJ==='function'&&ensureUsaFaceJ();typeof paintXeurbi==='function'&&paintXeurbi();
-    document.querySelectorAll('.country .usa-face-j').forEach(el=>el.classList.remove('hidden'));
-  }catch(e){}},50);
 }
 
 const REPO_PAGE_CATALOG=[
