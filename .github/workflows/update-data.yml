@@ -1,1 +1,224 @@
-PLACEHOLDER
+name: MacroWatch data update
+on:
+  workflow_dispatch:
+  # Für einen garantierten Takt kann ein externer Cron-Dienst diesen Workflow
+  # per API starten (siehe README.txt, Abschnitt „Zuverlässiger Takt“).
+  repository_dispatch:
+    types: [macrowatch-update]
+  schedule:
+    # GitHub führt Zeitpläne nur „best effort“ aus (oft verspätet oder ausgelassen,
+    # besonders zur vollen Stunde). Daher alle 15 Minuten zu ungeraden Minuten.
+    - cron: '4,19,34,49 * * * *'
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'data.json'
+      - 'version.json'
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: macrowatch-data-update
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      deploy: ${{ steps.decide.outputs.deploy }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore and patch updater if broken
+        run: |
+          set -e
+          if ! grep -q 'async function loadInflation' scripts/update-data.mjs 2>/dev/null; then
+            git show c8234d974ef2cf0248b0edd8a81744c2cd03227e:scripts/update-data.mjs > scripts/update-data.mjs
+          fi
+          sed -i 's/ageDays > 200/ageDays > 280/g' scripts/update-data.mjs
+          sed -i 's/ageDays > 45/ageDays > 75/g' scripts/update-data.mjs
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install poppler (pdftotext) for FHLB OF PDFs
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+      - name: Restore index.html + debt UI
+        run: node scripts/restore-index.mjs
+      - name: Inject Copper/Gold native chart (USA page 2)
+        run: node scripts/inject-cuau.mjs
+      - name: Inject DXY (USA page 1)
+        run: node scripts/inject-dxy.mjs
+      - name: Inject USA page 3 (EFFR/SOFR/IORB + diff)
+        run: node scripts/inject-faceC.mjs
+      - name: Inject rate overlay (EFFR/SOFR/IORB dual)
+        run: node scripts/inject-rate-overlay.mjs
+      - name: Fix JS structure after injects
+        run: node scripts/fix-js-structure.mjs
+      - name: Inject UST + TIPS curve (USA page 4)
+        run: node scripts/inject-ust-curve.mjs
+      - name: Inject SOFR tenor history picker (USA page 4)
+        run: node scripts/inject-sofr-tenor.mjs || true
+      - name: Chart dialog crosshair / axis interact
+        run: node scripts/inject-chart-interact.mjs || true
+      - name: Inject FHLB Advances (USA page 5)
+        run: node scripts/inject-fhlb.mjs
+      - name: Inject EFFR Volume (USA page 5)
+        run: node scripts/inject-effrvol.mjs
+      - name: Fix USA page 5 visibility (faceE)
+        run: node scripts/inject-fix-page5.mjs
+      - name: Strip extra EFFRVOL charts (keep volume only)
+        run: node scripts/strip-effrvol-extra.mjs
+      - name: Inject USA page 6 IORB + US 1Y
+        run: node scripts/inject-page6-iorb-us1y.mjs
+      - name: Inject MOVE Index (USA page 6)
+        run: node scripts/inject-move.mjs
+      - name: Inject US 2Y + SOFR (USA page 3)
+        run: node scripts/inject-us2y-sofr.mjs
+      - name: US2Y dual toggle SOFR/IORB
+        run: node scripts/inject-us2y-pair-toggle.mjs
+      - name: Enable range on rate-diff chart
+        run: node scripts/fix-diff-range.mjs
+      - name: Enable range on US2Y+SOFR dual chart
+        run: node scripts/fix-us2y-sofr-range.mjs
+      - name: Fix JS syntax (orphan branches)
+        run: node scripts/fix-js-syntax.mjs
+      - name: Restore paintChartDlg (enlarged charts)
+        run: node scripts/fix-paint-chart-dlg.mjs
+      - name: Inject USA page 7 yields + diff
+        run: node scripts/inject-page7-yields.mjs
+      - name: Inject USA page 8 Repo-Markt
+        run: node scripts/inject-page8-repo.mjs || true
+      - name: Fix USA page-select template if wiped
+        run: node scripts/fix-usa-template.mjs || true
+      - name: Fix USA page navigation (sticky)
+        run: node scripts/inject-fix-usa-nav.mjs
+      - name: Final JS dedupe (after all injects)
+        run: node scripts/fix-js-syntax.mjs
+      - name: Restore paintChartDlg after final dedupe
+        run: node scripts/fix-paint-chart-dlg.mjs
+      - name: Re-apply rate overlay after other injects
+        run: node scripts/inject-rate-overlay.mjs
+      - name: Re-apply DXY panel
+        run: node scripts/inject-dxy.mjs
+      - name: Re-apply SOFR tenor panel
+        run: node scripts/inject-sofr-tenor.mjs || true
+      - name: Fix SOFR dual enlarge (keep red overlay)
+        run: node scripts/inject-sofr-enlarge-fix.mjs || true
+      - name: Re-apply page 8 Repo-Markt
+        run: node scripts/inject-page8-repo.mjs || true
+      - name: Inject USA page 9 EUR/Dollar XEURBI
+        run: node scripts/inject-page9-xeurbi.mjs || true
+      - name: Fix USA template again after page8
+        run: node scripts/fix-usa-template.mjs || true
+      - name: Fix USA face visibility (empty pages)
+        run: node scripts/fix-usa-face-visibility.mjs || true
+      - name: Repo-Markt enlarge dual charts
+        run: node scripts/inject-repo-enlarge-fix.mjs || true
+      - name: Late inject re-apply bundle
+        run: |
+          node scripts/inject-page9-xeurbi.mjs || true
+          node scripts/fix-usa-page9-nav.mjs || true
+          node scripts/fix-paint-chart-dlg.mjs || true
+          node scripts/inject-repo-enlarge-fix.mjs || true
+          node scripts/strip-page2-dupes.mjs || true
+          node scripts/fix-usa-page9-nav.mjs || true
+      - name: Patch EUR/Dollar curve data load
+        run: node scripts/patch-eur-dollar-curve.mjs || true
+      - name: Auto-Refresh im Browser einbinden + Datum auf Zins-Karten
+        run: |
+          node scripts/fix-rate-card-dates.mjs || true
+          node scripts/inject-autorefresh.mjs
+      - name: Fix USA page 9 nav after all injects
+        run: node scripts/fix-usa-page9-nav.mjs || true
+      - name: Patch curve pack again after final nav
+        run: node scripts/patch-eur-dollar-curve.mjs || true
+
+      - name: Pages-URL ermitteln
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Neuesten Datenstand übernehmen (Live-Seite vs. Repository)
+        env:
+          PAGES_BASE_URL: ${{ steps.pages.outputs.base_url }}
+        run: node scripts/sync-live-data.mjs
+      - name: Alle Datenquellen abrufen (einzeln abgesichert)
+        env:
+          TRADING_ECONOMICS_API_KEY: ${{ secrets.TRADING_ECONOMICS_API_KEY }}
+        run: node scripts/run-fetchers.mjs
+      - name: Datenprüfung – Stand Seite vs. Quelle
+        continue-on-error: true
+        timeout-minutes: 5
+        run: node scripts/check-freshness.mjs
+      - name: Datenstand prüfen + version.json schreiben
+        id: finalize
+        run: node scripts/finalize-data.mjs
+      - name: Deploy nötig?
+        id: decide
+        run: |
+          if [ "${{ steps.finalize.outputs.changed }}" = "true" ] || [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "Keine neuen Daten – kein Deploy nötig"
+          fi
+      - name: Seite für GitHub Pages verpacken
+        if: steps.decide.outputs.deploy == 'true'
+        run: |
+          mkdir -p docs
+          for f in index.html data.json version.json freshness.json manifest.json robots.txt; do
+            [ -f "$f" ] && cp -f "$f" "docs/$f" || true
+          done
+          for f in *.js; do [ -f "$f" ] && cp -f "$f" "docs/$f" || true; done
+          touch docs/.nojekyll
+          wc -c docs/index.html docs/data.json docs/eur-dollar.js 2>/dev/null || true
+      - name: Upload Pages artifact
+        if: steps.decide.outputs.deploy == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Stand ins Repository sichern
+        continue-on-error: true
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          last=$(git log -1 --format=%ct -- data.json 2>/dev/null || echo 0)
+          age=$(( $(date +%s) - ${last:-0} ))
+          paths="index.html scripts/ eur-dollar.js docs/"
+          if [ "${{ steps.finalize.outputs.changed }}" = "true" ] && { [ "$age" -ge 10800 ] || [ "${{ github.event_name }}" != "schedule" ]; }; then
+            paths="$paths data.json version.json freshness.json"
+          fi
+          for f in $paths; do [ -e "$f" ] && git add "$f"; done
+          if git diff --cached --quiet; then
+            echo "Nichts zu committen (letzter Daten-Commit vor $((age/60)) Min.)"
+            exit 0
+          fi
+          git commit -m "Update MacroWatch data"
+          for i in 1 2 3; do
+            if git pull --no-rebase -X ours --no-edit origin main && git push origin HEAD:main; then
+              echo "Gepusht"; exit 0
+            fi
+            git merge --abort 2>/dev/null || true
+            sleep $((i * 10))
+          done
+          echo "::warning::Push fehlgeschlagen – die Live-Seite ist trotzdem aktuell, der Stand wird beim nächsten Lauf gesichert"
+
+  deploy:
+    needs: update
+    if: needs.update.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
