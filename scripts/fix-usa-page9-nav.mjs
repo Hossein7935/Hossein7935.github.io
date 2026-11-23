@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-/** Last-step fix: USA page 9 nav + do NOT wipe eur-dollar.js content */
+/** Last-step fix: USA page 9 + curve data merge + no wipe */
 let html = fs.readFileSync('index.html', 'utf8');
 
 function replaceFunction(html, name, newSrc) {
@@ -34,7 +34,6 @@ const setUsaPageFn = `function setUsaPage(page){
     if(page===5){typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove();}
     if(page===6){typeof paintYieldPage7==='function'&&paintYieldPage7();}
     if(page===7){typeof paintRepoPage==='function'&&paintRepoPage();}
-    // Seite 9: eur-dollar.js steuert den Inhalt — paintXeurbi darf nicht überschreiben
     if(page===9){typeof ensureUsaFaceJ==='function'&&ensureUsaFaceJ();}
   }catch(e){}
   document.querySelectorAll('.country').forEach(card=>{
@@ -69,7 +68,6 @@ const ensureUsaFaceJFn = `function ensureUsaFaceJ(){
     }
   }
   face.classList.add('metrics','usa-face');
-  // WICHTIG: Inhalt von eur-dollar.js nicht überschreiben
   if(face.querySelector('.usde-curve-root')||face.querySelector('[data-chart*="usDeCurve"]')||face.children.length>1){
     return face;
   }
@@ -89,7 +87,6 @@ const ensureUsaFaceJFn = `function ensureUsaFaceJ(){
 const paintXeurbiFn = `function paintXeurbi(){
   const face=ensureUsaFaceJ();
   if(!face)return;
-  // Wenn eur-dollar.js die volle Seite gemalt hat: nichts überschreiben
   if(face.querySelector('.usde-curve-root')||face.querySelector('[data-chart*="usDeCurve"]'))return;
   let pageNow=0;
   try{pageNow=Number(localStorage.getItem('macrowatch-usa-page')||0)}catch(e){}
@@ -111,38 +108,31 @@ const paintXeurbiFn = `function paintXeurbi(){
 
 let r = replaceFunction(html, 'setUsaPage', setUsaPageFn);
 html = r.html;
-console.log('setUsaPage', r.ok);
 r = replaceFunction(html, 'ensureUsaFaceJ', ensureUsaFaceJFn);
 html = r.html;
-console.log('ensureUsaFaceJ', r.ok);
 r = replaceFunction(html, 'paintXeurbi', paintXeurbiFn);
 html = r.html;
-console.log('paintXeurbi', r.ok);
 
-// bindUsaPages: ensure face-j exists, max page 9
-if (html.includes('function bindUsaPages')) {
+if (html.includes("const ALL_KEYS=") && !html.includes("'usDeCurveDaily'")) {
   html = html.replace(
-    /Math\.min\(\s*[0-9]+\s*,/g,
-    (m) => (m.includes('9') ? m : 'Math.min(9,')
+    "const ALL_KEYS=['inflation'",
+    "const ALL_KEYS=['usDeCurve','usDeCurveDaily','xeurbi','rr25','eurusd','inflation'"
   );
+  console.log('ALL_KEYS extended');
+}
+const oldMerge =
+  "for(const key of Object.keys(incoming)){if(!next[key]&&incoming[key]&&typeof incoming[key]==='object'&&incoming[key].value!=null)next[key]=incoming[key]}";
+const newMerge =
+  "for(const key of Object.keys(incoming)){if(next[key])continue;const v=incoming[key];if(!v||typeof v!=='object')continue;if(v.value!=null||Array.isArray(v.dates)||Array.isArray(v.usa)||Array.isArray(v.curves)||Array.isArray(v.nominal))next[key]=v}";
+if (html.includes(oldMerge)) {
+  html = html.replace(oldMerge, newMerge);
+  console.log('merge fixed');
 }
 
-html = html.replace(/eur-dollar\.js\?v=\d+/g, 'eur-dollar.js?v=5');
+html = html.replace(/eur-dollar\.js\?v=\d+/g, 'eur-dollar.js?v=7');
 if (!html.includes('eur-dollar.js')) {
-  html = html.replace(
-    /(</script>)(\s*<script src="credit\.js)/,
-    '$1<script src="eur-dollar.js?v=5"></script>$2'
-  );
-  if (!html.includes('eur-dollar.js')) {
-    html = html.replace('</body>', '<script src="eur-dollar.js?v=5"></script></body>');
-  }
-  console.log('linked eur-dollar.js');
+  html = html.replace('</body>', '<script src="eur-dollar.js?v=7"></script></body>');
 }
 
 fs.writeFileSync('index.html', html);
-console.log(
-  'fix-usa-page9-nav done',
-  html.includes('usde-curve-root'),
-  html.includes('eur-dollar.js?v=5'),
-  html.includes('paintXeurbi darf nicht')
-);
+console.log('fix-usa-page9-nav done', html.includes('usDeCurveDaily'), html.includes('eur-dollar.js?v=7'));

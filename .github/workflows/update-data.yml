@@ -63,10 +63,10 @@ jobs:
       - name: Inject SOFR tenor history picker (USA page 4)
         run: node scripts/inject-sofr-tenor.mjs || true
       - name: Chart dialog crosshair / axis interact
-        run: node scripts/inject-chart-interact.mjs
-      - name: Inject FHLBank Advances Monitor (USA page 5)
+        run: node scripts/inject-chart-interact.mjs || true
+      - name: Inject FHLB Advances (USA page 5)
         run: node scripts/inject-fhlb.mjs
-      - name: Inject Fed Funds Volume Monitor (USA page 5)
+      - name: Inject EFFR Volume (USA page 5)
         run: node scripts/inject-effrvol.mjs
       - name: Fix USA page 5 visibility (faceE)
         run: node scripts/inject-fix-page5.mjs
@@ -118,26 +118,24 @@ jobs:
         run: node scripts/fix-usa-face-visibility.mjs || true
       - name: Repo-Markt enlarge dual charts
         run: node scripts/inject-repo-enlarge-fix.mjs || true
-      - name: Strip USA page 2 duplicate charts
-        run: node scripts/strip-page2-dupes.mjs || true
-      - name: Final index fixes (vorher im Commit-Pfad)
+      - name: Late inject re-apply bundle
         run: |
-          node scripts/fix-js-syntax.mjs || true
-          node scripts/inject-fix-usa-nav.mjs || true
-          node scripts/inject-page8-repo.mjs || true
           node scripts/inject-page9-xeurbi.mjs || true
-          node scripts/fix-usa-template.mjs || true
-          node scripts/fix-usa-face-visibility.mjs || true
+          node scripts/fix-usa-page9-nav.mjs || true
           node scripts/fix-paint-chart-dlg.mjs || true
           node scripts/inject-repo-enlarge-fix.mjs || true
           node scripts/strip-page2-dupes.mjs || true
           node scripts/fix-usa-page9-nav.mjs || true
+      - name: Patch EUR/Dollar curve data load
+        run: node scripts/patch-eur-dollar-curve.mjs || true
       - name: Auto-Refresh im Browser einbinden + Datum auf Zins-Karten
         run: |
           node scripts/fix-rate-card-dates.mjs || true
           node scripts/inject-autorefresh.mjs
       - name: Fix USA page 9 nav after all injects
         run: node scripts/fix-usa-page9-nav.mjs || true
+      - name: Patch curve pack again after final nav
+        run: node scripts/patch-eur-dollar-curve.mjs || true
 
       - name: Pages-URL ermitteln
         id: pages
@@ -168,13 +166,21 @@ jobs:
           fi
       - name: Seite für GitHub Pages verpacken
         if: steps.decide.outputs.deploy == 'true'
+        run: |
+          mkdir -p docs
+          for f in index.html data.json version.json freshness.json manifest.json robots.txt; do
+            [ -f "$f" ] && cp -f "$f" "docs/$f" || true
+          done
+          for f in *.js; do [ -f "$f" ] && cp -f "$f" "docs/$f" || true; done
+          touch docs/.nojekyll
+          wc -c docs/index.html docs/data.json docs/eur-dollar.js 2>/dev/null || true
+      - name: Upload Pages artifact
+        if: steps.decide.outputs.deploy == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
 
       - name: Stand ins Repository sichern
-        # data.json höchstens alle 3 Stunden committen (die Live-Seite wird bei jedem Lauf
-        # aktualisiert); Code-Änderungen an index.html/scripts sofort.
         continue-on-error: true
         run: |
           set -e
@@ -182,7 +188,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           last=$(git log -1 --format=%ct -- data.json 2>/dev/null || echo 0)
           age=$(( $(date +%s) - ${last:-0} ))
-          paths="index.html scripts/"
+          paths="index.html scripts/ eur-dollar.js docs/"
           if [ "${{ steps.finalize.outputs.changed }}" = "true" ] && { [ "$age" -ge 10800 ] || [ "${{ github.event_name }}" != "schedule" ]; }; then
             paths="$paths data.json version.json freshness.json"
           fi
