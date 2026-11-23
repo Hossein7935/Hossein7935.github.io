@@ -1,6 +1,4 @@
 name: Deploy GitHub Pages
-# Veröffentlicht die Seite bei eigenen Code-Änderungen (Push) oder manuell.
-# Die regelmäßigen Daten-Updates veröffentlicht „MacroWatch data update“ selbst.
 on:
   push:
     branches: [main]
@@ -18,7 +16,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Setup Pages
@@ -28,13 +26,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Neuesten Datenstand übernehmen (nicht mit älterem Repo-Stand überschreiben)
+      - name: Sync site into docs/ (branch/docs Pages source)
+        run: |
+          set -e
+          mkdir -p docs
+          for f in index.html data.json version.json freshness.json manifest.json robots.txt sw.js \
+                   eur-dollar.js credit.js autorefresh.js; do
+            if [ -f "$f" ]; then cp -f "$f" "docs/$f"; fi
+          done
+          for f in *.js; do
+            [ -f "$f" ] && cp -f "$f" "docs/$f" || true
+          done
+          touch docs/.nojekyll
+          wc -c docs/index.html docs/data.json 2>/dev/null || true
+          ls -la docs | head -30
+      - name: Neuesten Datenstand übernehmen
         env:
           PAGES_BASE_URL: ${{ steps.pages.outputs.base_url }}
         run: |
           node scripts/sync-live-data.mjs || true
           node scripts/finalize-data.mjs || true
           node scripts/inject-autorefresh.mjs || true
+          for f in index.html data.json version.json freshness.json eur-dollar.js credit.js autorefresh.js; do
+            [ -f "$f" ] && cp -f "$f" "docs/$f" || true
+          done
+          touch docs/.nojekyll
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
