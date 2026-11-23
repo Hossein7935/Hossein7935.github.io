@@ -1,5 +1,5 @@
 {
- "checkedAt": "2026-11-23T05:02:56.968Z",
+ "checkedAt": "2026-11-23T05:27:51.550Z",
  "today": "2026-11-23",
  "summary": {
   "info": 13,
@@ -109,8 +109,8 @@
   {
    "page": "USA · Seite 1",
    "label": "DXY",
-   "pageDate": "2026-11-20",
-   "srcDate": "2026-11-20",
+   "pageDate": "2026-11-23",
+   "srcDate": "2026-11-23",
    "source": "Yahoo DX-Y.NYB",
    "status": "ok",
    "note": ""
@@ -137,7 +137,7 @@
    "page": "USA · Seite 2",
    "label": "Kupfer / Gold",
    "pageDate": "2026-11-23",
-   "srcDate": "2026-11-20",
+   "srcDate": "2026-11-23",
    "source": "Yahoo HG=F",
    "status": "ok",
    "note": ""
@@ -563,7 +563,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:CN02Y",
    "status": "ok",
-   "note": "Seite 1.229 · TradingView 1.230"
+   "note": "Seite 1.230 · TradingView 1.233"
   },
   {
    "page": "CHN",
@@ -572,7 +572,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:CN10Y",
    "status": "ok",
-   "note": "Seite 1.581 · TradingView 1.581"
+   "note": "Seite 1.581 · TradingView 1.582"
   },
   {
    "page": "CHN",
@@ -599,7 +599,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.704 · TradingView 4.704"
+   "note": "Seite 4.706 · TradingView 4.707"
   },
   {
    "page": "AUS",
@@ -608,7 +608,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.913 · TradingView 4.914"
+   "note": "Seite 4.914 · TradingView 4.913"
   },
   {
    "page": "AUS",
