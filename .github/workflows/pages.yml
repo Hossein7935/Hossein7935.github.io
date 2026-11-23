@@ -4,7 +4,7 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 concurrency:
@@ -16,7 +16,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - name: Setup Pages
@@ -26,31 +26,33 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Sync site into docs/ (branch/docs Pages source)
+      - name: Sync full site into docs/
         run: |
           set -e
           mkdir -p docs
-          for f in index.html data.json version.json freshness.json manifest.json robots.txt sw.js \
-                   eur-dollar.js credit.js autorefresh.js; do
-            if [ -f "$f" ]; then cp -f "$f" "docs/$f"; fi
+          # komplette statische Seite nach docs (Pages-Source /docs)
+          for f in index.html data.json version.json freshness.json manifest.json robots.txt; do
+            [ -f "$f" ] && cp -f "$f" "docs/$f" && echo "copied $f"
           done
           for f in *.js; do
-            [ -f "$f" ] && cp -f "$f" "docs/$f" || true
+            [ -f "$f" ] && cp -f "$f" "docs/$f"
           done
           touch docs/.nojekyll
-          wc -c docs/index.html docs/data.json 2>/dev/null || true
-          ls -la docs | head -30
-      - name: Neuesten Datenstand übernehmen
-        env:
-          PAGES_BASE_URL: ${{ steps.pages.outputs.base_url }}
+          echo "docs sizes:"
+          wc -c docs/index.html docs/data.json docs/eur-dollar.js 2>/dev/null || true
+          ls -la docs | head -40
+      - name: Commit docs snapshot (for branch/docs publishing)
+        continue-on-error: true
         run: |
-          node scripts/sync-live-data.mjs || true
-          node scripts/finalize-data.mjs || true
-          node scripts/inject-autorefresh.mjs || true
-          for f in index.html data.json version.json freshness.json eur-dollar.js credit.js autorefresh.js; do
-            [ -f "$f" ] && cp -f "$f" "docs/$f" || true
-          done
-          touch docs/.nojekyll
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          if git diff --cached --quiet; then
+            echo "docs unchanged"
+          else
+            git commit -m "Sync docs/ static site for GitHub Pages" || true
+            git push origin HEAD:main || true
+          fi
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
