@@ -1,5 +1,5 @@
 {
- "checkedAt": "2026-11-23T06:39:03.057Z",
+ "checkedAt": "2026-11-23T07:44:46.227Z",
  "today": "2026-11-23",
  "summary": {
   "info": 13,
@@ -32,7 +32,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:US02Y",
    "status": "ok",
-   "note": "Seite 4.649 · TradingView 4.649"
+   "note": "Seite 4.681 · TradingView 4.683"
   },
   {
    "page": "USA · Seite 1",
@@ -41,7 +41,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:US10Y",
    "status": "ok",
-   "note": "Seite 4.950 · TradingView 4.950"
+   "note": "Seite 4.960 · TradingView 4.962"
   },
   {
    "page": "USA · Seite 1",
@@ -455,7 +455,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:DE02Y",
    "status": "ok",
-   "note": "Seite 3.052 · TradingView 3.052"
+   "note": "Seite 3.082 · TradingView 3.082"
   },
   {
    "page": "DEU",
@@ -464,7 +464,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:DE10Y",
    "status": "ok",
-   "note": "Seite 3.291 · TradingView 3.291"
+   "note": "Seite 3.310 · TradingView 3.310"
   },
   {
    "page": "DEU",
@@ -491,7 +491,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:FR02Y",
    "status": "ok",
-   "note": "Seite 3.563 · TradingView 3.563"
+   "note": "Seite 3.598 · TradingView 3.593"
   },
   {
    "page": "FRA",
@@ -500,7 +500,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:FR10Y",
    "status": "ok",
-   "note": "Seite 4.871 · TradingView 4.871"
+   "note": "Seite 4.843 · TradingView 4.843"
   },
   {
    "page": "FRA",
@@ -563,7 +563,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:CN02Y",
    "status": "ok",
-   "note": "Seite 1.230 · TradingView 1.230"
+   "note": "Seite 1.234 · TradingView 1.235"
   },
   {
    "page": "CHN",
@@ -572,7 +572,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:CN10Y",
    "status": "ok",
-   "note": "Seite 1.581 · TradingView 1.581"
+   "note": "Seite 1.582 · TradingView 1.583"
   },
   {
    "page": "CHN",
@@ -599,7 +599,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.718 · TradingView 4.718"
+   "note": "Seite 4.733 · TradingView 4.734"
   },
   {
    "page": "AUS",
@@ -608,7 +608,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.914 · TradingView 4.914"
+   "note": "Seite 4.919 · TradingView 4.920"
   },
   {
    "page": "AUS",
