@@ -1,10 +1,10 @@
 {
- "checkedAt": "2026-11-23T19:57:55.065Z",
+ "checkedAt": "2026-11-23T20:22:25.355Z",
  "today": "2026-11-23",
  "summary": {
   "info": 13,
-  "ok": 49,
-  "alt": 7
+  "ok": 51,
+  "alt": 5
  },
  "items": [
   {
@@ -32,7 +32,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:US02Y",
    "status": "ok",
-   "note": "Seite 4.664 · TradingView 4.664"
+   "note": "Seite 4.664 · TradingView 4.666"
   },
   {
    "page": "USA · Seite 1",
@@ -41,7 +41,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:US10Y",
    "status": "ok",
-   "note": "Seite 4.920 · TradingView 4.920"
+   "note": "Seite 4.920 · TradingView 4.924"
   },
   {
    "page": "USA · Seite 1",
@@ -289,19 +289,19 @@
   {
    "page": "USA · Repo-Markt",
    "label": "Repo TRI Volumen / Satz",
-   "pageDate": "2026-11-18",
+   "pageDate": "2026-11-19",
    "srcDate": "2026-11-19",
    "source": "OFR",
-   "status": "alt",
+   "status": "ok",
    "note": ""
   },
   {
    "page": "USA · Repo-Markt",
    "label": "Repo DVP Volumen / Satz",
-   "pageDate": "2026-11-19",
+   "pageDate": "2026-11-20",
    "srcDate": "2026-11-20",
    "source": "OFR",
-   "status": "alt",
+   "status": "ok",
    "note": ""
   },
   {
@@ -464,7 +464,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:DE10Y",
    "status": "ok",
-   "note": "Seite 3.273 · TradingView 3.273"
+   "note": "Seite 3.274 · TradingView 3.275"
   },
   {
    "page": "DEU",
@@ -491,7 +491,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:FR02Y",
    "status": "ok",
-   "note": "Seite 3.553 · TradingView 3.554"
+   "note": "Seite 3.554 · TradingView 3.555"
   },
   {
    "page": "FRA",
@@ -599,7 +599,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.696 · TradingView 4.696"
+   "note": "Seite 4.693 · TradingView 4.693"
   },
   {
    "page": "AUS",
@@ -608,7 +608,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.883 · TradingView 4.883"
+   "note": "Seite 4.880 · TradingView 4.880"
   },
   {
    "page": "AUS",
