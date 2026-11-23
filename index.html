@@ -17,8 +17,7 @@
     }
   }
   face.classList.add('metrics','usa-face');
-  // eur-dollar.js Inhalt schützen
-  if(face.querySelector('.usde-curve-root')||face.querySelector('[data-chart*="usDeCurve"]')||face.querySelectorAll('.metric').length>1){
+  if(face.querySelector('.usde-curve-root')||face.querySelector('[data-chart*="usDeCurve"]')||face.children.length>1){
     return face;
   }
   if(!face.querySelector('#xeurbiChart')&&!face.querySelector('.metric')){
@@ -36,7 +35,6 @@
 function paintXeurbi(){
   const face=ensureUsaFaceJ();
   if(!face)return;
-  // volle EUR/Dollar-Seite von eur-dollar.js nicht anfassen
   if(face.querySelector('.usde-curve-root')||face.querySelector('[data-chart*="usDeCurve"]'))return;
   let pageNow=0;
   try{pageNow=Number(localStorage.getItem('macrowatch-usa-page')||0)}catch(e){}
@@ -49,14 +47,11 @@ function paintXeurbi(){
   const host=document.getElementById('xeurbiChart');
   const metaEl=document.getElementById('xeurbiMeta');
   if(valEl)valEl.textContent=last?((Number(last.value)>=0?'+':'')+Number(last.value).toFixed(2)+' bp'):'—';
-  if(dateEl)dateEl.textContent=last?('Stand '+last.period+' · '+(meta.source||'CME XEURBI')+' · '+pts.length+' Punkte'):'Keine Daten';
-  if(host){
-    if(!pts.length)host.innerHTML='<div class="sparkempty">Keine XEURBI-Historie</div>';
-    else if(typeof renderLineChart==='function'){
-      host.innerHTML=renderLineChart(pts,{w:Math.min(640,360),h:140});
-    }
+  if(dateEl)dateEl.textContent=last?('Stand '+last.period+(meta.source?' · '+meta.source:'')):'Keine Daten';
+  if(host&&typeof renderLineChart==='function'&&pts.length){
+    host.innerHTML=renderLineChart(pts,{w:Math.min(640,360),h:140});
   }
-  if(metaEl)metaEl.textContent=meta.note||'';
+  if(metaEl)metaEl.textContent=meta.note||(pts.length?pts.length+' Punkte':'');
 }
 </script><style>
 :root{color-scheme:dark;--bg:#0b1120;--page-top:#101827;--panel:#141e30;--line:#29364c;--text:#edf3ff;--muted:#aab7cc;--accent:#74d4c4;--warn:#f5c76b;--bad:#ffb2a8;--control:#202c40;--control-line:#3a4b63;--metric:#0e1727;--metric-line:#26334a;--notice-bg:#292517;--notice-line:#5e5030;--notice-text:#ffe5a3;--link-line:#35564f;--bar-label:#8292aa}
@@ -511,38 +506,31 @@ if(c.id==='USA'){
 grid.append(card)}
 grid.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openEdit(b.dataset.edit)))}
 function setValue(country,key,value,date,source){if(!Number.isFinite(Number(value)))return;data[country]||(data[country]={});data[country][key]={value:Number(value),date:String(date||''),source};previous[country+'-'+key]=Number(value)}
-async function refresh(){const btn=document.querySelector('#refresh'),status=document.querySelector('#status');btn.disabled=true;status.textContent='Lade alle Daten …';try{const r=await fetch('./data.json?refresh='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('data.json HTTP '+r.status);const payload=await r.json();if(!payload||!payload.data)throw Error('data.json ungültig');const ALL_KEYS=['inflation','rate','y2','y10','t10y2y','t10y5y','tips5','tips10','reservesGdp','deficit','gdp','sofr3m','us3m','sofrUs3mSpread','bofaCcc','us10yTips','us5yTips','hhDebt','bizDebt','sofrIorb','wresbal','effr','sofr','iorb','cuAu','sofrFwd','ustCurve','fhlbAdv','fhlbAdvQoq','fhlbAdvYoy','effrVol','effrVolChg','effr','move','dxy'];for(const c of countries){const incoming=payload.data[c.id]||{};const next={};const prev=data[c.id]||{};for(const key of ALL_KEYS){if(incoming[key])next[key]=incoming[key];else if(prev[key]&&prev[key].source==='Manuell')next[key]=prev[key]}for(const key of Object.keys(incoming)){if(!next[key]&&incoming[key]&&typeof incoming[key]==='object'&&incoming[key].value!=null)next[key]=incoming[key]}data[c.id]=next}if(payload.histories&&typeof payload.histories==='object'){histories={...payload.histories}}const year=String(document.querySelector('#year').value);for(const c of countries){const v=payload.forecasts?.[c.id]?.[year];if(v!=null&&Number.isFinite(Number(v)))setValue(c.id,'gdp',Number(v),'IMF WEO · '+year,'IMF DataMapper · NGDP_RPCH')}persist();render();const counts={inflation:countries.filter(c=>!!data[c.id]?.inflation).length,y2:countries.filter(c=>!!data[c.id]?.y2).length,y10:countries.filter(c=>!!data[c.id]?.y10).length,t10y2y:countries.filter(c=>!!data[c.id]?.t10y2y).length,rate:countries.filter(c=>!!data[c.id]?.rate).length,tips10:countries.filter(c=>!!data[c.id]?.tips10).length};const stamp=payload.updatedAt?new Date(payload.updatedAt).toLocaleString('de-DE'):'?';const e=Array.isArray(payload.errors)?payload.errors:[];const histN=Object.keys(histories||{}).length;status.innerHTML='Datenstand: '+esc(stamp)+'. Inflation '+counts.inflation+'/6 · Leitzins '+counts.rate+'/6 · 2J '+counts.y2+'/6 · 10J '+counts.y10+'/6 · 10Y−2Y '+counts.t10y2y+'/6 · TIPS '+counts.tips10+'/6 · Charts '+histN+'.'+(e.length?'<br><span class="err">'+e.length+' Hinweise</span>':'');}catch(e){status.innerHTML='<span class="err">'+esc(e.message||e)+'</span>'}finally{btn.disabled=false}}
+async function refresh(){const btn=document.querySelector('#refresh'),status=document.querySelector('#status');btn.disabled=true;status.textContent='Lade alle Daten …';try{const r=await fetch('./data.json?refresh='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('data.json HTTP '+r.status);const payload=await r.json();if(!payload||!payload.data)throw Error('data.json ungültig');const ALL_KEYS=['usDeCurve','usDeCurveDaily','xeurbi','rr25','eurusd','inflation','rate','y2','y10','t10y2y','t10y5y','tips5','tips10','reservesGdp','deficit','gdp','sofr3m','us3m','sofrUs3mSpread','bofaCcc','us10yTips','us5yTips','hhDebt','bizDebt','sofrIorb','wresbal','effr','sofr','iorb','cuAu','sofrFwd','ustCurve','fhlbAdv','fhlbAdvQoq','fhlbAdvYoy','effrVol','effrVolChg','effr','move','dxy'];for(const c of countries){const incoming=payload.data[c.id]||{};const next={};const prev=data[c.id]||{};for(const key of ALL_KEYS){if(incoming[key])next[key]=incoming[key];else if(prev[key]&&prev[key].source==='Manuell')next[key]=prev[key]}for(const key of Object.keys(incoming)){if(next[key])continue;const v=incoming[key];if(!v||typeof v!=='object')continue;if(v.value!=null||Array.isArray(v.dates)||Array.isArray(v.usa)||Array.isArray(v.curves)||Array.isArray(v.nominal))next[key]=v}data[c.id]=next}if(payload.histories&&typeof payload.histories==='object'){histories={...payload.histories}}const year=String(document.querySelector('#year').value);for(const c of countries){const v=payload.forecasts?.[c.id]?.[year];if(v!=null&&Number.isFinite(Number(v)))setValue(c.id,'gdp',Number(v),'IMF WEO · '+year,'IMF DataMapper · NGDP_RPCH')}persist();render();const counts={inflation:countries.filter(c=>!!data[c.id]?.inflation).length,y2:countries.filter(c=>!!data[c.id]?.y2).length,y10:countries.filter(c=>!!data[c.id]?.y10).length,t10y2y:countries.filter(c=>!!data[c.id]?.t10y2y).length,rate:countries.filter(c=>!!data[c.id]?.rate).length,tips10:countries.filter(c=>!!data[c.id]?.tips10).length};const stamp=payload.updatedAt?new Date(payload.updatedAt).toLocaleString('de-DE'):'?';const e=Array.isArray(payload.errors)?payload.errors:[];const histN=Object.keys(histories||{}).length;status.innerHTML='Datenstand: '+esc(stamp)+'. Inflation '+counts.inflation+'/6 · Leitzins '+counts.rate+'/6 · 2J '+counts.y2+'/6 · 10J '+counts.y10+'/6 · 10Y−2Y '+counts.t10y2y+'/6 · TIPS '+counts.tips10+'/6 · Charts '+histN+'.'+(e.length?'<br><span class="err">'+e.length+' Hinweise</span>':'');}catch(e){status.innerHTML='<span class="err">'+esc(e.message||e)+'</span>'}finally{btn.disabled=false}}
 function openEdit(token){const[country,key]=token.split('|');editTarget={country,key};const c=countries.find(x=>x.id===country),d=defs.find(x=>x[0]===key),old=valueFor(country,key);document.querySelector('#editTitle').textContent=c.name+': '+d[1];document.querySelector('#editHelp').textContent=d[2];document.querySelector('#editValue').value=old?.value??'';document.querySelector('#editDate').value=old?.date??'';document.querySelector('#edit').showModal()}
 document.querySelector('#editForm').addEventListener('submit',e=>{e.preventDefault();if(!editTarget)return;setValue(editTarget.country,editTarget.key,document.querySelector('#editValue').value,document.querySelector('#editDate').value,'Manuell');persist();render();document.querySelector('#edit').close()});document.querySelector('#cancel').addEventListener('click',()=>document.querySelector('#edit').close());document.querySelector('#refresh').addEventListener('click',refresh);document.querySelector('#themeToggle').addEventListener('click',()=>{const t=document.documentElement.dataset.theme==='light'?'dark':'light';document.documentElement.dataset.theme=t;try{localStorage.setItem('macrowatch-theme',t)}catch(e){};document.querySelector('#themeToggle').textContent=t==='light'?'🌙 Dunkles Design':'☀️ Helles Design'});document.querySelector('#inflRange').addEventListener('change',()=>render());document.querySelector('#year').addEventListener('change',()=>refresh());document.querySelector('#chartClose').addEventListener('click',()=>document.querySelector('#chartDlg').close());document.querySelector('#chartRange').addEventListener('click',e=>{const b=e.target.closest('button[data-range]');if(!b||!chartCtx)return;chartCtx.range=b.dataset.range;document.querySelectorAll('#chartRange button').forEach(x=>x.classList.toggle('active',x===b));paintChartDlg()});document.addEventListener('click',e=>{const w=e.target.closest('[data-chart]');if(!w)return;const[country,key,label]=w.dataset.chart.split('|');openChart(country,key,label)});document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.closest('[data-chart]'))e.target.click()});const tip=document.querySelector('#chartTip');document.addEventListener('mousemove',e=>{const hit=e.target.closest('.hit');if(!hit){tip.classList.remove('show');return}tip.textContent=hit.dataset.period+' · '+hit.dataset.value;tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY+12)+'px';tip.classList.add('show')});document.addEventListener('mouseleave',()=>tip.classList.remove('show'));
 
 function setUsaPage(page){
-  page=Math.max(0,Math.min(7,Number(page)||0));
+  page=Math.max(0,Math.min(9,Number(page)||0));
   try{localStorage.setItem('macrowatch-usa-page',String(page))}catch(e){}
-  // Create dynamic faces before toggling visibility
   try{
     if(page===4){typeof paintFhlb==='function'&&paintFhlb();typeof paintEffrVol==='function'&&paintEffrVol();}
     if(page===5){typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove();}
     if(page===6){typeof paintYieldPage7==='function'&&paintYieldPage7();}
     if(page===7){typeof paintRepoPage==='function'&&paintRepoPage();}
+    if(page===9){typeof ensureUsaFaceJ==='function'&&ensureUsaFaceJ();}
   }catch(e){}
   document.querySelectorAll('.country').forEach(card=>{
     if(!card.querySelector('.usa-face-a'))return;
-    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h'];
+    const faces=['.usa-face-a','.usa-face-b','.usa-face-c','.usa-face-d','.usa-face-e','.usa-face-f','.usa-face-g','.usa-face-h','.usa-face-i','.usa-face-j'];
     faces.forEach((sel,i)=>{
-      const el=card.querySelector(sel);
-      if(el)el.classList.toggle('hidden',page!==i);
+      const f=card.querySelector(sel);
+      if(f)f.classList.toggle('hidden',i!==page);
     });
-    const sel=card.querySelector('#usaPageSelect');
-    if(sel)sel.querySelectorAll('button').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.page)===page));
   });
-  if(page===0)setTimeout(()=>{try{typeof paintDxy==='function'&&paintDxy()}catch(e){}},50);
-  if(page===1)setTimeout(()=>{try{typeof paintCuAu==='function'&&paintCuAu()}catch(e){}},50);
-  if(page===2)setTimeout(()=>{try{typeof paintRateDiff==='function'&&paintRateDiff();typeof paintRateOverlay==='function'&&paintRateOverlay();typeof paintUs2ySofr==='function'&&paintUs2ySofr()}catch(e){}},50);
-  if(page===3)setTimeout(()=>{try{typeof paintSofRFwd==='function'&&paintSofRFwd()}catch(e){};try{typeof paintSofRTenor==='function'&&paintSofRTenor()}catch(e){};try{typeof paintUstCurve==='function'&&paintUstCurve()}catch(e){}},50);
-  if(page===4)setTimeout(()=>{try{typeof paintFhlb==='function'&&paintFhlb()}catch(e){};try{typeof paintEffrVol==='function'&&paintEffrVol()}catch(e){}},50);
-  if(page===5)setTimeout(()=>{try{typeof paintIorbUs1y==='function'&&paintIorbUs1y();typeof paintMove==='function'&&paintMove()}catch(e){}},50);
-  if(page===6)setTimeout(()=>{try{typeof paintYieldPage7==='function'&&paintYieldPage7()}catch(e){}},50);
-  if(page===7)setTimeout(()=>{try{typeof paintRepoPage==='function'&&paintRepoPage()}catch(e){}},50);
+  document.querySelectorAll('#usaPageSelect button, .usa-page-select button').forEach(b=>{
+    b.classList.toggle('active',Number(b.getAttribute('data-page'))===page);
+  });
 }
 
 const REPO_PAGE_CATALOG=[
@@ -2749,5 +2737,5 @@ document.querySelector('#refresh')?.addEventListener('click',()=>setTimeout(pain
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='usaExtraToggle')setTimeout(paintCuAu,250)});
 
 refresh();
-</script><script src="eur-dollar.js?v=6"></script><script src="credit.js?v=3d6ef6289c"></script><script src="autorefresh.js?v=8c3727a1a5"></script>
+</script><script src="eur-dollar.js?v=7"></script><script src="credit.js?v=3d6ef6289c"></script><script src="autorefresh.js?v=8c3727a1a5"></script>
 </body></html>
