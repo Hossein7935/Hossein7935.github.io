@@ -102,7 +102,6 @@
   function getDailyPack() {
     var pack = metaUSA('usDeCurveDaily');
     if (pack && Array.isArray(pack.dates) && pack.dates.length) return pack;
-    // fallback: single snapshot
     var snap = metaUSA('usDeCurve');
     if (snap && snap.usa) {
       return {
@@ -340,17 +339,6 @@
       range.addEventListener('input', onMove);
       range.addEventListener('change', onMove);
     }
-
-    // click on curve (not slider) still opens enlarge — only on small card
-    if (!big) {
-      var svgEl = root.querySelector('svg.usde-curve-svg');
-      if (svgEl) {
-        svgEl.style.cursor = 'pointer';
-        svgEl.addEventListener('click', function (e) {
-          // don't block; parent data-chart handles openChart
-        });
-      }
-    }
   }
 
   function curveCard() {
@@ -358,7 +346,11 @@
     var meta = metaUSA('usDeCurve');
     var dateLine =
       (pack.dates.length
-        ? pack.dates.length + ' Tage Historie · ' + pack.dates[0] + ' → ' + pack.dates[pack.dates.length - 1]
+        ? pack.dates.length +
+          ' Tage Historie · ' +
+          pack.dates[0] +
+          ' → ' +
+          pack.dates[pack.dates.length - 1]
         : '—') +
       (meta.source || pack.source ? ' · ' + (meta.source || pack.source) : '') +
       ' · blau USA · rot DE';
@@ -371,7 +363,6 @@
       dateLine +
       '</div>' +
       '<div class="yield-chart-wrap usde-curve-root" role="button" tabindex="0" data-chart="USA|usDeCurve|Zinskurve USA vs DE" title="Chart vergrößern">' +
-      '<!-- filled by JS -->' +
       '</div>' +
       '<div class="sofr-fwd-meta">Obere X-Achse = Laufzeit. Untere Zeitachse = Kalendertag (täglich). Schieber bewegt beide Kurven.</div>' +
       '</div>'
@@ -425,19 +416,22 @@
       digits: 2,
       suffix: ' vol',
       signed: true,
-      source: (metaUSA('rr25').source || ''),
-      note: (metaUSA('rr25').note || '')
+      source: metaUSA('rr25').source || '',
+      note: metaUSA('rr25').note || ''
     });
 
     face.innerHTML = html;
 
     var root = face.querySelector('.usde-curve-root');
     if (root) {
-      // prevent range input from triggering chart enlarge
       root.addEventListener(
         'click',
         function (e) {
-          if (e.target && (e.target.classList.contains('usde-time-range') || e.target.closest('.usde-time-axis'))) {
+          if (
+            e.target &&
+            (e.target.classList.contains('usde-time-range') ||
+              e.target.closest('.usde-time-axis'))
+          ) {
             e.stopPropagation();
           }
         },
@@ -467,7 +461,7 @@
           metaEl.textContent =
             'USA blau · DE rot · Zeitachse täglich · ' +
             (pack.dates.length || 0) +
-            ' Tage · Maus am Schieber bewegt beide Kurven';
+            ' Tage · Schieber bewegt beide Kurven';
         }
         return;
       }
@@ -498,7 +492,13 @@
     var origSet = setUsaPage;
     var wrappedSet = function (page) {
       ensureButtons();
-      if (Number(page) === PAGE) return showPage();
+      if (Number(page) === PAGE) {
+        var ret = origSet.apply(this, arguments);
+        showPage();
+        setTimeout(showPage, 50);
+        setTimeout(showPage, 300);
+        return ret;
+      }
       var f = document.querySelector('.usa-face-j');
       if (f) f.classList.add('hidden');
       return origSet.apply(this, arguments);
