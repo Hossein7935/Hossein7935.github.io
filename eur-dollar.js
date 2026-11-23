@@ -271,9 +271,9 @@
           yAt(uVals[i]).toFixed(1) +
           '" r="4" fill="#3b82f6" data-period="' +
           labels[i] +
-          ' USA" data-value="' +
+          ' USA" data-tenor="' + labels[i] + '" data-country="USA" data-value="' +
           Number(uVals[i]).toFixed(3) +
-          '%"></circle>';
+          '" data-date="' + (opts.date || '') + '"></circle>';
       }
       if (dVals[i] != null && Number.isFinite(dVals[i])) {
         hits +=
@@ -283,9 +283,9 @@
           yAt(dVals[i]).toFixed(1) +
           '" r="4" fill="#ef4444" data-period="' +
           labels[i] +
-          ' DE" data-value="' +
+          ' DE" data-tenor="' + labels[i] + '" data-country="DE" data-value="' +
           Number(dVals[i]).toFixed(3) +
-          '%"></circle>';
+          '" data-date="' + (opts.date || '') + '"></circle>';
       }
     }
 
