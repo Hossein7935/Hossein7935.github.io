@@ -1,10 +1,10 @@
 {
- "checkedAt": "2026-11-23T14:50:56.204Z",
+ "checkedAt": "2026-11-23T19:57:55.065Z",
  "today": "2026-11-23",
  "summary": {
   "info": 13,
-  "ok": 51,
-  "alt": 5
+  "ok": 49,
+  "alt": 7
  },
  "items": [
   {
@@ -32,7 +32,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:US02Y",
    "status": "ok",
-   "note": "Seite 4.694 · TradingView 4.692"
+   "note": "Seite 4.664 · TradingView 4.664"
   },
   {
    "page": "USA · Seite 1",
@@ -41,7 +41,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:US10Y",
    "status": "ok",
-   "note": "Seite 4.948 · TradingView 4.944"
+   "note": "Seite 4.920 · TradingView 4.920"
   },
   {
    "page": "USA · Seite 1",
@@ -127,8 +127,8 @@
   {
    "page": "USA · Seite 2",
    "label": "BofA CCC High Yield",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "FRED BAMLH0A3HYCEY",
    "status": "ok",
    "note": ""
@@ -290,18 +290,18 @@
    "page": "USA · Repo-Markt",
    "label": "Repo TRI Volumen / Satz",
    "pageDate": "2026-11-18",
-   "srcDate": "2026-11-18",
+   "srcDate": "2026-11-19",
    "source": "OFR",
-   "status": "ok",
+   "status": "alt",
    "note": ""
   },
   {
    "page": "USA · Repo-Markt",
    "label": "Repo DVP Volumen / Satz",
    "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "srcDate": "2026-11-20",
    "source": "OFR",
-   "status": "ok",
+   "status": "alt",
    "note": ""
   },
   {
@@ -397,8 +397,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "High-Yield-OAS",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "FRED BAMLH0A0HYM2",
    "status": "ok",
    "note": ""
@@ -406,8 +406,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "Investment-Grade-OAS",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "FRED BAMLC0A0CM",
    "status": "ok",
    "note": ""
@@ -415,8 +415,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "Ausfallprämie Baa − Aaa",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "FRED DBAA",
    "status": "ok",
    "note": ""
@@ -455,7 +455,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:DE02Y",
    "status": "ok",
-   "note": "Seite 3.086 · TradingView 3.082"
+   "note": "Seite 3.063 · TradingView 3.063"
   },
   {
    "page": "DEU",
@@ -464,7 +464,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:DE10Y",
    "status": "ok",
-   "note": "Seite 3.291 · TradingView 3.286"
+   "note": "Seite 3.273 · TradingView 3.273"
   },
   {
    "page": "DEU",
@@ -491,7 +491,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:FR02Y",
    "status": "ok",
-   "note": "Seite 3.578 · TradingView 3.572"
+   "note": "Seite 3.553 · TradingView 3.554"
   },
   {
    "page": "FRA",
@@ -500,7 +500,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:FR10Y",
    "status": "ok",
-   "note": "Seite 4.801 · TradingView 4.790"
+   "note": "Seite 4.785 · TradingView 4.785"
   },
   {
    "page": "FRA",
@@ -599,7 +599,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.715 · TradingView 4.714"
+   "note": "Seite 4.696 · TradingView 4.696"
   },
   {
    "page": "AUS",
@@ -608,7 +608,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.895 · TradingView 4.891"
+   "note": "Seite 4.883 · TradingView 4.883"
   },
   {
    "page": "AUS",
