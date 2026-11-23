@@ -1,5 +1,5 @@
 {
- "checkedAt": "2026-11-23T08:23:01.704Z",
+ "checkedAt": "2026-11-23T14:19:40.496Z",
  "today": "2026-11-23",
  "summary": {
   "info": 13,
@@ -19,8 +19,8 @@
   {
    "page": "USA · Seite 1",
    "label": "Leitzins (Fed-Zielspanne)",
-   "pageDate": "2026-11-22",
-   "srcDate": "2026-11-22",
+   "pageDate": "2026-11-23",
+   "srcDate": "2026-11-23",
    "source": "FRED DFEDTARU",
    "status": "ok",
    "note": ""
@@ -32,7 +32,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:US02Y",
    "status": "ok",
-   "note": "Seite 4.685 · TradingView 4.685"
+   "note": "Seite 4.719 · TradingView 4.713"
   },
   {
    "page": "USA · Seite 1",
@@ -41,7 +41,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:US10Y",
    "status": "ok",
-   "note": "Seite 4.964 · TradingView 4.964"
+   "note": "Seite 4.978 · TradingView 4.968"
   },
   {
    "page": "USA · Seite 1",
@@ -154,8 +154,8 @@
   {
    "page": "USA · Seite 3",
    "label": "EFFR",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "NY Fed",
    "status": "ok",
    "note": ""
@@ -163,8 +163,8 @@
   {
    "page": "USA · Seite 3",
    "label": "SOFR",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "NY Fed",
    "status": "ok",
    "note": ""
@@ -217,8 +217,8 @@
   {
    "page": "USA · Seite 4",
    "label": "SOFR 30-Tage-Ø",
-   "pageDate": "2026-11-20",
-   "srcDate": "2026-11-20",
+   "pageDate": "2026-11-23",
+   "srcDate": "2026-11-23",
    "source": "NY Fed SOFRAI",
    "status": "ok",
    "note": ""
@@ -235,8 +235,8 @@
   {
    "page": "USA · Seite 5",
    "label": "Fed Funds Volumen",
-   "pageDate": "2026-11-19",
-   "srcDate": "2026-11-19",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "NY Fed",
    "status": "ok",
    "note": ""
@@ -253,8 +253,8 @@
   {
    "page": "USA · Seite 6",
    "label": "MOVE Index",
-   "pageDate": "2026-11-20",
-   "srcDate": "2026-11-20",
+   "pageDate": "2026-11-23",
+   "srcDate": "2026-11-23",
    "source": "Yahoo ^MOVE",
    "status": "ok",
    "note": ""
@@ -455,7 +455,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:DE02Y",
    "status": "ok",
-   "note": "Seite 3.088 · TradingView 3.088"
+   "note": "Seite 3.103 · TradingView 3.102"
   },
   {
    "page": "DEU",
@@ -464,7 +464,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:DE10Y",
    "status": "ok",
-   "note": "Seite 3.321 · TradingView 3.320"
+   "note": "Seite 3.302 · TradingView 3.302"
   },
   {
    "page": "DEU",
@@ -491,7 +491,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:FR02Y",
    "status": "ok",
-   "note": "Seite 3.586 · TradingView 3.587"
+   "note": "Seite 3.593 · TradingView 3.589"
   },
   {
    "page": "FRA",
@@ -500,7 +500,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:FR10Y",
    "status": "ok",
-   "note": "Seite 4.849 · TradingView 4.850"
+   "note": "Seite 4.804 · TradingView 4.804"
   },
   {
    "page": "FRA",
@@ -563,7 +563,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:CN02Y",
    "status": "ok",
-   "note": "Seite 1.234 · TradingView 1.234"
+   "note": "Seite 1.233 · TradingView 1.233"
   },
   {
    "page": "CHN",
@@ -572,7 +572,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:CN10Y",
    "status": "ok",
-   "note": "Seite 1.583 · TradingView 1.584"
+   "note": "Seite 1.585 · TradingView 1.585"
   },
   {
    "page": "CHN",
@@ -599,7 +599,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.734 · TradingView 4.735"
+   "note": "Seite 4.724 · TradingView 4.725"
   },
   {
    "page": "AUS",
@@ -608,7 +608,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.920 · TradingView 4.920"
+   "note": "Seite 4.910 · TradingView 4.915"
   },
   {
    "page": "AUS",
