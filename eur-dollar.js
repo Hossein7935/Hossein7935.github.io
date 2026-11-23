@@ -1,6 +1,6 @@
 /*
  * MacroWatch – USA-Seite „EUR/Dollar“ (Seite 9)
- * Charts inkl. US/DE-Kurve: Klick = vergrößern, Maus = Crosshair/Werte
+ * US/DE-Kurve: Vergrößern + Zeitachse (täglich) — Maus bewegt beide Kurven
  */
 (function () {
   'use strict';
@@ -8,6 +8,7 @@
   var PAGE = 9;
   var LABEL = 'EUR/Dollar';
   var LS_PAGE = 'macrowatch-usa-page';
+  var curveState = { idx: -1 };
 
   function ensureButtons() {
     document.querySelectorAll('#usaPageSelect, .usa-page-select').forEach(function (sel) {
@@ -65,7 +66,7 @@
         ' · ' +
         pts.length +
         ' Punkte'
-      : 'Keine Daten — nächster Datenabruf';
+      : 'Keine Daten';
     var chartHtml;
     if (!pts.length) {
       chartHtml = '<div class="sparkempty">Noch keine Daten</div>';
@@ -93,25 +94,30 @@
       dateLine +
       '</div>' +
       chartHtml +
-      (opts.note
-        ? '<div class="sofr-fwd-meta">' + opts.note + '</div>'
-        : '') +
+      (opts.note ? '<div class="sofr-fwd-meta">' + opts.note + '</div>' : '') +
       '</div>'
     );
   }
 
-  function getCurveSeries() {
-    var meta = metaUSA('usDeCurve');
-    var usa = meta.usa || series('USA-usDeCurveUsa');
-    var de = meta.de || series('USA-usDeCurveDe');
-    return { usa: usa || [], de: de || [], meta: meta };
+  function getDailyPack() {
+    var pack = metaUSA('usDeCurveDaily');
+    if (pack && Array.isArray(pack.dates) && pack.dates.length) return pack;
+    // fallback: single snapshot
+    var snap = metaUSA('usDeCurve');
+    if (snap && snap.usa) {
+      return {
+        dates: [snap.date || '—'],
+        curves: [{ usa: snap.usa, de: snap.de }],
+        source: snap.source
+      };
+    }
+    return { dates: [], curves: [] };
   }
 
-  /** Dual yield curve with hit targets for hover + enlarge */
   function dualCurveSvg(usaPts, dePts, opts) {
     opts = opts || {};
     var W = opts.w || 640;
-    var H = opts.h || 200;
+    var H = opts.h || 220;
     var order = ['3M', '1Y', '2Y', '5Y', '10Y', '30Y'];
     var uMap = {};
     var dMap = {};
@@ -183,11 +189,7 @@
           labels[i] +
           ' USA" data-value="' +
           Number(uVals[i]).toFixed(3) +
-          '%"><title>' +
-          labels[i] +
-          ' USA ' +
-          Number(uVals[i]).toFixed(3) +
-          '%</title></circle>';
+          '%"></circle>';
       }
       if (dVals[i] != null && Number.isFinite(dVals[i])) {
         hits +=
@@ -199,11 +201,7 @@
           labels[i] +
           ' DE" data-value="' +
           Number(dVals[i]).toFixed(3) +
-          '%"><title>' +
-          labels[i] +
-          ' DE ' +
-          Number(dVals[i]).toFixed(3) +
-          '%</title></circle>';
+          '%"></circle>';
       }
     }
 
@@ -243,13 +241,13 @@
     }
 
     return (
-      '<svg class="chart-hover" viewBox="0 0 ' +
+      '<svg class="chart-hover usde-curve-svg" viewBox="0 0 ' +
       W +
       ' ' +
       H +
       '" width="100%" height="' +
       H +
-      '" style="max-width:100%;height:auto;cursor:crosshair" role="img" aria-label="US DE Zinskurve">' +
+      '" style="max-width:100%;height:auto;cursor:crosshair" role="img">' +
       yLabels +
       '<path d="' +
       path(uVals) +
@@ -273,13 +271,98 @@
     );
   }
 
+  function timeAxisHtml(pack, idx) {
+    var n = pack.dates.length;
+    if (!n) return '';
+    var i = idx < 0 ? n - 1 : idx;
+    if (i > n - 1) i = n - 1;
+    var date = pack.dates[i] || '—';
+    var first = pack.dates[0];
+    var last = pack.dates[n - 1];
+    return (
+      '<div class="usde-time-axis" style="margin-top:8px;user-select:none">' +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;color:#9aa4b2;margin-bottom:4px">' +
+      '<span>' +
+      first +
+      '</span>' +
+      '<span class="usde-time-label" style="color:#e8eef7;font-weight:600">Tag: ' +
+      date +
+      ' · ' +
+      (i + 1) +
+      '/' +
+      n +
+      '</span>' +
+      '<span>' +
+      last +
+      '</span>' +
+      '</div>' +
+      '<input type="range" class="usde-time-range" min="0" max="' +
+      (n - 1) +
+      '" value="' +
+      i +
+      '" step="1" style="width:100%;cursor:ew-resize" ' +
+      'aria-label="Zeitachse tägliche Zinskurve"/>' +
+      '<div style="font-size:11px;color:#9aa4b2;margin-top:4px">Zeitachse (täglich): Maus/Schieber bewegt USA- und DE-Kurve gemeinsam</div>' +
+      '</div>'
+    );
+  }
+
+  function renderCurveBlock(root, idx) {
+    var pack = getDailyPack();
+    if (!pack.dates.length) {
+      root.innerHTML = '<div class="sparkempty">Keine Kurvendaten</div>';
+      return;
+    }
+    var i = idx < 0 ? pack.dates.length - 1 : idx;
+    if (i > pack.dates.length - 1) i = pack.dates.length - 1;
+    curveState.idx = i;
+    var cur = pack.curves[i] || { usa: [], de: [] };
+    var big = root.getAttribute('data-big') === '1';
+    var svg = dualCurveSvg(cur.usa, cur.de, {
+      w: big ? 720 : 640,
+      h: big ? 300 : 200
+    });
+    root.innerHTML =
+      svg +
+      timeAxisHtml(pack, i) +
+      (big ? '<div class="chart-tip-inline" id="chartDlgTip"></div>' : '');
+
+    var range = root.querySelector('.usde-time-range');
+    if (range) {
+      var onMove = function (ev) {
+        var ni = Number(ev.target.value);
+        if (ni === curveState.idx) return;
+        renderCurveBlock(root, ni);
+        if (big && typeof bindBigChartHover === 'function') {
+          bindBigChartHover(root);
+        }
+      };
+      range.addEventListener('input', onMove);
+      range.addEventListener('change', onMove);
+    }
+
+    // click on curve (not slider) still opens enlarge — only on small card
+    if (!big) {
+      var svgEl = root.querySelector('svg.usde-curve-svg');
+      if (svgEl) {
+        svgEl.style.cursor = 'pointer';
+        svgEl.addEventListener('click', function (e) {
+          // don't block; parent data-chart handles openChart
+        });
+      }
+    }
+  }
+
   function curveCard() {
-    var c = getCurveSeries();
-    var svg = dualCurveSvg(c.usa, c.de, { w: 640, h: 200 });
+    var pack = getDailyPack();
+    var meta = metaUSA('usDeCurve');
     var dateLine =
-      (c.meta.date ? 'Stand ' + c.meta.date : '—') +
-      (c.meta.source ? ' · ' + c.meta.source : '') +
-      ' · blau USA · rot DE · Klick = vergrößern';
+      (pack.dates.length
+        ? pack.dates.length + ' Tage Historie · ' + pack.dates[0] + ' → ' + pack.dates[pack.dates.length - 1]
+        : '—') +
+      (meta.source || pack.source ? ' · ' + (meta.source || pack.source) : '') +
+      ' · blau USA · rot DE';
+
     return (
       '<div class="metric has-chart" style="grid-column:1/-1">' +
       '<div class="name">Zinskurve USA vs Deutschland (3M · 1Y · 2Y · 5Y · 10Y · 30Y)</div>' +
@@ -287,13 +370,10 @@
       '<div class="date">' +
       dateLine +
       '</div>' +
-      '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|usDeCurve|Zinskurve USA vs DE" title="Chart vergrößern · Maus für Werte">' +
-      svg +
+      '<div class="yield-chart-wrap usde-curve-root" role="button" tabindex="0" data-chart="USA|usDeCurve|Zinskurve USA vs DE" title="Chart vergrößern">' +
+      '<!-- filled by JS -->' +
       '</div>' +
-      '<div class="sofr-fwd-meta">' +
-      (c.meta.note ||
-        'X = Laufzeit, Y = Zinssatz %. Maus über Punkte = Rendite. Klick öffnet große Ansicht mit Crosshair.') +
-      '</div>' +
+      '<div class="sofr-fwd-meta">Obere X-Achse = Laufzeit. Untere Zeitachse = Kalendertag (täglich). Schieber bewegt beide Kurven.</div>' +
       '</div>'
     );
   }
@@ -303,25 +383,22 @@
     if (!face) return;
 
     var html = '';
-
     html += lineCard({
       histKey: 'USA-dxy',
       dlgKey: 'dxy',
       title: 'DXY · US Dollar Index',
       digits: 2,
-      source: metaUSA('dxy').source || 'Yahoo DX-Y.NYB',
-      note: 'Historischer Dollar-Index.'
+      source: metaUSA('dxy').source || 'Yahoo',
+      note: 'Dollar-Index Historie'
     });
-
     html += lineCard({
       histKey: 'USA-eurusd',
       dlgKey: 'eurusd',
       title: 'EUR/USD',
       digits: 4,
-      source: metaUSA('eurusd').source || 'Marktdaten',
-      note: 'EUR/USD mit Historie.'
+      source: metaUSA('eurusd').source || '',
+      note: 'EUR/USD Historie'
     });
-
     html += curveCard();
 
     var basisMeta = metaUSA('xeurbi');
@@ -334,15 +411,13 @@
       dlgKey: 'xeurbi',
       title: isProxy
         ? 'EUR/USD Basis-Monitor · Proxy (SOFR − €STR, %-Punkte)'
-        : 'CME XEURBI · EUR/USD Cross-Currency Basis',
+        : 'CME XEURBI',
       digits: 2,
       suffix: isProxy ? ' %' : ' bp',
       signed: true,
       source: basisMeta.source || '',
       note: basisMeta.note || ''
     });
-
-    var rrMeta = metaUSA('rr25');
     html += lineCard({
       histKey: 'USA-rr25',
       dlgKey: 'rr25',
@@ -350,14 +425,28 @@
       digits: 2,
       suffix: ' vol',
       signed: true,
-      source: rrMeta.source || '',
-      note: rrMeta.note || ''
+      source: (metaUSA('rr25').source || ''),
+      note: (metaUSA('rr25').note || '')
     });
 
     face.innerHTML = html;
+
+    var root = face.querySelector('.usde-curve-root');
+    if (root) {
+      // prevent range input from triggering chart enlarge
+      root.addEventListener(
+        'click',
+        function (e) {
+          if (e.target && (e.target.classList.contains('usde-time-range') || e.target.closest('.usde-time-axis'))) {
+            e.stopPropagation();
+          }
+        },
+        true
+      );
+      renderCurveBlock(root, curveState.idx);
+    }
   }
 
-  /** Enlarge dialog for US/DE curve + hover like other charts */
   function patchPaintChartDlg() {
     if (typeof paintChartDlg !== 'function' || paintChartDlg.__usDeCurve) return;
     var orig = paintChartDlg;
@@ -368,20 +457,17 @@
         var body = document.querySelector('#chartBody');
         var metaEl = document.querySelector('#chartMeta');
         if (!body) return;
-        var c = getCurveSeries();
-        if (!c.usa.length && !c.de.length) {
-          body.innerHTML = '<div class="sparkempty">Keine Daten</div>';
-          if (metaEl) metaEl.textContent = '';
-          return;
-        }
-        body.innerHTML =
-          dualCurveSvg(c.usa, c.de, { w: 720, h: 340 }) +
-          '<div class="chart-tip-inline" id="chartDlgTip"></div>';
+        body.innerHTML = '';
+        body.setAttribute('data-big', '1');
+        body.classList.add('usde-curve-root');
+        renderCurveBlock(body, curveState.idx);
         if (typeof bindBigChartHover === 'function') bindBigChartHover(body);
         if (metaEl) {
+          var pack = getDailyPack();
           metaEl.textContent =
-            'USA blau · DE rot · Maus = Rendite pro Laufzeit · Stand ' +
-            (c.meta.date || '—');
+            'USA blau · DE rot · Zeitachse täglich · ' +
+            (pack.dates.length || 0) +
+            ' Tage · Maus am Schieber bewegt beide Kurven';
         }
         return;
       }
