@@ -1,9 +1,8 @@
 import fs from 'node:fs';
 
 /**
- * USA page 9: EUR/Dollar · CME XEURBI
- * Only adds paint helpers + button + links eur-dollar.js.
- * Runtime open is handled by eur-dollar.js (Credit pattern).
+ * USA page 9: EUR/Dollar helpers.
+ * Darf eur-dollar.js Inhalt NICHT überschreiben.
  */
 let html = fs.readFileSync('index.html', 'utf8');
 
@@ -67,14 +66,18 @@ const ensureFn = `function ensureUsaFaceJ(){
     }
   }
   face.classList.add('metrics','usa-face');
-  if(!face.querySelector('#xeurbiChart')){
+  // eur-dollar.js Inhalt schützen
+  if(face.querySelector('.usde-curve-root')||face.querySelector('[data-chart*="usDeCurve"]')||face.querySelectorAll('.metric').length>1){
+    return face;
+  }
+  if(!face.querySelector('#xeurbiChart')&&!face.querySelector('.metric')){
     face.innerHTML=
       '<div class="metric has-chart" id="xeurbiPanel" style="grid-column:1/-1">'+
         '<div class="name">CME XEURBI · EUR/USD Cross-Currency Basis Index</div>'+
         '<div class="value" id="xeurbiValue">—</div>'+
         '<div class="date" id="xeurbiDate">CME · Basispunkte</div>'+
         '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|xeurbi|XEURBI" title="Chart vergrößern" id="xeurbiChart"></div>'+
-        '<div class="sofr-fwd-meta" id="xeurbiMeta">XEURBI in bp · Seite öffnet auch ohne Daten</div>'+
+        '<div class="sofr-fwd-meta" id="xeurbiMeta">XEURBI in bp</div>'+
       '</div>';
   }
   return face;
@@ -83,6 +86,8 @@ const ensureFn = `function ensureUsaFaceJ(){
 const paintFn = `function paintXeurbi(){
   const face=ensureUsaFaceJ();
   if(!face)return;
+  // volle EUR/Dollar-Seite von eur-dollar.js nicht anfassen
+  if(face.querySelector('.usde-curve-root')||face.querySelector('[data-chart*="usDeCurve"]'))return;
   let pageNow=0;
   try{pageNow=Number(localStorage.getItem('macrowatch-usa-page')||0)}catch(e){}
   if(pageNow===9)face.classList.remove('hidden');
@@ -94,51 +99,32 @@ const paintFn = `function paintXeurbi(){
   const host=document.getElementById('xeurbiChart');
   const metaEl=document.getElementById('xeurbiMeta');
   if(valEl)valEl.textContent=last?((Number(last.value)>=0?'+':'')+Number(last.value).toFixed(2)+' bp'):'—';
-  if(dateEl)dateEl.textContent=last?('Stand '+last.period+' · '+(meta.source||'CME XEURBI')+' · '+pts.length+' Punkte'):'Noch keine CME-Daten — Seite ist aktiv';
+  if(dateEl)dateEl.textContent=last?('Stand '+last.period+' · '+(meta.source||'CME XEURBI')+' · '+pts.length+' Punkte'):'Keine Daten';
   if(host){
-    if(!pts.length)host.innerHTML='<div class="sparkempty">Keine XEURBI-Historie bisher. Seite funktioniert; Daten kommen über den CME-Fetch.</div>';
+    if(!pts.length)host.innerHTML='<div class="sparkempty">Keine XEURBI-Historie</div>';
     else if(typeof renderLineChart==='function'){
-      host.innerHTML=renderLineChart(pts,{w:Math.min(640,(host.clientWidth||360)),h:120});
-      host.setAttribute('data-chart','USA|xeurbi|XEURBI');
+      host.innerHTML=renderLineChart(pts,{w:Math.min(640,360),h:140});
     }
   }
-  if(metaEl)metaEl.textContent=meta.note||('Historie ab '+(pts[0]&&pts[0].period||'—')+' · CME Index-Start: 2024-07-27');
+  if(metaEl)metaEl.textContent=meta.note||'';
 }`;
 
-if (html.includes('function ensureUsaFaceJ')) {
-  const r = replaceFunction(html, 'ensureUsaFaceJ', ensureFn);
-  html = r.html;
-} else if (html.includes('function paintRepoPage')) {
-  html = html.replace('function paintRepoPage', ensureFn + '\n' + paintFn + '\nfunction paintRepoPage');
-} else {
+let r = replaceFunction(html, 'ensureUsaFaceJ', ensureFn);
+html = r.html;
+console.log('ensureUsaFaceJ', r.ok);
+r = replaceFunction(html, 'paintXeurbi', paintFn);
+html = r.html;
+console.log('paintXeurbi', r.ok);
+if (!r.ok && !html.includes('function paintXeurbi')) {
   html = html.replace('</script>', ensureFn + '\n' + paintFn + '\n</script>');
+  console.log('appended ensure/paint');
 }
 
-if (html.includes('function paintXeurbi')) {
-  const r = replaceFunction(html, 'paintXeurbi', paintFn);
-  html = r.html;
-}
-
-if (html.includes('data-page="9"') && html.includes('Math.min(7,')) {
-  html = html.replace(/Math\.min\(7,/g, 'Math.min(9,');
-  html = html.replace(/start>7\)/g, 'start>9)');
-}
-
+html = html.replace(/eur-dollar\.js\?v=\d+/g, 'eur-dollar.js?v=6');
 if (!html.includes('eur-dollar.js')) {
-  if (html.includes('credit.js')) {
-    html = html.replace(
-      /(<script src="credit\.js[^"]*"><\/script>)/,
-      '$1<script src="eur-dollar.js?v=1"></script>'
-    );
-    html = html.replace(/(<script src="eur-dollar\.js\?v=1"><\/script>){2,}/g, '$1');
-    console.log('linked eur-dollar.js');
-  } else if (html.includes('autorefresh.js')) {
-    html = html.replace(
-      /(<script src="autorefresh\.js[^"]*"><\/script>)/,
-      '<script src="eur-dollar.js?v=1"></script>$1'
-    );
-  }
+  html = html.replace('</body>', '<script src="eur-dollar.js?v=6"></script></body>');
+  console.log('linked eur-dollar.js');
 }
 
 fs.writeFileSync('index.html', html);
-console.log('done page9 xeurbi');
+console.log('inject-page9-xeurbi done');
