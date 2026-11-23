@@ -1,5 +1,5 @@
 {
- "checkedAt": "2026-11-23T06:14:25.847Z",
+ "checkedAt": "2026-11-23T06:39:03.057Z",
  "today": "2026-11-23",
  "summary": {
   "info": 13,
@@ -572,7 +572,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:CN10Y",
    "status": "ok",
-   "note": "Seite 1.586 · TradingView 1.585"
+   "note": "Seite 1.581 · TradingView 1.581"
   },
   {
    "page": "CHN",
@@ -599,7 +599,7 @@
    "srcDate": "2026-11-23",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.709 · TradingView 4.717"
+   "note": "Seite 4.718 · TradingView 4.718"
   },
   {
    "page": "AUS",
