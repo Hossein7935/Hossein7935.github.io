@@ -1,13 +1,9 @@
 name: MacroWatch data update
 on:
   workflow_dispatch:
-  # Für einen garantierten Takt kann ein externer Cron-Dienst diesen Workflow
-  # per API starten (siehe README.txt, Abschnitt „Zuverlässiger Takt“).
   repository_dispatch:
     types: [macrowatch-update]
   schedule:
-    # GitHub führt Zeitpläne nur „best effort“ aus (oft verspätet oder ausgelassen,
-    # besonders zur vollen Stunde). Daher alle 15 Minuten zu ungeraden Minuten.
     - cron: '4,19,34,49 * * * *'
   push:
     branches: [main]
@@ -126,16 +122,22 @@ jobs:
           node scripts/inject-repo-enlarge-fix.mjs || true
           node scripts/strip-page2-dupes.mjs || true
           node scripts/fix-usa-page9-nav.mjs || true
-      - name: Patch EUR/Dollar curve data load
-        run: node scripts/patch-eur-dollar-curve.mjs || true
+      - name: Patch EUR/Dollar curve (data + keys + spread UI)
+        run: |
+          node scripts/patch-eur-dollar-curve.mjs || true
+          node scripts/patch-eur-dollar-time-keys.mjs || true
+          node scripts/patch-eur-dollar-spread-ui.mjs || true
       - name: Auto-Refresh im Browser einbinden + Datum auf Zins-Karten
         run: |
           node scripts/fix-rate-card-dates.mjs || true
           node scripts/inject-autorefresh.mjs
       - name: Fix USA page 9 nav after all injects
         run: node scripts/fix-usa-page9-nav.mjs || true
-      - name: Patch curve pack again after final nav
-        run: node scripts/patch-eur-dollar-curve.mjs || true
+      - name: Patch EUR/Dollar curve again after final nav
+        run: |
+          node scripts/patch-eur-dollar-curve.mjs || true
+          node scripts/patch-eur-dollar-time-keys.mjs || true
+          node scripts/patch-eur-dollar-spread-ui.mjs || true
 
       - name: Pages-URL ermitteln
         id: pages
@@ -194,7 +196,7 @@ jobs:
           fi
           for f in $paths; do [ -e "$f" ] && git add "$f"; done
           if git diff --cached --quiet; then
-            echo "Nichts zu committen (letzter Daten-Commit vor $((age/60)) Min.)"
+            echo "Nichts zu committen"
             exit 0
           fi
           git commit -m "Update MacroWatch data"
@@ -205,7 +207,6 @@ jobs:
             git merge --abort 2>/dev/null || true
             sleep $((i * 10))
           done
-          echo "::warning::Push fehlgeschlagen – die Live-Seite ist trotzdem aktuell, der Stand wird beim nächsten Lauf gesichert"
 
   deploy:
     needs: update
