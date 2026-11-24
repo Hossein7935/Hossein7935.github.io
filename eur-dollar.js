@@ -1,6 +1,6 @@
 /*
  * MacroWatch – USA-Seite „EUR/Dollar“ (Seite 9)
- * US/DE-Kurve: Vergrößern + Zeitachse (täglich) — Maus bewegt beide Kurven
+ * US/DE-Kurve: Zeitachse mit ←→ / Mausrad, Hover zeigt USA+DE %
  */
 (function () {
   'use strict';
@@ -9,7 +9,6 @@
   var LABEL = 'EUR/Dollar';
   var LS_PAGE = 'macrowatch-usa-page';
   var curveState = { idx: -1 };
-  var diffSelection = [];
 
   function ensureButtons() {
     document.querySelectorAll('#usaPageSelect, .usa-page-select').forEach(function (sel) {
@@ -214,11 +213,11 @@
     var labels = [];
     var uVals = [];
     var dVals = [];
-    order.forEach(function (t) {
-      if (Number.isFinite(uMap[t]) || Number.isFinite(dMap[t])) {
-        labels.push(t);
-        uVals.push(Number.isFinite(uMap[t]) ? uMap[t] : null);
-        dVals.push(Number.isFinite(dMap[t]) ? dMap[t] : null);
+    order.forEach(function (tn) {
+      if (Number.isFinite(uMap[tn]) || Number.isFinite(dMap[tn])) {
+        labels.push(tn);
+        uVals.push(Number.isFinite(uMap[tn]) ? uMap[tn] : null);
+        dVals.push(Number.isFinite(dMap[tn]) ? dMap[tn] : null);
       }
     });
     if (!labels.length) return '<div class="sparkempty">Keine Kurvendaten</div>';
@@ -271,9 +270,9 @@
           yAt(uVals[i]).toFixed(1) +
           '" r="4" fill="#3b82f6" data-period="' +
           labels[i] +
-          ' USA" data-tenor="' + labels[i] + '" data-country="USA" data-value="' +
+          ' USA" data-value="' +
           Number(uVals[i]).toFixed(3) +
-          '" data-date="' + (opts.date || '') + '"></circle>';
+          '%"></circle>';
       }
       if (dVals[i] != null && Number.isFinite(dVals[i])) {
         hits +=
@@ -283,9 +282,9 @@
           yAt(dVals[i]).toFixed(1) +
           '" r="4" fill="#ef4444" data-period="' +
           labels[i] +
-          ' DE" data-tenor="' + labels[i] + '" data-country="DE" data-value="' +
+          ' DE" data-value="' +
           Number(dVals[i]).toFixed(3) +
-          '" data-date="' + (opts.date || '') + '"></circle>';
+          '%"></circle>';
       }
     }
 
@@ -355,31 +354,6 @@
     );
   }
 
-
-  function diffPanelHtml(date) {
-    var a = diffSelection[0], b = diffSelection[1];
-    function label(p) {
-      return p ? (p.country + ' ' + p.tenor + ': ' + p.value.toFixed(3) + ' %') : 'Noch nicht ausgewählt';
-    }
-    var result = '';
-    if (a && b) {
-      var diff = a.value - b.value;
-      result = '<div style="margin-top:6px;font-weight:700">Differenz (1. Wert − 2. Wert): ' +
-        (diff >= 0 ? '+' : '') + diff.toFixed(3) + ' Prozentpunkte · ' +
-        (diff * 100).toFixed(1) + ' bp</div>';
-    } else if (a) {
-      result = '<div style="margin-top:6px">Jetzt den zweiten Zinspunkt auswählen.</div>';
-    } else {
-      result = '<div style="margin-top:6px">Zwei Punkte am selben Datum anklicken – USA/DE oder innerhalb eines Landes.</div>';
-    }
-    return '<div class="usde-diff-panel" style="margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--metric);font-size:12px">' +
-      '<b>Spread-Rechner · ' + date + '</b>' +
-      '<div style="margin-top:5px">1. ' + label(a) + '</div>' +
-      '<div>2. ' + label(b) + '</div>' + result +
-      '<button type="button" class="usde-diff-reset" style="margin-top:8px;padding:5px 9px;border:1px solid var(--control-line);border-radius:7px;background:var(--control);color:var(--text)">Zurücksetzen</button>' +
-      '</div>';
-  }
-
   function timeAxisHtml(pack, idx) {
     var n = pack.dates.length;
     if (!n) return '';
@@ -411,7 +385,7 @@
       i +
       '" step="1" style="width:100%;cursor:ew-resize" ' +
       'aria-label="Zeitachse tägliche Zinskurve"/>' +
-      '<div style="font-size:11px;color:#9aa4b2;margin-top:4px">Zeitachse (täglich): Maus/Schieber bewegt USA- und DE-Kurve gemeinsam</div>' +
+      '<div style="font-size:11px;color:#9aa4b2;margin-top:4px">Zeitachse: Schieber/Maus · ← → (Shift=5 Tage) · Mausrad · Hover = USA/DE %</div>' +
       '</div>'
     );
   }
@@ -434,23 +408,116 @@
     });
     root.innerHTML =
       svg +
-      diffPanelHtml(pack.dates[i]) +
       timeAxisHtml(pack, i) +
       (big ? '<div class="chart-tip-inline" id="chartDlgTip"></div>' : '');
 
     var range = root.querySelector('.usde-time-range');
-    if (range) {
-      var onMove = function (ev) {
-        var ni = Number(ev.target.value);
-        if (ni === curveState.idx) return;
-        renderCurveBlock(root, ni);
-        if (big && typeof bindBigChartHover === 'function') {
-          bindBigChartHover(root);
-        }
-      };
-      range.addEventListener('input', onMove);
-      range.addEventListener('change', onMove);
+    function goTo(ni) {
+      ni = Math.max(0, Math.min(pack.dates.length - 1, Number(ni)));
+      if (!Number.isFinite(ni)) return;
+      if (ni === curveState.idx) return;
+      renderCurveBlock(root, ni);
+      if (big && typeof bindBigChartHover === 'function') {
+        bindBigChartHover(root);
+      }
+      var r2 = root.querySelector('.usde-time-range');
+      if (r2) {
+        try { r2.focus(); } catch (e) {}
+      }
     }
+    if (range) {
+      range.addEventListener('input', function (ev) { goTo(ev.target.value); });
+      range.addEventListener('change', function (ev) { goTo(ev.target.value); });
+      range.setAttribute('tabindex', '0');
+      range.addEventListener('keydown', function (ev) {
+        var step = ev.shiftKey ? 5 : 1;
+        if (ev.key === 'ArrowLeft' || ev.key === 'Left') {
+          ev.preventDefault();
+          ev.stopPropagation();
+          goTo(curveState.idx - step);
+        } else if (ev.key === 'ArrowRight' || ev.key === 'Right') {
+          ev.preventDefault();
+          ev.stopPropagation();
+          goTo(curveState.idx + step);
+        } else if (ev.key === 'Home') {
+          ev.preventDefault();
+          goTo(0);
+        } else if (ev.key === 'End') {
+          ev.preventDefault();
+          goTo(pack.dates.length - 1);
+        }
+      });
+      range.addEventListener('wheel', function (ev) {
+        ev.preventDefault();
+        var dir = (ev.deltaY > 0 || ev.deltaX > 0) ? 1 : -1;
+        goTo(curveState.idx + dir);
+      }, { passive: false });
+      try { range.focus(); } catch (e) {}
+    }
+    var axis = root.querySelector('.usde-time-axis');
+    if (axis) {
+      axis.addEventListener('mousedown', function () {
+        if (range) try { range.focus(); } catch (e) {}
+      });
+      axis.addEventListener('wheel', function (ev) {
+        ev.preventDefault();
+        var dir = (ev.deltaY > 0 || ev.deltaX > 0) ? 1 : -1;
+        goTo(curveState.idx + dir);
+      }, { passive: false });
+    }
+    bindCurveHover(root, cur);
+  }
+
+  function bindCurveHover(root, cur) {
+    var svg = root.querySelector('svg.usde-curve-svg');
+    if (!svg) return;
+    var tip = root.querySelector('.usde-hover-tip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.className = 'usde-hover-tip';
+      tip.style.cssText = 'position:absolute;pointer-events:none;background:rgba(16,24,39,0.95);border:1px solid #3a4556;padding:6px 10px;border-radius:8px;font-size:12px;color:#e8eef7;z-index:6;opacity:0;white-space:nowrap;box-shadow:0 4px 16px #0006';
+      if (getComputedStyle(root).position === 'static') root.style.position = 'relative';
+      root.appendChild(tip);
+    }
+    var order = ['3M', '1Y', '2Y', '5Y', '10Y', '30Y'];
+    var uMap = {}, dMap = {};
+    (cur.usa || []).forEach(function (p) { uMap[String(p.period).toUpperCase()] = Number(p.value); });
+    (cur.de || []).forEach(function (p) { dMap[String(p.period).toUpperCase()] = Number(p.value); });
+    function nearestTenor(clientX) {
+      var rect = svg.getBoundingClientRect();
+      var x = clientX - rect.left;
+      var labels = order.filter(function (tn) { return Number.isFinite(uMap[tn]) || Number.isFinite(dMap[tn]); });
+      if (!labels.length) return null;
+      var vbW = svg.viewBox.baseVal && svg.viewBox.baseVal.width ? svg.viewBox.baseVal.width : 640;
+      var scale = rect.width / vbW;
+      var lPx = 42 * scale;
+      var rPx = 12 * scale;
+      var inner = rect.width - lPx - rPx;
+      var best = 0, bestDist = 1e9;
+      for (var i = 0; i < labels.length; i++) {
+        var xi = labels.length === 1 ? lPx + inner / 2 : lPx + (i / (labels.length - 1)) * inner;
+        var d = Math.abs(x - xi);
+        if (d < bestDist) { bestDist = d; best = i; }
+      }
+      return labels[best];
+    }
+    svg.addEventListener('mousemove', function (ev) {
+      var tn = nearestTenor(ev.clientX);
+      if (!tn) { tip.style.opacity = '0'; return; }
+      var u = uMap[tn], d = dMap[tn];
+      var lines = '<b>' + tn + '</b>';
+      if (Number.isFinite(u)) lines += ' · <span style="color:#3b82f6">USA ' + u.toFixed(3) + '%</span>';
+      if (Number.isFinite(d)) lines += ' · <span style="color:#ef4444">DE ' + d.toFixed(3) + '%</span>';
+      tip.innerHTML = lines;
+      tip.style.opacity = '1';
+      var rect = root.getBoundingClientRect();
+      var left = ev.clientX - rect.left + 12;
+      var top = ev.clientY - rect.top + 12;
+      if (left > rect.width - 180) left = ev.clientX - rect.left - 180;
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    });
+    svg.addEventListener('mouseleave', function () { tip.style.opacity = '0'; });
   }
 
   function curveCard() {
@@ -476,7 +543,7 @@
       '</div>' +
       '<div class="yield-chart-wrap usde-curve-root" role="button" tabindex="0" data-chart="USA|usDeCurve|Zinskurve USA vs DE" title="Chart vergrößern">' +
       '</div>' +
-      '<div class="sofr-fwd-meta">Obere X-Achse = Laufzeit. Untere Zeitachse = Kalendertag (täglich). Schieber bewegt beide Kurven.</div>' +
+      '<div class="sofr-fwd-meta">Obere X-Achse = Laufzeit. Untere Zeitachse = Kalendertag. ← → / Maus / Hover.</div>' +
       '</div>'
     );
   }
@@ -571,16 +638,16 @@
         if (metaEl) {
           var pack = getDailyPack();
           metaEl.textContent =
-            'USA blau · DE rot · Zeitachse täglich · ' +
+            'USA blau · DE rot · ← → / Mausrad · Hover = % · ' +
             (pack.dates.length || 0) +
-            ' Tage · Schieber bewegt beide Kurven';
+            ' Tage';
         }
         return;
       }
       return orig.apply(this, arguments);
     };
     wrapped.__usDeCurve = true;
-    paintChartDlg = wrapped; // eslint-disable-line no-global-assign
+    paintChartDlg = wrapped;
   }
 
   function showPage() {
@@ -616,7 +683,7 @@
       return origSet.apply(this, arguments);
     };
     wrappedSet.__eurDollar = true;
-    setUsaPage = wrappedSet; // eslint-disable-line no-global-assign
+    setUsaPage = wrappedSet;
   }
 
   if (!window.__eurDollarClickBound) {
@@ -636,36 +703,6 @@
       },
       true
     );
-  }
-
-
-  if (!window.__usDeDiffBound) {
-    window.__usDeDiffBound = true;
-    document.addEventListener('click', function (e) {
-      var reset = e.target && e.target.closest && e.target.closest('.usde-diff-reset');
-      if (reset) {
-        diffSelection = [];
-        var root = reset.closest('.usde-curve-root');
-        if (root) renderCurveBlock(root, curveState.idx);
-        e.preventDefault(); e.stopPropagation(); return;
-      }
-      var point = e.target && e.target.closest && e.target.closest('.usde-curve-svg .hit');
-      if (!point) return;
-      var root = point.closest('.usde-curve-root');
-      if (!root) return;
-      var chosen = {
-        date: point.getAttribute('data-date') || '',
-        country: point.getAttribute('data-country') || '',
-        tenor: point.getAttribute('data-tenor') || '',
-        value: Number(point.getAttribute('data-value'))
-      };
-      if (!Number.isFinite(chosen.value)) return;
-      if (!diffSelection.length || diffSelection.length >= 2) diffSelection = [chosen];
-      else if (diffSelection[0].date === chosen.date) diffSelection.push(chosen);
-      else diffSelection = [chosen];
-      renderCurveBlock(root, curveState.idx);
-      e.preventDefault(); e.stopPropagation();
-    }, true);
   }
 
   function boot() {
