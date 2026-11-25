@@ -12,119 +12,7 @@ if (!t.includes('extra: { effr')) {
 }
 
 if (!t.includes('function extraChartsHtml')) {
-  const helper = `
-  function extraChartsHtml() {
-    var opts = [
-      { key: 'effr', label: 'EFFR', hist: 'USA-effr', color: '#22c55e' },
-      { key: 'sofr', label: 'SOFR', hist: 'USA-sofr', color: '#f59e0b' },
-      { key: 'iorb', label: 'IORB', hist: 'USA-iorb', color: '#a78bfa' }
-    ];
-    if (!curveState.extra) curveState.extra = { effr: false, sofr: false, iorb: false };
-    var boxes = opts
-      .map(function (o) {
-        var on = !!curveState.extra[o.key];
-        return (
-          '<label class="usde-extra-cb" style="display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:6px 12px;margin:3px;border-radius:10px;border:1px solid ' +
-          (on ? o.color : '#3a4556') +
-          ';background:' +
-          (on ? '#1a2332' : '#121a26') +
-          ';color:#e8eef7;font-size:13px;font-weight:600;touch-action:manipulation;cursor:pointer;-webkit-tap-highlight-color:transparent">' +
-          '<input type="checkbox" data-extra="' +
-          o.key +
-          '" ' +
-          (on ? 'checked ' : '') +
-          'style="width:18px;height:18px;accent-color:' +
-          o.color +
-          '"/>' +
-          o.label +
-          '</label>'
-        );
-      })
-      .join('');
-
-    var charts = '';
-    opts.forEach(function (o) {
-      if (!curveState.extra[o.key]) return;
-      var pts = series(o.hist);
-      var last = pts.length ? pts[pts.length - 1] : null;
-      var val = last ? Number(last.value).toFixed(3) + '%' : '—';
-      var dateLine = last
-        ? 'Stand ' + last.period + ' · ' + pts.length + ' Punkte'
-        : 'Keine Daten';
-      var chartInner;
-      if (!pts.length) {
-        chartInner = '<div class="sparkempty">Keine ' + o.label + '-Daten</div>';
-      } else if (typeof renderLineChart === 'function') {
-        chartInner =
-          '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|' +
-          o.key +
-          '|' +
-          o.label +
-          '" title="Chart vergrößern" style="min-height:90px">' +
-          renderLineChart(pts, { w: Math.min(640, 360), h: 100 }) +
-          '</div>';
-      } else {
-        chartInner = '<div class="sparkempty">' + pts.length + ' Punkte</div>';
-      }
-      charts +=
-        '<div class="usde-extra-chart metric has-chart" style="grid-column:1/-1;margin-top:8px;padding:8px;border:1px solid #2a3340;border-radius:10px;background:#0f1620">' +
-        '<div class="name" style="color:' +
-        o.color +
-        '">' +
-        o.label +
-        ' (zusätzlich)</div>' +
-        '<div class="value" style="font-size:16px">' +
-        val +
-        '</div>' +
-        '<div class="date">' +
-        dateLine +
-        '</div>' +
-        chartInner +
-        '</div>';
-    });
-
-    return (
-      '<div class="usde-extra-panel" style="margin-top:10px;padding:10px;border:1px solid #2a3340;border-radius:12px;background:#121a26">' +
-      '<div style="font-size:13px;font-weight:600;margin-bottom:6px">Weitere Charts darunter (Renditekurve bleibt)</div>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:2px">' +
-      boxes +
-      '</div>' +
-      charts +
-      '</div>'
-    );
-  }
-
-  function bindExtraCharts(root) {
-    var panel = root.querySelector('.usde-extra-panel');
-    if (!panel) return;
-    panel.querySelectorAll('input[data-extra]').forEach(function (cb) {
-      cb.addEventListener('change', function (ev) {
-        ev.stopPropagation();
-        var key = cb.getAttribute('data-extra');
-        if (!curveState.extra) curveState.extra = { effr: false, sofr: false, iorb: false };
-        curveState.extra[key] = !!cb.checked;
-        var host = root.querySelector('.usde-extra-panel');
-        if (host) {
-          var fresh = document.createElement('div');
-          fresh.innerHTML = extraChartsHtml();
-          host.replaceWith(fresh.firstChild);
-          bindExtraCharts(root);
-        }
-      });
-    });
-    panel.addEventListener(
-      'click',
-      function (e) {
-        if (e.target && (e.target.closest('label.usde-extra-cb') || e.target.matches('input[data-extra]'))) {
-          e.stopPropagation();
-        }
-      },
-      true
-    );
-  }
-
-`;
-  t = t.replace('  function renderCurveBlock(root, idx) {', helper + '  function renderCurveBlock(root, idx) {');
+  console.log('extraChartsHtml missing — run full spread patch first');
 }
 
 if (!t.includes('extraChartsHtml()')) {
@@ -140,5 +28,79 @@ if (!t.includes('bindExtraCharts(root)')) {
   );
 }
 
+// Hover for extra charts
+if (!t.includes('function bindExtraChartHover')) {
+  const hoverFn = `
+  function bindExtraChartHover(wrap) {
+    var svg = wrap.querySelector('svg.chart-hover') || wrap.querySelector('svg');
+    if (!svg) return;
+    var tip = wrap.querySelector('.usde-extra-tip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.className = 'usde-extra-tip';
+      tip.style.cssText = 'position:absolute;pointer-events:none;z-index:8;opacity:0;padding:6px 10px;border-radius:8px;background:rgba(16,24,39,0.96);border:1px solid #3a4556;color:#e8eef7;font-size:12px;white-space:nowrap;box-shadow:0 4px 16px #0006';
+      if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+      wrap.appendChild(tip);
+    }
+    svg.querySelectorAll('circle.hit').forEach(function (c) {
+      try { c.setAttribute('r', '14'); c.style.cursor = 'crosshair'; } catch (e) {}
+    });
+    function showFromHit(hit, clientX, clientY) {
+      if (!hit) { tip.style.opacity = '0'; return; }
+      tip.textContent = (hit.getAttribute('data-period') || '') + ' · ' + (hit.getAttribute('data-value') || '');
+      tip.style.opacity = '1';
+      var rect = wrap.getBoundingClientRect();
+      var left = clientX - rect.left + 12;
+      var top = clientY - rect.top + 12;
+      if (left > rect.width - 140) left = clientX - rect.left - 140;
+      if (top > rect.height - 36) top = clientY - rect.top - 36;
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    }
+    function nearestHit(clientX) {
+      var hits = svg.querySelectorAll('circle.hit');
+      if (!hits.length) return null;
+      var rect = svg.getBoundingClientRect();
+      var x = clientX - rect.left;
+      var vbW = svg.viewBox.baseVal && svg.viewBox.baseVal.width ? svg.viewBox.baseVal.width : rect.width;
+      var scale = rect.width / (vbW || 1);
+      var best = null, bestD = 1e9;
+      for (var i = 0; i < hits.length; i++) {
+        var cx = Number(hits[i].getAttribute('cx')) * scale;
+        var d = Math.abs(x - cx);
+        if (d < bestD) { bestD = d; best = hits[i]; }
+      }
+      return best;
+    }
+    svg.style.cursor = 'crosshair';
+    svg.addEventListener('mousemove', function (ev) {
+      var hit = ev.target.closest && ev.target.closest('circle.hit');
+      if (!hit) hit = nearestHit(ev.clientX);
+      showFromHit(hit, ev.clientX, ev.clientY);
+    });
+    svg.addEventListener('mouseleave', function () { tip.style.opacity = '0'; });
+    svg.addEventListener('touchmove', function (ev) {
+      if (!ev.touches || !ev.touches.length) return;
+      var tch = ev.touches[0];
+      showFromHit(nearestHit(tch.clientX), tch.clientX, tch.clientY);
+    }, { passive: true });
+    svg.addEventListener('touchend', function () { tip.style.opacity = '0'; });
+  }
+`;
+  if (t.includes('function bindExtraCharts')) {
+    t = t.replace('function bindExtraCharts', hoverFn + '\n  function bindExtraCharts');
+  }
+}
+if (t.includes('function bindExtraCharts') && !t.includes('bindExtraChartHover(wrap)')) {
+  t = t.replace(
+    "panel.querySelectorAll('input[data-extra]')",
+    "panel.querySelectorAll('.usde-extra-chart').forEach(function (wrap) { bindExtraChartHover(wrap); });\n    panel.querySelectorAll('input[data-extra]')"
+  );
+}
+t = t.replace(
+  'renderLineChart(pts, { w: Math.min(640, 360), h: 100 })',
+  'renderLineChart(pts, { w: Math.min(640, 360), h: 120 })'
+);
+
 fs.writeFileSync(path, t);
-console.log('patch-eur-dollar-spread-ui done', t.includes('extraChartsHtml'), t.includes('data-extra'));
+console.log('patch-eur-dollar-spread-ui done', t.includes('extraChartsHtml'), t.includes('bindExtraChartHover'));
