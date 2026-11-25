@@ -1,10 +1,10 @@
 {
- "checkedAt": "2026-11-25T12:51:40.789Z",
+ "checkedAt": "2026-11-25T18:04:02.081Z",
  "today": "2026-11-25",
  "summary": {
   "info": 13,
-  "ok": 51,
-  "alt": 5
+  "ok": 50,
+  "alt": 6
  },
  "items": [
   {
@@ -19,8 +19,8 @@
   {
    "page": "USA · Seite 1",
    "label": "Leitzins (Fed-Zielspanne)",
-   "pageDate": "2026-11-24",
-   "srcDate": "2026-11-24",
+   "pageDate": "2026-11-25",
+   "srcDate": "2026-11-25",
    "source": "FRED DFEDTARU",
    "status": "ok",
    "note": ""
@@ -32,7 +32,7 @@
    "srcDate": "2026-11-25",
    "source": "TradingView TVC:US02Y",
    "status": "ok",
-   "note": "Seite 4.606 · TradingView 4.604"
+   "note": "Seite 4.623 · TradingView 4.623"
   },
   {
    "page": "USA · Seite 1",
@@ -41,7 +41,7 @@
    "srcDate": "2026-11-25",
    "source": "TradingView TVC:US10Y",
    "status": "ok",
-   "note": "Seite 4.852 · TradingView 4.850"
+   "note": "Seite 4.836 · TradingView 4.838"
   },
   {
    "page": "USA · Seite 1",
@@ -127,8 +127,8 @@
   {
    "page": "USA · Seite 2",
    "label": "BofA CCC High Yield",
-   "pageDate": "2026-11-23",
-   "srcDate": "2026-11-23",
+   "pageDate": "2026-11-24",
+   "srcDate": "2026-11-24",
    "source": "FRED BAMLH0A3HYCEY",
    "status": "ok",
    "note": ""
@@ -154,8 +154,8 @@
   {
    "page": "USA · Seite 3",
    "label": "EFFR",
-   "pageDate": "2026-11-23",
-   "srcDate": "2026-11-23",
+   "pageDate": "2026-11-24",
+   "srcDate": "2026-11-24",
    "source": "NY Fed",
    "status": "ok",
    "note": ""
@@ -163,8 +163,8 @@
   {
    "page": "USA · Seite 3",
    "label": "SOFR",
-   "pageDate": "2026-11-23",
-   "srcDate": "2026-11-23",
+   "pageDate": "2026-11-24",
+   "srcDate": "2026-11-24",
    "source": "NY Fed",
    "status": "ok",
    "note": ""
@@ -217,8 +217,8 @@
   {
    "page": "USA · Seite 4",
    "label": "SOFR 30-Tage-Ø",
-   "pageDate": "2026-11-24",
-   "srcDate": "2026-11-24",
+   "pageDate": "2026-11-25",
+   "srcDate": "2026-11-25",
    "source": "NY Fed SOFRAI",
    "status": "ok",
    "note": ""
@@ -235,8 +235,8 @@
   {
    "page": "USA · Seite 5",
    "label": "Fed Funds Volumen",
-   "pageDate": "2026-11-23",
-   "srcDate": "2026-11-23",
+   "pageDate": "2026-11-24",
+   "srcDate": "2026-11-24",
    "source": "NY Fed",
    "status": "ok",
    "note": ""
@@ -253,8 +253,8 @@
   {
    "page": "USA · Seite 6",
    "label": "MOVE Index",
-   "pageDate": "2026-11-24",
-   "srcDate": "2026-11-24",
+   "pageDate": "2026-11-25",
+   "srcDate": "2026-11-25",
    "source": "Yahoo ^MOVE",
    "status": "ok",
    "note": ""
@@ -397,8 +397,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "High-Yield-OAS",
-   "pageDate": "2026-11-23",
-   "srcDate": "2026-11-23",
+   "pageDate": "2026-11-24",
+   "srcDate": "2026-11-24",
    "source": "FRED BAMLH0A0HYM2",
    "status": "ok",
    "note": ""
@@ -406,8 +406,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "Investment-Grade-OAS",
-   "pageDate": "2026-11-23",
-   "srcDate": "2026-11-23",
+   "pageDate": "2026-11-24",
+   "srcDate": "2026-11-24",
    "source": "FRED BAMLC0A0CM",
    "status": "ok",
    "note": ""
@@ -415,8 +415,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "Ausfallprämie Baa − Aaa",
-   "pageDate": "2026-11-23",
-   "srcDate": "2026-11-23",
+   "pageDate": "2026-11-24",
+   "srcDate": "2026-11-24",
    "source": "FRED DBAA",
    "status": "ok",
    "note": ""
@@ -424,8 +424,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "NFCI",
-   "pageDate": "2026-11-13",
-   "srcDate": "2026-11-13",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "FRED NFCI",
    "status": "ok",
    "note": ""
@@ -443,9 +443,9 @@
    "page": "USA · Credit Vergabe",
    "label": "SKSI vs. neuester NFCI",
    "pageDate": "2026-11-13",
-   "srcDate": "2026-11-13",
+   "srcDate": "2026-11-20",
    "source": "FRED NFCI (Rechenbasis des SKSI)",
-   "status": "ok",
+   "status": "alt",
    "note": ""
   },
   {
@@ -455,7 +455,7 @@
    "srcDate": "2026-11-25",
    "source": "TradingView TVC:DE02Y",
    "status": "ok",
-   "note": "Seite 3.026 · TradingView 3.024"
+   "note": "Seite 3.061 · TradingView 3.061"
   },
   {
    "page": "DEU",
@@ -464,7 +464,7 @@
    "srcDate": "2026-11-25",
    "source": "TradingView TVC:DE10Y",
    "status": "ok",
-   "note": "Seite 3.229 · TradingView 3.227"
+   "note": "Seite 3.221 · TradingView 3.221"
   },
   {
    "page": "DEU",
@@ -491,7 +491,7 @@
    "srcDate": "2026-11-25",
    "source": "TradingView TVC:FR02Y",
    "status": "ok",
-   "note": "Seite 3.488 · TradingView 3.486"
+   "note": "Seite 3.541 · TradingView 3.541"
   },
   {
    "page": "FRA",
@@ -500,7 +500,7 @@
    "srcDate": "2026-11-25",
    "source": "TradingView TVC:FR10Y",
    "status": "ok",
-   "note": "Seite 4.746 · TradingView 4.745"
+   "note": "Seite 4.731 · TradingView 4.731"
   },
   {
    "page": "FRA",
@@ -527,7 +527,7 @@
    "srcDate": "2026-11-25",
    "source": "TradingView TVC:JP02Y",
    "status": "ok",
-   "note": "Seite 1.716 · TradingView 1.716"
+   "note": "Seite 1.728 · TradingView 1.728"
   },
   {
    "page": "JPN",
@@ -536,7 +536,7 @@
    "srcDate": "2026-11-25",
    "source": "TradingView TVC:JP10Y",
    "status": "ok",
-   "note": "Seite 2.612 · TradingView 2.612"
+   "note": "Seite 2.621 · TradingView 2.623"
   },
   {
    "page": "JPN",
@@ -599,7 +599,7 @@
    "srcDate": "2026-11-25",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.651 · TradingView 4.651"
+   "note": "Seite 4.646 · TradingView 4.646"
   },
   {
    "page": "AUS",
@@ -608,7 +608,7 @@
    "srcDate": "2026-11-25",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.781 · TradingView 4.781"
+   "note": "Seite 4.788 · TradingView 4.788"
   },
   {
    "page": "AUS",
