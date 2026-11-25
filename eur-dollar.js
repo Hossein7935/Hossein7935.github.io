@@ -1,6 +1,6 @@
 /*
  * MacroWatch – USA-Seite „EUR/Dollar“ (Seite 9)
- * US/DE-Kurve: Zeitachse mit ←→ / Mausrad, Hover zeigt USA+DE %
+ * US/DE-Kurve + Spread + optionale EFFR/SOFR/IORB Mini-Charts
  */
 (function () {
   'use strict';
@@ -390,7 +390,6 @@
     );
   }
 
-
   function mapTenors(pts) {
     var m = {};
     (pts || []).forEach(function (p) {
@@ -471,7 +470,6 @@
         '<div style="margin-top:8px;font-size:13px;color:#9aa4b2">Zwei Laufzeiten tippen → Spread A − B</div>';
     }
 
-    // gleicher Tenor USA−DE
     var cross = '';
     if (a && Number.isFinite(uMap[a]) && Number.isFinite(dMap[a])) {
       cross =
@@ -521,7 +519,6 @@
         } else {
           curveState.pickB = tn;
         }
-        // Panel neu zeichnen ohne ganzen Chart zu zerstören
         var host = root.querySelector('.usde-spread-panel');
         if (host) {
           var fresh = document.createElement('div');
@@ -681,8 +678,10 @@
       svg +
       timeAxisHtml(pack, i) +
       spreadPanelHtml(cur) +
+      extraChartsHtml() +
       (big ? '<div class="chart-tip-inline" id="chartDlgTip"></div>' : '');
     bindSpreadPanel(root, cur);
+    bindExtraCharts(root);
 
     var range = root.querySelector('.usde-time-range');
     function goTo(ni) {
@@ -816,7 +815,7 @@
       '</div>' +
       '<div class="yield-chart-wrap usde-curve-root" role="button" tabindex="0" data-chart="USA|usDeCurve|Zinskurve USA vs DE" title="Chart vergrößern">' +
       '</div>' +
-      '<div class="sofr-fwd-meta">Obere X-Achse = Laufzeit. Untere Zeitachse = Kalendertag. ← → / Maus / Hover.</div>' +
+      '<div class="sofr-fwd-meta">Obere X-Achse = Laufzeit. Untere Zeitachse = Kalendertag. ← → / Maus / Hover. Kästchen = weitere Charts.</div>' +
       '</div>'
     );
   }
@@ -882,7 +881,9 @@
           if (
             e.target &&
             (e.target.classList.contains('usde-time-range') ||
-              e.target.closest('.usde-time-axis'))
+              e.target.closest('.usde-time-axis') ||
+              e.target.closest('.usde-spread-panel') ||
+              e.target.closest('.usde-extra-panel'))
           ) {
             e.stopPropagation();
           }
@@ -911,7 +912,7 @@
         if (metaEl) {
           var pack = getDailyPack();
           metaEl.textContent =
-            'USA blau · DE rot · ← → / Mausrad · Hover = % · ' +
+            'USA blau · DE rot · ← → / Mausrad · Hover · Kästchen EFFR/SOFR/IORB · ' +
             (pack.dates.length || 0) +
             ' Tage';
         }
