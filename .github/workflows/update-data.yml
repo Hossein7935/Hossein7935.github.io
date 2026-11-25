@@ -122,22 +122,26 @@ jobs:
           node scripts/inject-repo-enlarge-fix.mjs || true
           node scripts/strip-page2-dupes.mjs || true
           node scripts/fix-usa-page9-nav.mjs || true
-      - name: Patch EUR/Dollar curve (data + keys + spread UI)
+      - name: Restore + patch EUR/Dollar (curve, keys, spread, hover)
         run: |
+          node scripts/restore-eur-dollar.mjs || true
           node scripts/patch-eur-dollar-curve.mjs || true
           node scripts/patch-eur-dollar-time-keys.mjs || true
           node scripts/patch-eur-dollar-spread-ui.mjs || true
+          node scripts/restore-eur-dollar.mjs || true
       - name: Auto-Refresh im Browser einbinden + Datum auf Zins-Karten
         run: |
           node scripts/fix-rate-card-dates.mjs || true
           node scripts/inject-autorefresh.mjs
       - name: Fix USA page 9 nav after all injects
         run: node scripts/fix-usa-page9-nav.mjs || true
-      - name: Patch EUR/Dollar curve again after final nav
+      - name: Final EUR/Dollar restore/patch
         run: |
+          node scripts/restore-eur-dollar.mjs || true
           node scripts/patch-eur-dollar-curve.mjs || true
           node scripts/patch-eur-dollar-time-keys.mjs || true
           node scripts/patch-eur-dollar-spread-ui.mjs || true
+          node scripts/restore-eur-dollar.mjs || true
 
       - name: Pages-URL ermitteln
         id: pages
