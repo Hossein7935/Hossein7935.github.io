@@ -1,6 +1,6 @@
 /*
  * MacroWatch – USA-Seite „EUR/Dollar“ (Seite 9)
- * US/DE-Kurve: Zeitachse mit ←→ / Mausrad, Hover zeigt USA+DE %
+ * US/DE-Kurve + Spread + optionale EFFR/SOFR/IORB Mini-Charts
  */
 (function () {
   'use strict';
@@ -8,7 +8,7 @@
   var PAGE = 9;
   var LABEL = 'EUR/Dollar';
   var LS_PAGE = 'macrowatch-usa-page';
-  var curveState = { idx: -1, pickA: null, pickB: null };
+  var curveState = { idx: -1, pickA: null, pickB: null, extra: { effr: false, sofr: false, iorb: false } };
 
   function ensureButtons() {
     document.querySelectorAll('#usaPageSelect, .usa-page-select').forEach(function (sel) {
@@ -390,7 +390,6 @@
     );
   }
 
-
   function mapTenors(pts) {
     var m = {};
     (pts || []).forEach(function (p) {
@@ -471,7 +470,6 @@
         '<div style="margin-top:8px;font-size:13px;color:#9aa4b2">Zwei Laufzeiten tippen → Spread A − B</div>';
     }
 
-    // gleicher Tenor USA−DE
     var cross = '';
     if (a && Number.isFinite(uMap[a]) && Number.isFinite(dMap[a])) {
       cross =
@@ -521,7 +519,6 @@
         } else {
           curveState.pickB = tn;
         }
-        // Panel neu zeichnen ohne ganzen Chart zu zerstören
         var host = root.querySelector('.usde-spread-panel');
         if (host) {
           var fresh = document.createElement('div');
@@ -550,6 +547,116 @@
     }
   }
 
+  function extraChartsHtml() {
+    var opts = [
+      { key: 'effr', label: 'EFFR', hist: 'USA-effr', color: '#22c55e' },
+      { key: 'sofr', label: 'SOFR', hist: 'USA-sofr', color: '#f59e0b' },
+      { key: 'iorb', label: 'IORB', hist: 'USA-iorb', color: '#a78bfa' }
+    ];
+    if (!curveState.extra) curveState.extra = { effr: false, sofr: false, iorb: false };
+    var boxes = opts
+      .map(function (o) {
+        var on = !!curveState.extra[o.key];
+        return (
+          '<label class="usde-extra-cb" style="display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:6px 12px;margin:3px;border-radius:10px;border:1px solid ' +
+          (on ? o.color : '#3a4556') +
+          ';background:' +
+          (on ? '#1a2332' : '#121a26') +
+          ';color:#e8eef7;font-size:13px;font-weight:600;touch-action:manipulation;cursor:pointer;-webkit-tap-highlight-color:transparent">' +
+          '<input type="checkbox" data-extra="' +
+          o.key +
+          '" ' +
+          (on ? 'checked ' : '') +
+          'style="width:18px;height:18px;accent-color:' +
+          o.color +
+          '"/>' +
+          o.label +
+          '</label>'
+        );
+      })
+      .join('');
+
+    var charts = '';
+    opts.forEach(function (o) {
+      if (!curveState.extra[o.key]) return;
+      var pts = series(o.hist);
+      var last = pts.length ? pts[pts.length - 1] : null;
+      var val = last ? Number(last.value).toFixed(3) + '%' : '—';
+      var dateLine = last
+        ? 'Stand ' + last.period + ' · ' + pts.length + ' Punkte'
+        : 'Keine Daten';
+      var chartInner;
+      if (!pts.length) {
+        chartInner = '<div class="sparkempty">Keine ' + o.label + '-Daten</div>';
+      } else if (typeof renderLineChart === 'function') {
+        chartInner =
+          '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|' +
+          o.key +
+          '|' +
+          o.label +
+          '" title="Chart vergrößern" style="min-height:90px">' +
+          renderLineChart(pts, { w: Math.min(640, 360), h: 100 }) +
+          '</div>';
+      } else {
+        chartInner = '<div class="sparkempty">' + pts.length + ' Punkte</div>';
+      }
+      charts +=
+        '<div class="usde-extra-chart metric has-chart" style="grid-column:1/-1;margin-top:8px;padding:8px;border:1px solid #2a3340;border-radius:10px;background:#0f1620">' +
+        '<div class="name" style="color:' +
+        o.color +
+        '">' +
+        o.label +
+        ' (zusätzlich)</div>' +
+        '<div class="value" style="font-size:16px">' +
+        val +
+        '</div>' +
+        '<div class="date">' +
+        dateLine +
+        '</div>' +
+        chartInner +
+        '</div>';
+    });
+
+    return (
+      '<div class="usde-extra-panel" style="margin-top:10px;padding:10px;border:1px solid #2a3340;border-radius:12px;background:#121a26">' +
+      '<div style="font-size:13px;font-weight:600;margin-bottom:6px">Weitere Charts darunter (Renditekurve bleibt)</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:2px">' +
+      boxes +
+      '</div>' +
+      charts +
+      '</div>'
+    );
+  }
+
+  function bindExtraCharts(root) {
+    var panel = root.querySelector('.usde-extra-panel');
+    if (!panel) return;
+    panel.querySelectorAll('input[data-extra]').forEach(function (cb) {
+      cb.addEventListener('change', function (ev) {
+        ev.stopPropagation();
+        var key = cb.getAttribute('data-extra');
+        if (!curveState.extra) curveState.extra = { effr: false, sofr: false, iorb: false };
+        curveState.extra[key] = !!cb.checked;
+        var host = root.querySelector('.usde-extra-panel');
+        if (host) {
+          var fresh = document.createElement('div');
+          fresh.innerHTML = extraChartsHtml();
+          host.replaceWith(fresh.firstChild);
+          bindExtraCharts(root);
+        }
+      });
+    });
+    panel.addEventListener(
+      'click',
+      function (e) {
+        if (e.target && (e.target.closest('label.usde-extra-cb') || e.target.matches('input[data-extra]'))) {
+          e.stopPropagation();
+        }
+      },
+      true
+    );
+  }
+
   function renderCurveBlock(root, idx) {
     var pack = getDailyPack();
     if (!pack.dates.length) {
@@ -570,8 +677,10 @@
       svg +
       timeAxisHtml(pack, i) +
       spreadPanelHtml(cur) +
+      extraChartsHtml() +
       (big ? '<div class="chart-tip-inline" id="chartDlgTip"></div>' : '');
     bindSpreadPanel(root, cur);
+    bindExtraCharts(root);
 
     var range = root.querySelector('.usde-time-range');
     function goTo(ni) {
@@ -705,7 +814,7 @@
       '</div>' +
       '<div class="yield-chart-wrap usde-curve-root" role="button" tabindex="0" data-chart="USA|usDeCurve|Zinskurve USA vs DE" title="Chart vergrößern">' +
       '</div>' +
-      '<div class="sofr-fwd-meta">Obere X-Achse = Laufzeit. Untere Zeitachse = Kalendertag. ← → / Maus / Hover.</div>' +
+      '<div class="sofr-fwd-meta">Obere X-Achse = Laufzeit. Untere Zeitachse = Kalendertag. ← → / Maus / Hover. Kästchen = weitere Charts.</div>' +
       '</div>'
     );
   }
@@ -771,7 +880,9 @@
           if (
             e.target &&
             (e.target.classList.contains('usde-time-range') ||
-              e.target.closest('.usde-time-axis'))
+              e.target.closest('.usde-time-axis') ||
+              e.target.closest('.usde-spread-panel') ||
+              e.target.closest('.usde-extra-panel'))
           ) {
             e.stopPropagation();
           }
@@ -800,7 +911,7 @@
         if (metaEl) {
           var pack = getDailyPack();
           metaEl.textContent =
-            'USA blau · DE rot · ← → / Mausrad · Hover = % · ' +
+            'USA blau · DE rot · ← → / Mausrad · Hover · Kästchen EFFR/SOFR/IORB · ' +
             (pack.dates.length || 0) +
             ' Tage';
         }
