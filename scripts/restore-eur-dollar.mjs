@@ -24,11 +24,11 @@ if (t.length < 5000 || !t.includes('function renderCurveBlock') || !t.includes('
   console.log('restored bytes', t.length);
 }
 
-// Apply follow-up patches if present
 for (const script of [
   'scripts/patch-eur-dollar-spread-ui.mjs',
   'scripts/patch-extra-hover-fix.mjs',
-  'scripts/patch-extra-time-window.mjs'
+  'scripts/patch-extra-time-window.mjs',
+  'scripts/patch-fix-curve-open.mjs'
 ]) {
   if (fs.existsSync(script)) {
     try {
@@ -40,4 +40,11 @@ for (const script of [
 }
 
 t = read();
-console.log('restore-eur-dollar final', t.length, 'window=', t.includes('windowPts'), 'hover=', t.includes('bindExtraChartHover'));
+console.log(
+  'restore-eur-dollar final',
+  t.length,
+  'window=',
+  t.includes('windowPts'),
+  'openFix=',
+  !t.includes('extraChartsHtml() +') && t.includes('bindExtraCharts(root, pack.dates[i])')
+);
