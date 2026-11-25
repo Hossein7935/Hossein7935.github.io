@@ -5,6 +5,9 @@ permissions:
   contents: write
   pages: write
   id-token: write
+concurrency:
+  group: fix-enlarge
+  cancel-in-progress: true
 jobs:
   fix:
     runs-on: ubuntu-latest
@@ -15,26 +18,31 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Restore and patch eur-dollar
+      - name: Force enlarge patch
         run: |
-          node scripts/restore-eur-dollar.mjs || true
+          set -e
           node scripts/patch-fix-curve-open.mjs || true
-          node scripts/patch-curve-enlarge-click.mjs || true
+          node scripts/patch-curve-enlarge-click.mjs
           node --check eur-dollar.js
-          grep -q "openChart('USA', 'usDeCurve'" eur-dollar.js
+          grep -n "openChart('USA', 'usDeCurve'" eur-dollar.js
           wc -c eur-dollar.js
       - name: Commit fixed file
         run: |
+          set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add eur-dollar.js
-          git diff --cached --quiet && echo "no change" && exit 0
-          git commit -m "fix: Renditekurve vergrößern (openChart)"
+          if git diff --cached --quiet; then
+            echo "WARNING: no change after patch"
+            grep -c "openChart" eur-dollar.js || true
+            exit 1
+          fi
+          git commit -m "fix: Renditekurve openChart vergrößern"
           git push origin HEAD:main
       - name: Prepare pages files
         run: |
           mkdir -p docs
-          cp -f eur-dollar.js docs/eur-dollar.js || true
+          cp -f eur-dollar.js docs/eur-dollar.js
           cp -f index.html docs/index.html || true
           [ -f data.json ] && cp -f data.json docs/data.json || true
           touch docs/.nojekyll
