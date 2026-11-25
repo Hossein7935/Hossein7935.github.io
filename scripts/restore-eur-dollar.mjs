@@ -28,7 +28,8 @@ for (const script of [
   'scripts/patch-eur-dollar-spread-ui.mjs',
   'scripts/patch-extra-hover-fix.mjs',
   'scripts/patch-extra-time-window.mjs',
-  'scripts/patch-fix-curve-open.mjs'
+  'scripts/patch-fix-curve-open.mjs',
+  'scripts/patch-curve-enlarge-click.mjs'
 ]) {
   if (fs.existsSync(script)) {
     try {
@@ -43,8 +44,8 @@ t = read();
 console.log(
   'restore-eur-dollar final',
   t.length,
+  'enlarge=',
+  t.includes("openChart('USA', 'usDeCurve'"),
   'window=',
-  t.includes('windowPts'),
-  'openFix=',
-  !t.includes('extraChartsHtml() +') && t.includes('bindExtraCharts(root, pack.dates[i])')
+  t.includes('windowPts')
 );
