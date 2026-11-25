@@ -853,11 +853,10 @@
       svg +
       timeAxisHtml(pack, i) +
       spreadPanelHtml(cur) +
-      extraChartsHtml() +
       extraChartsHtml(pack.dates[i]) +
       (big ? '<div class="chart-tip-inline" id="chartDlgTip"></div>' : '');
     bindSpreadPanel(root, cur);
-    bindExtraCharts(root, focusDate);
+    bindExtraCharts(root, pack.dates[i]);
 
     var range = root.querySelector('.usde-time-range');
     function goTo(ni) {
@@ -1054,19 +1053,55 @@
       root.addEventListener(
         'click',
         function (e) {
+          var tgt = e.target;
+          if (!tgt) return;
           if (
-            e.target &&
-            (e.target.classList.contains('usde-time-range') ||
-              e.target.closest('.usde-time-axis') ||
-              e.target.closest('.usde-spread-panel') ||
-              e.target.closest('.usde-extra-panel'))
+            tgt.classList.contains('usde-time-range') ||
+            tgt.closest('.usde-time-axis') ||
+            tgt.closest('.usde-spread-panel') ||
+            tgt.closest('.usde-extra-panel') ||
+            tgt.closest('.usde-tenor-btn') ||
+            tgt.closest('label.usde-extra-cb') ||
+            tgt.closest('.usde-spread-reset')
           ) {
             e.stopPropagation();
+            return;
+          }
+          if (tgt.closest('svg') || tgt === root) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof openChart === 'function') {
+              openChart('USA', 'usDeCurve', 'Zinskurve USA vs DE');
+            } else {
+              try {
+                chartCtx = {
+                  country: 'USA',
+                  key: 'usDeCurve',
+                  label: 'Zinskurve USA vs DE',
+                  range: '3y'
+                };
+                var title = document.querySelector('#chartTitle');
+                if (title) title.textContent = 'Zinskurve USA vs DE';
+                if (typeof paintChartDlg === 'function') paintChartDlg();
+                var dlg = document.querySelector('#chartDlg');
+                if (dlg && dlg.showModal) dlg.showModal();
+              } catch (err) {
+                console.error(err);
+              }
+            }
           }
         },
         true
       );
-      renderCurveBlock(root, curveState.idx);
+      try {
+        renderCurveBlock(root, curveState.idx);
+      } catch (err) {
+        console.error('renderCurveBlock', err);
+        root.innerHTML =
+          '<div class="sparkempty">Kurve Fehler: ' +
+          (err && err.message ? err.message : err) +
+          '</div>';
+      }
     }
   }
 
@@ -1083,8 +1118,8 @@
         body.innerHTML = '';
         body.setAttribute('data-big', '1');
         body.classList.add('usde-curve-root');
-        renderCurveBlock(body, curveState.idx);
-        if (typeof bindBigChartHover === 'function') bindBigChartHover(body);
+        try { renderCurveBlock(body, curveState.idx); } catch (err) { console.error(err); body.innerHTML = '<div class="sparkempty">Kurve Fehler</div>'; }
+        if (typeof bindBigChartHover === 'function') try { bindBigChartHover(body); } catch (e2) {}
         if (metaEl) {
           var pack = getDailyPack();
           metaEl.textContent =
