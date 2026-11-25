@@ -41,7 +41,10 @@
   }
 
   function series(key) {
-    return (typeof histories !== 'undefined' && histories[key]) || [];
+    if (typeof histories !== 'undefined' && histories && histories[key]) return histories[key];
+    if (typeof window !== 'undefined' && window.histories && window.histories[key]) return window.histories[key];
+    try { if (typeof data !== 'undefined' && data && data.histories && data.histories[key]) return data.histories[key]; } catch (e) {}
+    return [];
   }
 
   function metaUSA(key) {
@@ -526,6 +529,8 @@
           var neu = fresh.firstChild;
           host.replaceWith(neu);
           bindSpreadPanel(root, cur);
+    bindExtraCharts(root);
+    bindExtraCharts(root, pack.dates[i]);
         }
       });
     });
@@ -547,13 +552,61 @@
     }
   }
 
-  function extraChartsHtml() {
+  function extraChartsHtml(focusDate) {
     var opts = [
       { key: 'effr', label: 'EFFR', hist: 'USA-effr', color: '#22c55e' },
       { key: 'sofr', label: 'SOFR', hist: 'USA-sofr', color: '#f59e0b' },
       { key: 'iorb', label: 'IORB', hist: 'USA-iorb', color: '#a78bfa' }
     ];
     if (!curveState.extra) curveState.extra = { effr: false, sofr: false, iorb: false };
+
+    function parseDay(s) {
+      if (!s) return null;
+      var p = String(s).slice(0, 10).split('-');
+      if (p.length < 3) return null;
+      var d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+      return isNaN(d.getTime()) ? null : d;
+    }
+    function shiftMonths(d, months) {
+      var x = new Date(d.getTime());
+      x.setMonth(x.getMonth() + months);
+      return x;
+    }
+    function iso(d) {
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+    function windowPts(pts, centerIso) {
+      if (!pts || !pts.length) return [];
+      var center = parseDay(centerIso);
+      if (!center) return pts.slice(-180);
+      var from = shiftMonths(center, -6);
+      var to = shiftMonths(center, 6);
+      var fromS = iso(from);
+      var toS = iso(to);
+      var out = [];
+      for (var i = 0; i < pts.length; i++) {
+        var pr = String(pts[i].period || '').slice(0, 10);
+        if (pr >= fromS && pr <= toS) out.push(pts[i]);
+      }
+      if (out.length < 5) {
+        var best = 0, bestD = 1e15;
+        var cTime = center.getTime();
+        for (var j = 0; j < pts.length; j++) {
+          var dj = parseDay(pts[j].period);
+          if (!dj) continue;
+          var dd = Math.abs(dj.getTime() - cTime);
+          if (dd < bestD) { bestD = dd; best = j; }
+        }
+        var a = Math.max(0, best - 130);
+        var b = Math.min(pts.length, best + 131);
+        out = pts.slice(a, b);
+      }
+      return out;
+    }
+
     var boxes = opts
       .map(function (o) {
         var on = !!curveState.extra[o.key];
@@ -576,25 +629,56 @@
       })
       .join('');
 
+    var focus = focusDate || '';
     var charts = '';
     opts.forEach(function (o) {
       if (!curveState.extra[o.key]) return;
-      var pts = series(o.hist);
+      var all = series(o.hist);
+      var pts = windowPts(all, focus);
       var last = pts.length ? pts[pts.length - 1] : null;
-      var val = last ? Number(last.value).toFixed(3) + '%' : '—';
-      var dateLine = last
-        ? 'Stand ' + last.period + ' · ' + pts.length + ' Punkte'
-        : 'Keine Daten';
+      var focusVal = null;
+      if (focus && pts.length) {
+        for (var k = 0; k < pts.length; k++) {
+          if (String(pts[k].period).slice(0, 10) === String(focus).slice(0, 10)) {
+            focusVal = Number(pts[k].value);
+            break;
+          }
+        }
+        if (focusVal == null) {
+          var c = parseDay(focus);
+          if (c) {
+            var bestK = 0, bestDk = 1e15;
+            for (var k2 = 0; k2 < pts.length; k2++) {
+              var dd2 = parseDay(pts[k2].period);
+              if (!dd2) continue;
+              var dist = Math.abs(dd2.getTime() - c.getTime());
+              if (dist < bestDk) { bestDk = dist; bestK = k2; }
+            }
+            focusVal = Number(pts[bestK].value);
+          }
+        }
+      }
+      var val =
+        focusVal != null && Number.isFinite(focusVal)
+          ? focusVal.toFixed(3) + '%'
+          : last
+            ? Number(last.value).toFixed(3) + '%'
+            : '—';
+      var dateLine = focus
+        ? 'Fokus ' + String(focus).slice(0, 10) + ' · Fenster ±6M · ' + pts.length + ' Punkte'
+        : last
+          ? 'Stand ' + last.period + ' · ' + pts.length + ' Punkte'
+          : 'Keine Daten';
       var chartInner;
       if (!pts.length) {
-        chartInner = '<div class="sparkempty">Keine ' + o.label + '-Daten</div>';
+        chartInner = '<div class="sparkempty">Keine ' + o.label + '-Daten im Fenster</div>';
       } else if (typeof renderLineChart === 'function') {
         chartInner =
           '<div class="yield-chart-wrap" role="button" tabindex="0" data-chart="USA|' +
           o.key +
           '|' +
           o.label +
-          '" title="Chart vergrößern" style="min-height:90px">' +
+          '" title="Chart vergrößern" style="min-height:110px">' +
           renderLineChart(pts, { w: Math.min(640, 360), h: 120 }) +
           '</div>';
       } else {
@@ -606,7 +690,9 @@
         o.color +
         '">' +
         o.label +
-        ' (zusätzlich)</div>' +
+        ' · um ' +
+        (focus ? String(focus).slice(0, 10) : 'heute') +
+        ' (±6 Monate)</div>' +
         '<div class="value" style="font-size:16px">' +
         val +
         '</div>' +
@@ -619,7 +705,7 @@
 
     return (
       '<div class="usde-extra-panel" style="margin-top:10px;padding:10px;border:1px solid #2a3340;border-radius:12px;background:#121a26">' +
-      '<div style="font-size:13px;font-weight:600;margin-bottom:6px">Weitere Charts darunter (Renditekurve bleibt)</div>' +
+      '<div style="font-size:13px;font-weight:600;margin-bottom:6px">Weitere Charts darunter · folgen der Zeitachse (±6M)</div>' +
       '<div style="display:flex;flex-wrap:wrap;gap:2px">' +
       boxes +
       '</div>' +
@@ -628,39 +714,63 @@
     );
   }
 
-  
   function bindExtraChartHover(wrap) {
     var svg = wrap.querySelector('svg.chart-hover') || wrap.querySelector('svg');
     if (!svg) return;
+    // Prefer global dashboard tip if present
+    var globalTip = document.querySelector('#chartTip');
     var tip = wrap.querySelector('.usde-extra-tip');
     if (!tip) {
       tip = document.createElement('div');
       tip.className = 'usde-extra-tip';
-      tip.style.cssText = 'position:absolute;pointer-events:none;z-index:8;opacity:0;padding:6px 10px;border-radius:8px;background:rgba(16,24,39,0.96);border:1px solid #3a4556;color:#e8eef7;font-size:12px;white-space:nowrap;box-shadow:0 4px 16px #0006';
-      if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
-      wrap.appendChild(tip);
+      tip.style.cssText = 'position:fixed;pointer-events:none;z-index:99999;opacity:0;padding:6px 10px;border-radius:8px;background:rgba(16,24,39,0.96);border:1px solid #3a4556;color:#e8eef7;font-size:12px;white-space:nowrap;box-shadow:0 4px 16px #0006';
+      document.body.appendChild(tip);
     }
     svg.querySelectorAll('circle.hit').forEach(function (c) {
-      try { c.setAttribute('r', '14'); c.style.cursor = 'crosshair'; } catch (e) {}
+      try {
+        c.setAttribute('r', '18');
+        c.style.cursor = 'crosshair';
+        // ensure attributes readable
+        if (!c.getAttribute('data-period') && c.dataset && c.dataset.period) {
+          c.setAttribute('data-period', c.dataset.period);
+        }
+      } catch (e) {}
     });
-    function showFromHit(hit, clientX, clientY) {
-      if (!hit) { tip.style.opacity = '0'; return; }
-      tip.textContent = (hit.getAttribute('data-period') || '') + ' · ' + (hit.getAttribute('data-value') || '');
+    function readHit(hit) {
+      if (!hit) return null;
+      var period = hit.getAttribute('data-period') || (hit.dataset && hit.dataset.period) || '';
+      var value = hit.getAttribute('data-value') || (hit.dataset && hit.dataset.value) || '';
+      if (!period && !value) return null;
+      return period + (value ? ' · ' + value : '');
+    }
+    function showText(text, clientX, clientY) {
+      if (!text) {
+        tip.style.opacity = '0';
+        if (globalTip) globalTip.classList.remove('show');
+        return;
+      }
+      tip.textContent = text;
       tip.style.opacity = '1';
-      var rect = wrap.getBoundingClientRect();
-      var left = clientX - rect.left + 12;
-      var top = clientY - rect.top + 12;
-      if (left > rect.width - 140) left = clientX - rect.left - 140;
-      if (top > rect.height - 36) top = clientY - rect.top - 36;
-      tip.style.left = left + 'px';
-      tip.style.top = top + 'px';
+      tip.style.display = 'block';
+      tip.style.left = (clientX + 14) + 'px';
+      tip.style.top = (clientY + 14) + 'px';
+      if (globalTip) {
+        globalTip.textContent = text;
+        globalTip.style.left = (clientX + 14) + 'px';
+        globalTip.style.top = (clientY + 14) + 'px';
+        globalTip.classList.add('show');
+      }
     }
     function nearestHit(clientX) {
       var hits = svg.querySelectorAll('circle.hit');
       if (!hits.length) return null;
       var rect = svg.getBoundingClientRect();
+      if (rect.width < 1) return null;
       var x = clientX - rect.left;
-      var vbW = svg.viewBox.baseVal && svg.viewBox.baseVal.width ? svg.viewBox.baseVal.width : rect.width;
+      var vbW = 360;
+      try {
+        if (svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width) vbW = svg.viewBox.baseVal.width;
+      } catch (e) {}
       var scale = rect.width / (vbW || 1);
       var best = null, bestD = 1e9;
       for (var i = 0; i < hits.length; i++) {
@@ -670,22 +780,31 @@
       }
       return best;
     }
+    function onMove(clientX, clientY) {
+      var hit = nearestHit(clientX);
+      showText(readHit(hit), clientX, clientY);
+    }
     svg.style.cursor = 'crosshair';
-    svg.addEventListener('mousemove', function (ev) {
-      var hit = ev.target.closest && ev.target.closest('circle.hit');
-      if (!hit) hit = nearestHit(ev.clientX);
-      showFromHit(hit, ev.clientX, ev.clientY);
+    wrap.style.cursor = 'crosshair';
+    wrap.addEventListener('mousemove', function (ev) {
+      onMove(ev.clientX, ev.clientY);
     });
-    svg.addEventListener('mouseleave', function () { tip.style.opacity = '0'; });
-    svg.addEventListener('touchmove', function (ev) {
+    wrap.addEventListener('mouseleave', function () {
+      tip.style.opacity = '0';
+      if (globalTip) globalTip.classList.remove('show');
+    });
+    wrap.addEventListener('touchmove', function (ev) {
       if (!ev.touches || !ev.touches.length) return;
       var tch = ev.touches[0];
-      showFromHit(nearestHit(tch.clientX), tch.clientX, tch.clientY);
+      onMove(tch.clientX, tch.clientY);
     }, { passive: true });
-    svg.addEventListener('touchend', function () { tip.style.opacity = '0'; });
+    wrap.addEventListener('touchend', function () {
+      tip.style.opacity = '0';
+      if (globalTip) globalTip.classList.remove('show');
+    });
   }
 
-  function bindExtraCharts(root) {
+  function bindExtraCharts(root, focusDate) {
     var panel = root.querySelector('.usde-extra-panel');
     if (!panel) return;
     panel.querySelectorAll('input[data-extra]').forEach(function (cb) {
@@ -697,9 +816,9 @@
         var host = root.querySelector('.usde-extra-panel');
         if (host) {
           var fresh = document.createElement('div');
-          fresh.innerHTML = extraChartsHtml();
+          fresh.innerHTML = extraChartsHtml(focusDate);
           host.replaceWith(fresh.firstChild);
-          bindExtraCharts(root);
+          bindExtraCharts(root, focusDate);
         }
       });
     });
@@ -735,9 +854,10 @@
       timeAxisHtml(pack, i) +
       spreadPanelHtml(cur) +
       extraChartsHtml() +
+      extraChartsHtml(pack.dates[i]) +
       (big ? '<div class="chart-tip-inline" id="chartDlgTip"></div>' : '');
     bindSpreadPanel(root, cur);
-    bindExtraCharts(root);
+    bindExtraCharts(root, focusDate);
 
     var range = root.querySelector('.usde-time-range');
     function goTo(ni) {
