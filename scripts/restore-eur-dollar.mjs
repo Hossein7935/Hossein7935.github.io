@@ -1,32 +1,37 @@
 import fs from 'node:fs';
 import { execSync } from 'node:child_process';
 
-const path = 'eur-dollar.js';
-const GOOD = 'ae437b10c991cc366d75263621ff989632c6bc5e';
-
-function read() {
+// 1) Prefer assembled full fixed file
+if (fs.existsSync('scripts/ed-b64-0.txt') && fs.existsSync('scripts/assemble-eur-dollar.mjs')) {
   try {
-    return fs.readFileSync(path, 'utf8');
+    execSync('node scripts/assemble-eur-dollar.mjs', { stdio: 'inherit' });
+    const t = fs.readFileSync('eur-dollar.js', 'utf8');
+    if (t.includes("openChart('USA', 'usDeCurve'")) {
+      console.log('restore-eur-dollar: assembled fixed file');
+      process.exit(0);
+    }
   } catch (e) {
-    return '';
+    console.warn('assemble failed', e.message);
   }
 }
 
-let t = read();
+const path = 'eur-dollar.js';
+const GOOD = 'ae437b10c991cc366d75263621ff989632c6bc5e';
+let t = '';
+try {
+  t = fs.readFileSync(path, 'utf8');
+} catch (e) {}
 
-if (t.length < 5000 || !t.includes('function renderCurveBlock') || !t.includes('extraChartsHtml')) {
-  console.log('eur-dollar.js broken (len=' + t.length + ') — restore from', GOOD);
+if (t.length < 5000 || !t.includes('function renderCurveBlock')) {
   t = execSync('git show ' + GOOD + ':eur-dollar.js', {
     encoding: 'utf8',
     maxBuffer: 10 * 1024 * 1024
   });
   fs.writeFileSync(path, t);
-  console.log('restored bytes', t.length);
 }
 
 for (const script of [
   'scripts/patch-eur-dollar-spread-ui.mjs',
-  'scripts/patch-extra-hover-fix.mjs',
   'scripts/patch-extra-time-window.mjs',
   'scripts/patch-fix-curve-open.mjs',
   'scripts/patch-curve-enlarge-click.mjs'
@@ -35,17 +40,8 @@ for (const script of [
     try {
       execSync('node ' + script, { stdio: 'inherit' });
     } catch (e) {
-      console.warn('patch failed', script, e.message);
+      console.warn(script, e.message);
     }
   }
 }
-
-t = read();
-console.log(
-  'restore-eur-dollar final',
-  t.length,
-  'enlarge=',
-  t.includes("openChart('USA', 'usDeCurve'"),
-  'window=',
-  t.includes('windowPts')
-);
+console.log('restore-eur-dollar final', fs.statSync(path).size);
