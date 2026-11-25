@@ -1050,49 +1050,54 @@
 
     var root = face.querySelector('.usde-curve-root');
     if (root) {
-      root.addEventListener(
-        'click',
-        function (e) {
-          var tgt = e.target;
-          if (!tgt) return;
-          if (
-            tgt.classList.contains('usde-time-range') ||
-            tgt.closest('.usde-time-axis') ||
+      // Immer Vergrößerung bei Klick auf die Kurve
+      root.onclick = function (e) {
+        var tgt = e.target;
+        if (!tgt) return;
+        if (
+          tgt.classList && tgt.classList.contains('usde-time-range')
+        ) {
+          e.stopPropagation();
+          return;
+        }
+        if (
+          tgt.closest &&
+          (tgt.closest('.usde-time-axis') ||
             tgt.closest('.usde-spread-panel') ||
             tgt.closest('.usde-extra-panel') ||
             tgt.closest('.usde-tenor-btn') ||
             tgt.closest('label.usde-extra-cb') ||
-            tgt.closest('.usde-spread-reset')
-          ) {
-            e.stopPropagation();
-            return;
+            tgt.closest('.usde-spread-reset') ||
+            tgt.closest('input'))
+        ) {
+          e.stopPropagation();
+          return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        try {
+          if (typeof openChart === 'function') {
+            openChart('USA', 'usDeCurve', 'Zinskurve USA vs DE');
+          } else if (typeof window.openChart === 'function') {
+            window.openChart('USA', 'usDeCurve', 'Zinskurve USA vs DE');
+          } else {
+            window.chartCtx = {
+              country: 'USA',
+              key: 'usDeCurve',
+              label: 'Zinskurve USA vs DE',
+              range: '3y'
+            };
+            var title = document.querySelector('#chartTitle');
+            if (title) title.textContent = 'Zinskurve USA vs DE';
+            if (typeof paintChartDlg === 'function') paintChartDlg();
+            var dlg = document.querySelector('#chartDlg');
+            if (dlg && dlg.showModal) dlg.showModal();
           }
-          if (tgt.closest('svg') || tgt === root) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (typeof openChart === 'function') {
-              openChart('USA', 'usDeCurve', 'Zinskurve USA vs DE');
-            } else {
-              try {
-                chartCtx = {
-                  country: 'USA',
-                  key: 'usDeCurve',
-                  label: 'Zinskurve USA vs DE',
-                  range: '3y'
-                };
-                var title = document.querySelector('#chartTitle');
-                if (title) title.textContent = 'Zinskurve USA vs DE';
-                if (typeof paintChartDlg === 'function') paintChartDlg();
-                var dlg = document.querySelector('#chartDlg');
-                if (dlg && dlg.showModal) dlg.showModal();
-              } catch (err) {
-                console.error(err);
-              }
-            }
-          }
-        },
-        true
-      );
+        } catch (err) {
+          console.error('enlarge click', err);
+          alert('Kurve vergrößern fehlgeschlagen: ' + (err && err.message ? err.message : err));
+        }
+      };
       try {
         renderCurveBlock(root, curveState.idx);
       } catch (err) {
