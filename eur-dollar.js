@@ -41,7 +41,10 @@
   }
 
   function series(key) {
-    return (typeof histories !== 'undefined' && histories[key]) || [];
+    if (typeof histories !== 'undefined' && histories && histories[key]) return histories[key];
+    if (typeof window !== 'undefined' && window.histories && window.histories[key]) return window.histories[key];
+    try { if (typeof data !== 'undefined' && data && data.histories && data.histories[key]) return data.histories[key]; } catch (e) {}
+    return [];
   }
 
   function metaUSA(key) {
