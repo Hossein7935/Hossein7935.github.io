@@ -1,5 +1,5 @@
 {
- "checkedAt": "2026-11-26T10:32:40.035Z",
+ "checkedAt": "2026-11-26T19:33:58.848Z",
  "today": "2026-11-26",
  "summary": {
   "info": 13,
@@ -19,8 +19,8 @@
   {
    "page": "USA · Seite 1",
    "label": "Leitzins (Fed-Zielspanne)",
-   "pageDate": "2026-11-25",
-   "srcDate": "2026-11-25",
+   "pageDate": "2026-11-26",
+   "srcDate": "2026-11-26",
    "source": "FRED DFEDTARU",
    "status": "ok",
    "note": ""
@@ -455,7 +455,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:DE02Y",
    "status": "ok",
-   "note": "Seite 3.064 · TradingView 3.064"
+   "note": "Seite 3.096 · TradingView 3.096"
   },
   {
    "page": "DEU",
@@ -464,12 +464,12 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:DE10Y",
    "status": "ok",
-   "note": "Seite 3.253 · TradingView 3.251"
+   "note": "Seite 3.257 · TradingView 3.257"
   },
   {
    "page": "DEU",
    "label": "Leitzins",
-   "pageDate": "2026-11-25",
+   "pageDate": "2026-11-26",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
@@ -491,7 +491,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:FR02Y",
    "status": "ok",
-   "note": "Seite 3.565 · TradingView 3.564"
+   "note": "Seite 3.566 · TradingView 3.565"
   },
   {
    "page": "FRA",
@@ -500,12 +500,12 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:FR10Y",
    "status": "ok",
-   "note": "Seite 4.748 · TradingView 4.746"
+   "note": "Seite 4.724 · TradingView 4.723"
   },
   {
    "page": "FRA",
    "label": "Leitzins",
-   "pageDate": "2026-11-25",
+   "pageDate": "2026-11-26",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
@@ -527,7 +527,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:JP02Y",
    "status": "ok",
-   "note": "Seite 1.751 · TradingView 1.751"
+   "note": "Seite 1.745 · TradingView 1.745"
   },
   {
    "page": "JPN",
@@ -536,7 +536,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:JP10Y",
    "status": "ok",
-   "note": "Seite 2.643 · TradingView 2.643"
+   "note": "Seite 2.638 · TradingView 2.638"
   },
   {
    "page": "JPN",
@@ -599,7 +599,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.681 · TradingView 4.681"
+   "note": "Seite 4.678 · TradingView 4.678"
   },
   {
    "page": "AUS",
@@ -608,7 +608,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.818 · TradingView 4.814"
+   "note": "Seite 4.805 · TradingView 4.805"
   },
   {
    "page": "AUS",
