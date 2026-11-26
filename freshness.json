@@ -1,10 +1,10 @@
 {
- "checkedAt": "2026-11-26T02:10:06.472Z",
+ "checkedAt": "2026-11-26T10:07:39.181Z",
  "today": "2026-11-26",
  "summary": {
   "info": 13,
-  "ok": 50,
-  "alt": 6
+  "ok": 51,
+  "alt": 5
  },
  "items": [
   {
@@ -433,8 +433,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "SKSI",
-   "pageDate": "2026-11-13",
-   "srcDate": "2026-11-13",
+   "pageDate": "2026-11-20",
+   "srcDate": "2026-11-20",
    "source": "Repository sksi-credit-stress-index",
    "status": "ok",
    "note": ""
@@ -442,10 +442,10 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "SKSI vs. neuester NFCI",
-   "pageDate": "2026-11-13",
+   "pageDate": "2026-11-20",
    "srcDate": "2026-11-20",
    "source": "FRED NFCI (Rechenbasis des SKSI)",
-   "status": "alt",
+   "status": "ok",
    "note": ""
   },
   {
@@ -455,7 +455,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:DE02Y",
    "status": "ok",
-   "note": "Seite 3.061 · TradingView 3.061"
+   "note": "Seite 3.068 · TradingView 3.066"
   },
   {
    "page": "DEU",
@@ -464,7 +464,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:DE10Y",
    "status": "ok",
-   "note": "Seite 3.221 · TradingView 3.221"
+   "note": "Seite 3.255 · TradingView 3.254"
   },
   {
    "page": "DEU",
@@ -491,7 +491,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:FR02Y",
    "status": "ok",
-   "note": "Seite 3.541 · TradingView 3.541"
+   "note": "Seite 3.568 · TradingView 3.566"
   },
   {
    "page": "FRA",
@@ -500,7 +500,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:FR10Y",
    "status": "ok",
-   "note": "Seite 4.731 · TradingView 4.731"
+   "note": "Seite 4.754 · TradingView 4.754"
   },
   {
    "page": "FRA",
@@ -527,7 +527,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:JP02Y",
    "status": "ok",
-   "note": "Seite 1.744 · TradingView 1.744"
+   "note": "Seite 1.751 · TradingView 1.751"
   },
   {
    "page": "JPN",
@@ -536,12 +536,12 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:JP10Y",
    "status": "ok",
-   "note": "Seite 2.663 · TradingView 2.663"
+   "note": "Seite 2.640 · TradingView 2.640"
   },
   {
    "page": "JPN",
    "label": "Leitzins",
-   "pageDate": "2026-11-17",
+   "pageDate": "2026-11-24",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
@@ -563,7 +563,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:CN02Y",
    "status": "ok",
-   "note": "Seite 1.220 · TradingView 1.220"
+   "note": "Seite 1.270 · TradingView 1.270"
   },
   {
    "page": "CHN",
@@ -572,12 +572,12 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:CN10Y",
    "status": "ok",
-   "note": "Seite 1.600 · TradingView 1.601"
+   "note": "Seite 1.600 · TradingView 1.600"
   },
   {
    "page": "CHN",
    "label": "Leitzins",
-   "pageDate": "2026-11-17",
+   "pageDate": "2026-11-19",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
@@ -599,7 +599,7 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
-   "note": "Seite 4.698 · TradingView 4.698"
+   "note": "Seite 4.681 · TradingView 4.681"
   },
   {
    "page": "AUS",
@@ -608,12 +608,12 @@
    "srcDate": "2026-11-26",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.813 · TradingView 4.813"
+   "note": "Seite 4.817 · TradingView 4.818"
   },
   {
    "page": "AUS",
    "label": "Leitzins",
-   "pageDate": "2026-11-12",
+   "pageDate": "2026-11-19",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
