@@ -1,5 +1,5 @@
 {
- "checkedAt": "2026-11-27T11:42:23.110Z",
+ "checkedAt": "2026-11-27T20:01:02.676Z",
  "today": "2026-11-27",
  "summary": {
   "info": 13,
@@ -19,8 +19,8 @@
   {
    "page": "USA · Seite 1",
    "label": "Leitzins (Fed-Zielspanne)",
-   "pageDate": "2026-11-26",
-   "srcDate": "2026-11-26",
+   "pageDate": "2026-11-27",
+   "srcDate": "2026-11-27",
    "source": "FRED DFEDTARU",
    "status": "ok",
    "note": ""
@@ -32,7 +32,7 @@
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:US02Y",
    "status": "ok",
-   "note": "Seite 4.679 · TradingView 4.679"
+   "note": "Seite 4.710 · TradingView 4.710"
   },
   {
    "page": "USA · Seite 1",
@@ -41,7 +41,7 @@
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:US10Y",
    "status": "ok",
-   "note": "Seite 4.902 · TradingView 4.904"
+   "note": "Seite 4.936 · TradingView 4.936"
   },
   {
    "page": "USA · Seite 1",
@@ -56,7 +56,7 @@
    "page": "USA · Seite 1",
    "label": "TIPS Realzins 5 Jahre",
    "pageDate": "2026-11-24",
-   "srcDate": "2026-11-25",
+   "srcDate": "2026-11-27",
    "source": "U.S. Treasury Real Yield",
    "status": "alt",
    "note": ""
@@ -65,7 +65,7 @@
    "page": "USA · Seite 1",
    "label": "TIPS Realzins 10 Jahre",
    "pageDate": "2026-11-24",
-   "srcDate": "2026-11-25",
+   "srcDate": "2026-11-27",
    "source": "U.S. Treasury Real Yield",
    "status": "alt",
    "note": ""
@@ -127,8 +127,8 @@
   {
    "page": "USA · Seite 2",
    "label": "BofA CCC High Yield",
-   "pageDate": "2026-11-24",
-   "srcDate": "2026-11-24",
+   "pageDate": "2026-11-26",
+   "srcDate": "2026-11-26",
    "source": "FRED BAMLH0A3HYCEY",
    "status": "ok",
    "note": ""
@@ -154,8 +154,8 @@
   {
    "page": "USA · Seite 3",
    "label": "EFFR",
-   "pageDate": "2026-11-24",
-   "srcDate": "2026-11-24",
+   "pageDate": "2026-11-25",
+   "srcDate": "2026-11-25",
    "source": "NY Fed",
    "status": "ok",
    "note": ""
@@ -163,8 +163,8 @@
   {
    "page": "USA · Seite 3",
    "label": "SOFR",
-   "pageDate": "2026-11-24",
-   "srcDate": "2026-11-24",
+   "pageDate": "2026-11-25",
+   "srcDate": "2026-11-25",
    "source": "NY Fed",
    "status": "ok",
    "note": ""
@@ -200,7 +200,7 @@
    "page": "USA · Seite 4",
    "label": "Zinsstruktur TIPS 10Y",
    "pageDate": "2026-11-24",
-   "srcDate": "2026-11-25",
+   "srcDate": "2026-11-27",
    "source": "U.S. Treasury Real Yield",
    "status": "alt",
    "note": ""
@@ -217,8 +217,8 @@
   {
    "page": "USA · Seite 4",
    "label": "SOFR 30-Tage-Ø",
-   "pageDate": "2026-11-25",
-   "srcDate": "2026-11-25",
+   "pageDate": "2026-11-27",
+   "srcDate": "2026-11-27",
    "source": "NY Fed SOFRAI",
    "status": "ok",
    "note": ""
@@ -235,8 +235,8 @@
   {
    "page": "USA · Seite 5",
    "label": "Fed Funds Volumen",
-   "pageDate": "2026-11-24",
-   "srcDate": "2026-11-24",
+   "pageDate": "2026-11-25",
+   "srcDate": "2026-11-25",
    "source": "NY Fed",
    "status": "ok",
    "note": ""
@@ -253,8 +253,8 @@
   {
    "page": "USA · Seite 6",
    "label": "MOVE Index",
-   "pageDate": "2026-11-25",
-   "srcDate": "2026-11-25",
+   "pageDate": "2026-11-27",
+   "srcDate": "2026-11-27",
    "source": "Yahoo ^MOVE",
    "status": "ok",
    "note": ""
@@ -271,8 +271,8 @@
   {
    "page": "USA · Seite 7",
    "label": "TIPS 5Y / 10Y",
-   "pageDate": "2026-11-25",
-   "srcDate": "2026-11-25",
+   "pageDate": "2026-11-27",
+   "srcDate": "2026-11-27",
    "source": "U.S. Treasury Real Yield",
    "status": "ok",
    "note": ""
@@ -289,8 +289,8 @@
   {
    "page": "USA · Repo-Markt",
    "label": "Repo TRI Volumen / Satz",
-   "pageDate": "2026-11-23",
-   "srcDate": "2026-11-23",
+   "pageDate": "2026-11-24",
+   "srcDate": "2026-11-24",
    "source": "OFR",
    "status": "ok",
    "note": ""
@@ -298,8 +298,8 @@
   {
    "page": "USA · Repo-Markt",
    "label": "Repo DVP Volumen / Satz",
-   "pageDate": "2026-11-24",
-   "srcDate": "2026-11-24",
+   "pageDate": "2026-11-25",
+   "srcDate": "2026-11-25",
    "source": "OFR",
    "status": "ok",
    "note": ""
@@ -397,8 +397,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "High-Yield-OAS",
-   "pageDate": "2026-11-24",
-   "srcDate": "2026-11-24",
+   "pageDate": "2026-11-26",
+   "srcDate": "2026-11-26",
    "source": "FRED BAMLH0A0HYM2",
    "status": "ok",
    "note": ""
@@ -406,8 +406,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "Investment-Grade-OAS",
-   "pageDate": "2026-11-24",
-   "srcDate": "2026-11-24",
+   "pageDate": "2026-11-26",
+   "srcDate": "2026-11-26",
    "source": "FRED BAMLC0A0CM",
    "status": "ok",
    "note": ""
@@ -455,7 +455,7 @@
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:DE02Y",
    "status": "ok",
-   "note": "Seite 3.083 · TradingView 3.082"
+   "note": "Seite 3.085 · TradingView 3.085"
   },
   {
    "page": "DEU",
@@ -464,7 +464,7 @@
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:DE10Y",
    "status": "ok",
-   "note": "Seite 3.273 · TradingView 3.274"
+   "note": "Seite 3.272 · TradingView 3.272"
   },
   {
    "page": "DEU",
@@ -491,7 +491,7 @@
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:FR02Y",
    "status": "ok",
-   "note": "Seite 3.518 · TradingView 3.518"
+   "note": "Seite 3.505 · TradingView 3.506"
   },
   {
    "page": "FRA",
@@ -500,7 +500,7 @@
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:FR10Y",
    "status": "ok",
-   "note": "Seite 4.706 · TradingView 4.706"
+   "note": "Seite 4.707 · TradingView 4.707"
   },
   {
    "page": "FRA",
@@ -527,7 +527,7 @@
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:JP02Y",
    "status": "ok",
-   "note": "Seite 1.764 · TradingView 1.764"
+   "note": "Seite 1.758 · TradingView 1.758"
   },
   {
    "page": "JPN",
@@ -536,7 +536,7 @@
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:JP10Y",
    "status": "ok",
-   "note": "Seite 2.642 · TradingView 2.642"
+   "note": "Seite 2.637 · TradingView 2.637"
   },
   {
    "page": "JPN",
@@ -608,7 +608,7 @@
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
-   "note": "Seite 4.838 · TradingView 4.838"
+   "note": "Seite 4.851 · TradingView 4.851"
   },
   {
    "page": "AUS",
