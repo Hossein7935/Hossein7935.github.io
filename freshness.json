@@ -1,10 +1,10 @@
 {
- "checkedAt": "2026-11-27T20:25:57.675Z",
- "today": "2026-11-27",
+ "checkedAt": "2026-11-28T02:35:17.262Z",
+ "today": "2026-11-28",
  "summary": {
   "info": 13,
-  "ok": 51,
-  "alt": 5
+  "ok": 52,
+  "alt": 4
  },
  "items": [
   {
@@ -28,7 +28,7 @@
   {
    "page": "USA · Seite 1",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:US02Y",
    "status": "ok",
@@ -37,7 +37,7 @@
   {
    "page": "USA · Seite 1",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:US10Y",
    "status": "ok",
@@ -46,16 +46,16 @@
   {
    "page": "USA · Seite 1",
    "label": "Zinskurve 10Y − 2Y",
-   "pageDate": "2026-11-25",
+   "pageDate": "2026-11-27",
    "srcDate": "2026-11-27",
    "source": "Treasury + TradingView",
-   "status": "alt",
+   "status": "ok",
    "note": "laufend (TradingView)"
   },
   {
    "page": "USA · Seite 1",
    "label": "TIPS Realzins 5 Jahre",
-   "pageDate": "2026-11-24",
+   "pageDate": "2026-11-25",
    "srcDate": "2026-11-27",
    "source": "U.S. Treasury Real Yield",
    "status": "alt",
@@ -64,7 +64,7 @@
   {
    "page": "USA · Seite 1",
    "label": "TIPS Realzins 10 Jahre",
-   "pageDate": "2026-11-24",
+   "pageDate": "2026-11-25",
    "srcDate": "2026-11-27",
    "source": "U.S. Treasury Real Yield",
    "status": "alt",
@@ -73,8 +73,8 @@
   {
    "page": "USA · Seite 1",
    "label": "Bankreserven / BIP",
-   "pageDate": "2026-11-18",
-   "srcDate": "2026-11-18",
+   "pageDate": "2026-11-25",
+   "srcDate": "2026-11-25",
    "source": "FRED WRESBAL",
    "status": "ok",
    "note": ""
@@ -118,8 +118,8 @@
   {
    "page": "USA · Seite 2",
    "label": "Bankreserven WRESBAL",
-   "pageDate": "2026-11-18",
-   "srcDate": "2026-11-18",
+   "pageDate": "2026-11-25",
+   "srcDate": "2026-11-25",
    "source": "FRED WRESBAL",
    "status": "ok",
    "note": ""
@@ -172,8 +172,8 @@
   {
    "page": "USA · Seite 3",
    "label": "IORB",
-   "pageDate": "2026-11-27",
-   "srcDate": "2026-11-27",
+   "pageDate": "2026-11-30",
+   "srcDate": "2026-11-30",
    "source": "FRED IORB",
    "status": "ok",
    "note": ""
@@ -181,7 +181,7 @@
   {
    "page": "USA · Seite 3",
    "label": "US 2Y (Dual-Chart)",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "Treasury + TradingView",
    "status": "ok",
@@ -190,7 +190,7 @@
   {
    "page": "USA · Seite 4",
    "label": "Zinsstruktur nominal",
-   "pageDate": "2026-11-24",
+   "pageDate": "2026-11-25",
    "srcDate": "2026-11-27",
    "source": "Treasury + TradingView",
    "status": "alt",
@@ -199,7 +199,7 @@
   {
    "page": "USA · Seite 4",
    "label": "Zinsstruktur TIPS 10Y",
-   "pageDate": "2026-11-24",
+   "pageDate": "2026-11-25",
    "srcDate": "2026-11-27",
    "source": "U.S. Treasury Real Yield",
    "status": "alt",
@@ -208,7 +208,7 @@
   {
    "page": "USA · Seite 4",
    "label": "SOFR-Futures",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "Yahoo SR3=F",
    "status": "ok",
@@ -244,7 +244,7 @@
   {
    "page": "USA · Seite 6",
    "label": "US 1Y",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "Treasury + TradingView",
    "status": "ok",
@@ -262,7 +262,7 @@
   {
    "page": "USA · Seite 7",
    "label": "US 3M … 30Y",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "Treasury + TradingView",
    "status": "ok",
@@ -379,8 +379,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "Bankkredite (H.8)",
-   "pageDate": "2026-11-11",
-   "srcDate": "2026-11-11",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
    "source": "FRED TOTBKCR",
    "status": "ok",
    "note": ""
@@ -388,8 +388,8 @@
   {
    "page": "USA · Credit Vergabe",
    "label": "Unternehmenskredite (H.8)",
-   "pageDate": "2026-11-11",
-   "srcDate": "2026-11-11",
+   "pageDate": "2026-11-18",
+   "srcDate": "2026-11-18",
    "source": "FRED TOTCI",
    "status": "ok",
    "note": ""
@@ -451,7 +451,7 @@
   {
    "page": "DEU",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:DE02Y",
    "status": "ok",
@@ -460,16 +460,16 @@
   {
    "page": "DEU",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:DE10Y",
    "status": "ok",
-   "note": "Seite 3.271 · TradingView 3.271"
+   "note": "Seite 3.273 · TradingView 3.273"
   },
   {
    "page": "DEU",
    "label": "Leitzins",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
@@ -487,16 +487,16 @@
   {
    "page": "FRA",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:FR02Y",
    "status": "ok",
-   "note": "Seite 3.505 · TradingView 3.506"
+   "note": "Seite 3.508 · TradingView 3.508"
   },
   {
    "page": "FRA",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:FR10Y",
    "status": "ok",
@@ -505,7 +505,7 @@
   {
    "page": "FRA",
    "label": "Leitzins",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "—",
    "source": "BIS / EZB (Änderungen nur bei Notenbanksitzungen)",
    "status": "info",
@@ -523,7 +523,7 @@
   {
    "page": "JPN",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:JP02Y",
    "status": "ok",
@@ -532,7 +532,7 @@
   {
    "page": "JPN",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:JP10Y",
    "status": "ok",
@@ -559,7 +559,7 @@
   {
    "page": "CHN",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:CN02Y",
    "status": "ok",
@@ -568,7 +568,7 @@
   {
    "page": "CHN",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:CN10Y",
    "status": "ok",
@@ -595,7 +595,7 @@
   {
    "page": "AUS",
    "label": "Staatsanleihen 2 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:AU02Y",
    "status": "ok",
@@ -604,7 +604,7 @@
   {
    "page": "AUS",
    "label": "Staatsanleihen 10 Jahre",
-   "pageDate": "2026-11-27",
+   "pageDate": "2026-11-28",
    "srcDate": "2026-11-27",
    "source": "TradingView TVC:AU10Y",
    "status": "ok",
